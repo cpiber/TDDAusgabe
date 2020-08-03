@@ -1,0 +1,22 @@
+{
+  "name": "tddausgabe",
+  "version": "1.0.0",
+  "description": "Ausgabeprogramm für Tischlein Deck Dich",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cpiber/TDDAusgabe.git"
+  },
+  "author": "cpiber",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cpiber/TDDAusgabe/issues"
+  },
+  "homepage": "https://github.com/cpiber/TDDAusgabe#readme"
+}
