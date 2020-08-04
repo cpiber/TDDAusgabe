@@ -1,12 +1,16 @@
 <?php
 
-
-require "api/backup_db.php";
-require "api/reset_fam.php";
 require "api/get_orte.php";
 require "api/ort_update.php";
 require "api/ort_insert.php";
 require "api/ort_delete.php";
+
+require "api/get_settings.php";
+require "api/setting_update.php";
+
+require "api/action_backupdb.php";
+require "api/action_resetfam.php";
+require "api/action_deldate.php";
 
 if ( array_key_exists( 'api', $_GET ) ) {
   header( "Content-Type: application/json; charset=UTF-8" );
@@ -26,12 +30,21 @@ if ( array_key_exists( 'api', $_GET ) ) {
       api_deleteort($msg);
       break;
 
-    case "backup_db":
-      api_backupdb($msg);
+    case "setting":
+      api_getsettings($msg);
+      break;
+    case "setting/update":
+      api_updatesetting($msg);
       break;
 
-    case "reset_fam":
+    case "action/backupDB":
+      api_backupdb($msg);
+      break;
+    case "action/resetFam":
       api_resetfam($msg);
+      break;
+    case "action/delDate":
+      api_deldate($msg);
       break;
       
     default:

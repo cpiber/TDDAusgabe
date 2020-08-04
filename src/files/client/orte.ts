@@ -5,10 +5,10 @@ export interface OrtList extends Array<any> {
   loading ?: boolean;
 }
 
-export default function generate(orte: OrtList, ausgabe_sh: JQuery) {
+export default function generate(orte: OrtList, $header: JQuery) {
   let ort_cur = -1;
-  const $ort = ausgabe_sh.eq(0);
-  const $grp = ausgabe_sh.eq(1);
+  const $ort = $header.eq(0);
+  const $grp = $header.eq(1);
 
   function loadOrte() {
     if (orte.loading) {

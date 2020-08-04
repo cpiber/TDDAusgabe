@@ -180,7 +180,7 @@ div .select-list .expanded .expand {
   display: none;
 }
 
-ul#orte {
+#orte ul {
   height: auto;
   max-height: 450px;
 }

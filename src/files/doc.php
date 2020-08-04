@@ -172,44 +172,58 @@
       <div id="tab5">
         <h1>Einstellungen</h1>
         <div>
-          <div class="cols3">
+          <div class="cols3" id="orte">
             <h2>Orte</h2>
             <div class="select-list w100pm400px">
-              <ul id="orte" style="max-height:180px"></ul>
+              <ul style="max-height:180px"></ul>
             </div>
           </div>
           <div class="cols3" id="actions">
             <h2>Aktionen</h2>
-            <p><button id="del8w" class="w100pm400px" onclick="delFamDate()"
-                title="Löscht alle Familien, die seit 8 Wochen nicht mehr anwesend waren.">8 Wochen nicht anwesend
-                löschen</button><br /><button id="del8wab" class="w100pm400px" onclick="delFamDate(-1,'Karte')"
-                title="Löscht alle Familien, deren Karte seit 8 Wochen abgelaufen ist.">Karte 8 Wochen abgelaufen
-                löschen</button></p>
-            <p><button id="resetnum" class="w100pm400px" onclick="post('?reset_fam',{},resetComplete)"
-                title="Setzt alle Nummern der Familien zurück, d.h. alle Familien werden neu durchnummeriert.">Nummern
-                zurücksetzen</button></p>
-            <!--<p><button id="backup" class="w100pm400px" onclick="post('?backup_db',{},backupComplete)"
-                title="Backup aller Daten (Einstellungen, Familien, ...) als Datenbank erstellen">Datenbank
-                Backup</button></p>-->
-            <p><button id="createBackup" class="w100pm400px" onclick="window.open('?create_backup')"
-                title="Backup aller Daten (Einstellungen, Familien, ...) herunterladen">Backup
-                herunterladen</button><br /><button id="loadBackup" class="w100pm400px"
-                onclick="window.open('?load_backup')"
-                title="Backup aller Daten (Einstellungen, Familien, ...) laden">Backup laden</button></p>
+            <p>
+              <button class="w100pm400px" title="Löscht alle Familien, die seit 8 Wochen nicht mehr anwesend waren.">
+                8 Wochen nicht anwesend löschen
+              </button><br />
+              <button class="w100pm400px" title="Löscht alle Familien, deren Karte seit 8 Wochen abgelaufen ist.">
+                Karte 8 Wochen abgelaufen löschen
+              </button>
+            </p>
+            <p>
+              <button class="w100pm400px" title="Setzt alle Nummern der Familien zurück, d.h. alle Familien werden neu durchnummeriert.">
+                Nummern zurücksetzen
+              </button>
+            </p>
+            <!--<p>
+              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) als Datenbank erstellen">
+                Datenbank Backup
+              </button>
+            </p>-->
+            <p>
+              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) herunterladen">
+                Backup herunterladen
+              </button><br />
+              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) laden">
+                Backup laden
+              </button>
+            </p>
           </div>
           <div class="cols3" id="settings">
             <h2>Allgemein</h2>
-            <p class="heading" style="display: inline;">Preis Formel:
-              <span class="help" title="e ... Anzahl Erwachsene, k ... Anzahl Kinder&#xA;&#013;z.B.: e + k * 0.5&#xA;&#013;oder: (e > 0) * 2 + (k > 0)">(?)</span>
-            </p><br />
-            <input id="preisf" class="w100pm400px" type="text" data-name="Preis" placeholder="Preisformel" />
-            <p></p>
-            <p class="heading" style="display: inline;">Karten-Designs:
-              <span class="help" >(?)</span>
-            </p><br />
-            <textarea id="kartend" class="w100pm400px" data-name="Kartendesigns" style="height: 120px;"></textarea>
-            <p><br /></p>
-            <button id="sett-save" class="w100pm400px" title="Felder speichern bei ENTER automatisch">Alle Speichern</button>
+            <p>
+              <label class="heading" style="display: inline;">Preis Formel:
+                <span class="help" title="e ... Anzahl Erwachsene, k ... Anzahl Kinder&#xA;&#013;z.B.: e + k * 0.5&#xA;&#013;oder: (e > 0) * 2 + (k > 0)">(?)</span>
+                <input class="w100pm400px" type="text" data-name="Preis" placeholder="Preisformel" />
+              </label>
+            </p>
+            <p>
+              <label class="heading" style="display: inline;">Karten-Designs:
+                <span class="help">(?)</span>
+                <textarea class="w100pm400px" data-name="Kartendesigns" style="height: 120px;"></textarea>
+              </label>
+            </p>
+            <p>
+              <button class="w100pm400px" title="Felder speichern automatisch">Alle Speichern</button>
+            </p>
           </div>
         </div>
       </div>

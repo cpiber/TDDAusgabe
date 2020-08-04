@@ -4,10 +4,10 @@ import { alert } from './helpers';
 type p = JQuery.PromiseBase<void, never, never, never, never, never, never, never, never, never, never, never>;
 
 function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
-  const $opt = $('#tab5 #orte');
+  const $opt = $('#orte ul');
   const $l = $('<span>').text('Loading...').hide().insertBefore($opt);
 
-  const text = (name, gruppen) => {
+  const text = (name: string, gruppen: number) => {
     return `${name}, ${gruppen} Gruppen`;
   }
 
@@ -29,7 +29,7 @@ function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
       let grp = +$inp.eq(1).val();
       if (isNaN(grp) || grp < 0) grp = 0;
 
-      let req;
+      let req: JQuery.PromiseBase<boolean, never, never, never, never, never, never, never, never, never, never, never>;
       if (id > 0) {
         req = $.post('?api=ort/update', {
           ID: id,
@@ -80,10 +80,10 @@ function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
       }
 
       // update element
-      req.then((success) => {
+      req.then((success: boolean) => {
         if (!success) return;
         $this.empty().data('name', name).data('gruppen', grp)
-          .text(text(name, grp)).data('open', false);
+          .text(text(name as string, grp)).data('open', false);
       });
       return;
     }

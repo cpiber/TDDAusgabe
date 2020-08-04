@@ -34,9 +34,14 @@ function numPad(num: number, size: number) {
 
 
 // format date string
-function formatDate(date: string) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
+function formatDate(date: number|Date) {
+  let d: Date;
+  if (date instanceof Date) {
+    d = date;
+  } else {
+    d = new Date(date);
+  }
+  let month = '' + (d.getMonth() + 1),
     day = '' + d.getDate(),
     year = d.getFullYear();
 
@@ -58,7 +63,7 @@ function highlightElement(el: JQuery<HTMLElement>) {
 
 // alert using modal
 let modal: JQuery<HTMLElement> = null;
-function alert(text: string, title = "Meldung:", footer = "") {
+function alert(text: string, title = "", footer = "") {
   var m = modal;
   var h = m.find('.modal-head');
   var f = m.find('.modal-foot');

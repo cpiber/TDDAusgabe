@@ -2,7 +2,10 @@ import jQuery from 'jquery';
 // import 'JsBarcode';
 import { ausgabeFam, verwaltungFam } from './client/familie';
 import ortGenerate, { OrtList } from './client/orte';
-import { optionsOrteUpdate } from './client/options';
+import { delFamDate, resetFam } from './client/actions';
+import insertHelpHeadings from './client/help';
+import settings, { loadSettings } from './client/settings';
+import { optionsOrteUpdate } from './client/orte_settings';
 import { tabH, alert } from './client/helpers';
 import { karte_designs_help, preis_help } from './client/texts';
 
@@ -21,6 +24,8 @@ if ( DEBUG ) {
   window.verwaltungFam = verwaltungFam;
   // @ts-ignore
   window.alert = alert;
+  // @ts-ignore
+  window.settings = settings;
 }
 
 
@@ -34,30 +39,30 @@ export interface TabElement extends HTMLAnchorElement {
 // load window
 jQuery(($) => {
   // init tabs
-  const tabHs = $('#tab-head li');
-  let current_tab: JQuery<TabElement>;
+  const $tabHs = $('#tab-head li');
+  let $current_tab: JQuery<TabElement>;
   const orte: OrtList = [];
   orte.loading = false;
   
-  const tabLinks = tabHs.find('a') as JQuery<TabElement>
+  const tabLinks = $tabHs.find('a') as JQuery<TabElement>
   tabLinks.each((_, element) => {
     element.onClose = () => { };
     element.onOpen = () => { };
   });
 
   const changeTab = (link: JQuery<TabElement>) => {
-    if (current_tab) {
+    if ($current_tab) {
       // close tab and hide
-      current_tab.get(0).onClose();
-      $(current_tab.attr('href')).css('display', 'none');
-      current_tab.removeClass('selected');
+      $current_tab.get(0).onClose();
+      $($current_tab.attr('href')).css('display', 'none');
+      $current_tab.removeClass('selected');
     }
 
     // open tab and show
     $(link.attr('href')).css('display', 'block')
     link.addClass('selected');
     link.get(0).onOpen();
-    current_tab = link;
+    $current_tab = link;
 
     // if (c.getAttribute('href') == '#tab2' && typeof (selected_fam) !== "undefined") {
     //   selected_fam.save();
@@ -81,10 +86,10 @@ jQuery(($) => {
   verwaltungFam.clear();
   verwaltungFam.disable();
 
-  const ausgabe_sh = $('#tab2 .search-header select');
+  const $ausgabe_sh = $('#tab2 .search-header select');
 
   // Orte
-  const { loadOrte, ortChange } = ortGenerate(orte, ausgabe_sh);
+  const { loadOrte, ortChange } = ortGenerate(orte, $ausgabe_sh);
   if ( DEBUG ) {
     // @ts-ignore
     window.loadOrte = loadOrte;
@@ -92,16 +97,16 @@ jQuery(($) => {
     window.orte = orte;
   }
 
-  ausgabe_sh.first().on('change', () => ortChange());
+  $ausgabe_sh.first().on('change', () => ortChange());
   tabLinks.get(4).onOpen = optionsOrteUpdate(loadOrte, orte);
 
   // tabs
   if (window.location.hash == "") {
-    changeTab(tabHs.first().find('a') as JQuery<TabElement>);
+    changeTab($tabHs.first().find('a') as JQuery<TabElement>);
   } else {
-    changeTab(tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
+    changeTab($tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
   }
-  tabHs.on('click', 'a', function (e) { changeTab($(this)); });
+  $tabHs.on('click', 'a', function (e) { changeTab($(this)); });
   tabH();
 
   loadOrte();
@@ -111,10 +116,21 @@ jQuery(($) => {
   const $sett_help = $('#tab5 .help');
   $sett_help.eq(0).on('click', () => alert(preis_help, "Hilfe zur Preisformel"));
   $sett_help.eq(1).on('click', () => alert(karte_designs_help, "Hilfe zu Kartendesigns"));
+  const $sett_actions = $('#actions button');
+  $sett_actions.eq(0).on('click', () => delFamDate());
+  $sett_actions.eq(1).on('click', () => delFamDate(-1, 'Karte'));
+  $sett_actions.eq(2).on('click', () => resetFam());
+  $sett_actions.eq(3).on('click', () => window.open('?create_backup'));
+  $sett_actions.eq(4).on('click', () => window.open('?load_backup'));
+
+  loadSettings();
+
+  // Help page
+  insertHelpHeadings();
   
 
   // register handlers
-  jQuery(window).resize(tabH).on('keydown', keyboardHandler);
+  $(window).resize(tabH); //.on('keydown', keyboardHandler);
 
   // keyboard navigation
   function keyboardHandler(event: JQuery.KeyDownEvent) {
@@ -260,75 +276,7 @@ window.onload = function () {
     jQuery(e).on('keypress', function (event) { var code = event.keyCode ? event.keyCode : event.which; if (code == 13) { saveSettings(this); } });
   });
 
-  //Fancy alert
-  var modal = document.getElementById('modal');
-  var span = modal.getElementsByClassName("close")[0];
-
-  span.onclick = function () {
-    modal.style.display = "none";
-    document.body.style.overflow = "";
-  };
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-      document.body.style.overflow = "";
-    }
-  };
-
-  //Help headings
-  var hs = jQuery('#tab6 h2, #tab6 h3, #tab6 h4, #tab6 h5, #tab6 h6');
-  var ul = document.createElement('ul');
-  ul.style.marginTop = '0';
-  ul.style.marginBottom = '2.5em';
-  hs.each(function (i, e) {
-    var m = 0, f = '0.85em';
-    switch (e.tagName) {
-      case "H2":
-        m = "10px";
-        break;
-      case "H3":
-        m = "25px";
-        f = "0.85em";
-        break;
-      case "H4":
-        m = "32px";
-        f = "0.725em";
-        break;
-      case "H5":
-        m = "36px";
-        f = "0.675em";
-        break;
-      case "H6":
-        m = "39px";
-        f = "0.65em";
-        break;
-    }
-    var li = document.createElement('li'),
-      a = document.createElement('a');
-
-    a.href = '#';
-    a.classList.add('link');
-    a.innerHTML = e.innerHTML;
-    a.style.fontSize = f;
-    a.toEl = jQuery(e);
-
-    a.onclick = function () { return false };
-    a.addEventListener('click', function () {
-      scrollEl = this.toEl;
-      jQuery("body").animate({
-        scrollTop: this.toEl.offset().top
-      }, 600, "swing", function () {
-        //Anim done, flash heading
-        scrollEl.fadeTo(100, 0.2).fadeTo(200, 1.0),
-          scrollEl = undefined
-      });
-    });
-
-    li.appendChild(a);
-    li.style.marginLeft = m, li.style.marginRight = m;
-    ul.appendChild(li);
-  });
-  jQuery(ul).insertAfter(jQuery('#tab6 h1').first());
+  
 };
 
 window.onkeydown = function (evt) {
@@ -906,73 +854,6 @@ function logs(data) {
       lgs.append(table);
     }
   }
-}
-
-
-//Settingstab
-function displaySettings() {
-  var f = getSettForm();
-  var s = tdd_settings;
-  for (var i = 0; i < f.length; i++) {
-    var n = f[i].data("name");
-    if (typeof (n) !== "undefined") {
-      if (typeof (f[i].html) == "function") { f[i].html(unescape(s[n])); }
-      if (typeof (f[i].val) == "function") { f[i].val(unescape(s[n])); }
-    }
-  }
-}
-
-
-function saveSettings(element = null) {
-  if (element == null) {
-    var f = getSettForm();
-  } else {
-    var f = [jQuery(element)];
-  }
-  for (var i = 0; i < f.length; i++) {
-    var n = f[i].data("name");
-    var v = "";
-    if (typeof (n) !== "undefined") {
-      if (typeof (f[i].html) == "function") { v = escape(f[i].html()); }
-      if (typeof (f[i].val) == "function") { v = escape(f[i].val()); }
-    }
-    update({ table: "Einstellungen", meta: { key: "Name", value: n }, set: { Val: v } }, savedSett);
-  }
-}
-
-function savedSett(data) {
-  if (data.status == "success") {
-    console.debug(data, 'saved');
-    getSettings();
-  } else { console.debug(data); }
-}
-
-function delFamDate(date = -1, column = 'lAnwesenheit') {
-  if (date == -1) {
-    date = new Date();
-    //8 weeks
-    date.setTime(date.getTime() - 8 * 7 * 24 * 1000 * 3600);
-  }
-  if (typeof (date) == "number") {
-    var n = date;
-    date = new Date();
-    //n days
-    date.setTime(date.getTime() - n * 24 * 1000 * 3600);
-  }
-  if (typeof (date) == "object") {
-    date = formatDate(date);
-  }
-  if (typeof (date) == "string") {
-    remove({ table: 'Familien', meta: [{ key: column, value: date, compare: "<=" }, { key: column, value: "0000-00-00", compare: "<>" }] }, famBulkDel);
-  } else {
-    console.debug(date, "is no string");
-  }
-}
-
-function famBulkDel(data) {
-  if (data.status == "success") {
-    alert(data.rows + " Einträge gelöscht.", "Fertig")
-  } else { console.debug(data); }
 }
 
 
