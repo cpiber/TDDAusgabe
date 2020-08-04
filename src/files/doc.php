@@ -3,6 +3,7 @@
 
 <head>
   <title>Tischlein Deck Dich</title>
+  <meta charset="UTF-8">
   <link href="?file=favicon" rel="icon" type="image/x-icon" />
   <link href="?file=css" rel="stylesheet" />
   <script src="?file=js"></script>

@@ -1,17 +1,24 @@
 import jQuery from 'jquery';
 // import 'JsBarcode';
 import { ausgabeFam, verwaltungFam } from './client/familie';
-import generate from './client/orte';
+import ortGenerate, { OrtList } from './client/orte';
+import { tabH } from './client/helpers';
+import { optionsOrteUpdate } from './client/options';
+
+
+const DEBUG = true;
 
 
 
 // debug
-// @ts-ignore
-window.$ = jQuery;
-// @ts-ignore
-window.ausgabeFam = ausgabeFam;
-// @ts-ignore
-window.verwaltungFam = verwaltungFam;
+if ( DEBUG ) {
+  // @ts-ignore
+  window.$ = jQuery;
+  // @ts-ignore
+  window.ausgabeFam = ausgabeFam;
+  // @ts-ignore
+  window.verwaltungFam = verwaltungFam;
+}
 
 
 export interface TabElement extends HTMLAnchorElement {
@@ -26,9 +33,11 @@ jQuery(($) => {
   // init tabs
   const tabHs = $('#tab-head li');
   let current_tab: JQuery<TabElement>;
-  const orte = [];
+  const orte: OrtList = [];
+  orte.loading = false;
   
-  tabHs.find('a').each((_, element: TabElement) => {
+  const tabLinks = tabHs.find('a') as JQuery<TabElement>
+  tabLinks.each((_, element) => {
     element.onClose = () => { };
     element.onOpen = () => { };
   });
@@ -60,13 +69,6 @@ jQuery(($) => {
     // if (h == '#tab4') { var p = jQuery('#log-pagination').val(); getLogs(p); }
     // if (h == '#tab5') { getOrte(); }
   };
-  if (window.location.hash == "") {
-    changeTab(tabHs.first().find('a') as JQuery<TabElement>);
-  } else {
-    changeTab(tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
-  }
-  tabHs.on('click', 'a', function(e) { changeTab($(this)); });
-  tabH();
 
   // load forms and reset
   ausgabeFam.linkHtml();
@@ -82,30 +84,29 @@ jQuery(($) => {
   jQuery(window).resize(tabH).on('keydown', keyboardHandler);
 
   // Orte
-  const { loadOrte, ortChange } = generate(orte, ausgabe_sh);
-  // @ts-ignore
-  window.loadOrte = loadOrte;
-  // @ts-ignore
-  window.orte = orte;
+  const { loadOrte, ortChange } = ortGenerate(orte, ausgabe_sh);
+  if ( DEBUG ) {
+    // @ts-ignore
+    window.loadOrte = loadOrte;
+    // @ts-ignore
+    window.orte = orte;
+  }
 
   ausgabe_sh.first().on('change', () => ortChange());
+  tabLinks.get(4).onOpen = optionsOrteUpdate(loadOrte, orte);
+
+
+  if (window.location.hash == "") {
+    changeTab(tabHs.first().find('a') as JQuery<TabElement>);
+  } else {
+    changeTab(tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
+  }
+  tabHs.on('click', 'a', function (e) { changeTab($(this)); });
+  tabH();
+
   loadOrte();
   ortChange();
-
-
-
-
-  // Minimum-height for tabs
-  function tabH() {
-    var b = document.getElementById('tab-body'),
-      w = window.outerWidth,
-      h = document.getElementById('tab-head').offsetHeight;
-    if (w >= 1160) {
-      b.style.minHeight = h + 'px';
-    } else {
-      b.style.minHeight = '';
-    }
-  }
+  
 
   // keyboard navigation
   function keyboardHandler(event: JQuery.KeyDownEvent) {
@@ -396,72 +397,7 @@ window.onkeydown = function (evt) {
 }
 
 
-//Serverrequests
-function getOrte() {
-  jQuery.post('?post&getOrte', { callback: 'orte' }, postC);
-}
 
-function orte(data) {
-  if (data.status == "success") {
-    var oa = data.query;
-    tdd_orte = oa;
-
-    for (var i = 0; i < oa.length; i++) {
-      tdd_ort[oa[i].Name] = i;
-    }
-
-    var o = document.getElementById('ort-select');
-    while (o.lastChild) {
-      o.removeChild(o.lastChild);
-    }
-    var g = document.getElementById('gruppe-select');
-    while (g.lastChild) {
-      g.removeChild(g.lastChild);
-    }
-
-    for (var i = 0; i < oa.length; i++) {
-      var e = document.createElement('option');
-      e.value = i;
-      var t = document.createTextNode(unescape(oa[i].Name));
-      e.appendChild(t);
-      o.appendChild(e);
-    }
-
-    ortChange();
-    displayOrte();
-    //getFamilien();
-  } else {
-    console.debug('Orte failed: ', data);
-  }
-}
-
-function getFamilien() {
-  get({ table: "Familien" }, fam);
-}
-
-function fam(data) {
-  if (data.status == "success") {
-    var fa = data.query;
-    tdd_familien = fa;
-  } else { console.debug(data); }
-}
-
-function getSettings() {
-  get({ table: "Einstellungen" }, sett);
-}
-
-function sett(data) {
-  if (data.status == "success") {
-    var q = data.query;
-    var s = { query: q };
-    jQuery.each(q, function (i, e) {
-      s[e.Name] = unescape(e.Val);
-    });
-    tdd_settings = s;
-
-    displaySettings();
-  } else { console.debug(data); }
-}
 
 function getSearch(string, callback) {
   var meta = [], byid = false;
@@ -494,47 +430,6 @@ function getSearch(string, callback) {
   post('?post&getSearch', { meta: meta, byid: byid }, callback);
 }
 
-//Handling requests to server
-function get(postparam = {}, callback = "") {
-  post('?post&get', postparam, callback);
-}
-
-function update(postparam = {}, callback = "") {
-  post('?post&update', postparam, callback);
-}
-
-function insert(postparam = {}, callback = "") {
-  post('?post&insert', postparam, callback);
-}
-
-function remove(postparam = {}, callback = "") {
-  post('?post&delete', postparam, callback);
-}
-
-function post(url, postparam = {}, callback = "") {
-  if (typeof (callback) == "string" || typeof (callback) == "object") {
-    postparam.callback = callback;
-  } else if (typeof (callback) == "function") {
-    postparam.callback = callback.name;
-  } else {
-    postparam.callback = "";
-  }
-  jQuery.post(url, postparam, postC);
-}
-
-function postC(data) {
-  if (typeof (data.callback) == 'string') {
-    var fn = window[data.callback];
-  } else if (typeof (data.callback == 'object')) {
-    var fn = window;
-    jQuery.each(data.callback, function (i, e) { fn = fn[e]; });
-  }
-  if (typeof fn === 'function') {
-    fn(data);
-  } else {
-    console.debug(data.callback, 'is no function\n', data);
-  }
-}
 
 
 //Make familien-list + selecting functions
@@ -560,18 +455,6 @@ function famList(first = false) {
 
 }
 
-function selectFam() {
-  if (typeof (selected_fam) !== "undefined") {
-    var cf = selected_fam.index;
-    var ce = jQuery('ul#familie-list li[value=' + cf + ']')[0];
-    if (typeof (ce) !== "undefined") { ce.classList.remove('selected'); }
-    selected_fam.save();
-  }
-  this.classList.add('selected');
-  var new_fam = new familie(tdd_fam_curr[this.value], this.value);
-  selected_fam = new_fam;
-  displayFam();
-}
 
 function displayFam() {
   var f = getFamForm(),
@@ -676,19 +559,6 @@ function insertFam(data, list = "") {
     famList();
 
   } else { console.debug(data); }
-}
-
-
-//Verwaltung-tab
-function verwList() {
-  var l = document.getElementById('verwaltung-list');
-  var lis = l.children;
-  for (var i = 0; i < lis.length; i++) {
-    lis[i].removeEventListener('click', selectFamV);
-    if (lis[i].getAttribute('value') !== null) {
-      lis[i].addEventListener('click', selectFamV);
-    }
-  }
 }
 
 function selectFamV() {
@@ -1044,74 +914,6 @@ function displaySettings() {
   }
 }
 
-function displayOrte() {
-  var o = document.getElementById('orte');
-  //o.style.height = '';
-
-  while (o.lastChild) {
-    o.lastChild.removeEventListener('click', selectOrt);
-    o.removeChild(o.lastChild);
-  }
-
-  var os = tdd_orte;
-  for (var i = 0; i < os.length; i++) {
-    var el = document.createElement('li');
-    el.value = i;
-    var t = document.createTextNode(unescape(os[i].Name));
-    el.appendChild(t);
-
-    var sp = document.createElement('span');
-    sp.classList.add('list-add');
-    var it = document.createTextNode('ID:' + os[i].ID);
-    sp.appendChild(it);
-    el.appendChild(sp);
-
-    var div = document.createElement('div');
-    div.classList.add('expand');
-    var inp = document.createElement('input');
-    inp.type = 'number';
-    inp.value = os[i].Gruppen;
-    inp.placeholder = "Gruppen";
-    div.appendChild(inp);
-    div.appendChild(document.createElement('br'));
-
-    var b = document.createElement('button');
-    b.addEventListener('click', ortSave);
-    var t = document.createTextNode('Speichern');
-    b.appendChild(t);
-    div.appendChild(b);
-
-    var b = document.createElement('a');
-    b.addEventListener('click', ortDel);
-    b.classList.add('link-delete');
-    b.classList.add('ml15px');
-    b.href = '#';
-    var t = document.createTextNode('Löschen');
-    b.appendChild(t);
-    div.appendChild(b);
-
-    el.appendChild(div);
-    el.name = unescape(os[i].Name);
-    o.appendChild(el);
-  }
-
-  var el = document.createElement('li');
-  el.value = -1;
-  el.style.textAlign = 'center';
-  var t = document.createTextNode('+');
-  el.appendChild(t);
-  o.appendChild(el);
-
-  //o.style.height = jQuery(o).outerHeight();
-
-  var lis = o.children;
-  for (var i = 0; i < lis.length; i++) {
-    lis[i].removeEventListener('click', selectOrt);
-    if (lis[i].getAttribute('value') !== null) {
-      lis[i].addEventListener('click', selectOrt);
-    }
-  }
-}
 
 function saveSettings(element = null) {
   if (element == null) {
@@ -1134,79 +936,6 @@ function savedSett(data) {
   if (data.status == "success") {
     console.debug(data, 'saved');
     getSettings();
-  } else { console.debug(data); }
-}
-
-function selectOrt(event) {
-  if (event.target == this && event.target.value == -1) {
-    insert({ table: 'Orte', set: { ID: 'NULL', Name: "" } }, ortInsert);
-    return;
-  }
-  if (event.target == this || event.target.tagName == "DIV") {
-    if (!this.classList.contains('expanded')) {
-      var t = this.firstChild;
-      var inp = document.createElement('input');
-      inp.value = this.name;
-      inp.placeholder = "Name";
-      this.replaceChild(inp, t);
-    } else {
-      var i = this.firstChild;
-      var t = document.createTextNode(this.name);
-      this.replaceChild(t, i);
-    }
-    this.classList.toggle('expanded');
-  }
-}
-
-function ortInsert(data) {
-  if (data.status == "success") {
-    getOrte();
-    displayOrte();
-    changeTab(currentTab);
-  } else { console.debug(data); }
-}
-
-function ortSave() {
-  var li = this.parentNode.parentNode;
-  var i = li.value;
-  var id = tdd_orte[i].ID;
-
-  var set = {};
-  var ins = li.getElementsByTagName('input');
-  set['Name'] = escape(ins[0].value);
-  set['Gruppen'] = ins[1].value;
-
-  console.debug(set, 'saving');
-  update({ table: "Orte", meta: { key: "ID", value: id }, set: set, val: i }, savedOrt);
-}
-
-function savedOrt(data) {
-  if (data.status == "success") {
-    console.debug(data, 'saved');
-    var li = jQuery('ul#orte li[value=' + data.post.val + ']');
-    li.prop('name', unescape(data.post.set.Name));
-    li.children()[2].children[0].value = +data.post.set.Gruppen;
-    li.click();
-  } else { console.debug(data); }
-}
-
-function ortDel(event) {
-  var li = this.parentNode.parentNode;
-  var i = li.value;
-  var id = tdd_orte[i].ID;
-
-  remove({ table: "Orte", meta: { key: "ID", value: id }, val: i }, removedOrt);
-  event.preventDefault();
-}
-
-function removedOrt(data) {
-  if (data.status == "success") {
-    var i = data.post.val;
-    delete tdd_orte[i];
-
-    var li = jQuery('#orte li[value="' + i + '"]');
-    li = li.get(0);
-    li.parentElement.removeChild(li);
   } else { console.debug(data); }
 }
 
@@ -1239,88 +968,7 @@ function famBulkDel(data) {
 }
 
 
-//Eventlisteners dropdown-menus
-function ortChange() {
-  var g = document.getElementById('gruppe-select');
-  while (g.lastChild) {
-    g.removeChild(g.lastChild);
-  }
 
-  var os = document.getElementById('ort-select').selectedOptions[0];
-  if (typeof (os) != "undefined") {
-    var o = tdd_orte[os.value];
-    ort = o.Name;
-
-    for (var i = 1; i <= +o.Gruppen; i++) {
-      var e = document.createElement('option');
-      e.value = i;
-      var t = document.createTextNode('Gruppe ' + i);
-      e.appendChild(t);
-      g.appendChild(e);
-    }
-    var e = document.createElement('option');
-    e.value = "0";
-    var t = document.createTextNode('Neu');
-    e.appendChild(t);
-    g.appendChild(e);
-
-    gruppeChange();
-  }
-}
-
-function gruppeChange() {
-  if (typeof (selected_fam) !== "undefined") {
-    selected_fam.save();
-  }
-  var o = typeof (document.getElementById('ort-select').selectedOptions[0]),
-    g = typeof (document.getElementById('gruppe-select').selectedOptions[0]);
-
-  var f = document.getElementById('familie-list');
-  while (f.lastChild) {
-    f.lastChild.removeEventListener('click', selectFam);
-    f.removeChild(f.lastChild);
-  }
-
-  if (currentTab.getAttribute('href') == '#tab2') {
-    if (o !== "undefined" && g !== "undefined") {
-      gruppe = document.getElementById('gruppe-select').selectedOptions[0].value;
-      if (gruppe == "0") {
-        insertFam({ status: "success" }, tdd_fam_neu);
-        return;
-      }
-
-      get({ table: "familien", meta: [{ key: "Ort", value: ort }, { key: "Gruppe", value: gruppe }], order_by: "Num, ID" }, insertFam);
-    } else {
-      search(searchFamA);
-    }
-  }
-}
-
-function ortChangeV() {
-  var f = getVerwForm();
-
-  var o = f[1].get(0),
-    ort = f[0].val();
-
-  while (o.lastChild) {
-    o.removeChild(o.lastChild);
-  }
-
-  var oa = tdd_orte[ort] && tdd_orte[ort].Gruppen || 0;
-  var g = 1, p = Infinity;
-  for (var i = 1; i <= oa; i++) {
-    var el = document.createElement('option');
-    el.value = i;
-    var t = document.createTextNode('Gruppe ' + i);
-    el.appendChild(t);
-    o.appendChild(el);
-    if (tdd_orte[ort].Personen[i] < p) {
-      g = i;
-      p = tdd_orte[ort].Personen[i];
-    }
-  }
-  o.value = g;
-}
 
 
 //Search for familien and verwaltung tabs
@@ -1451,37 +1099,6 @@ function postFamKarte(familie) {
 }
 
 
-function backupComplete(data) {
-  if (data.status == "success") {
-    var t = "<p><i>Alles problemlos!</i></p><p>Datenbank " + data.db + " enthält alle Daten.</p>";
-    alert(t, "Fertig", "Backup");
-  } else {
-    var t = "<p><i style='color:red'>Fehler sind aufgetreten!</i></p><br><p>" + JSON.stringify(data) + "</p>";
-    alert(t, "FEHLER", "Backup");
-    console.debug(data);
-  }
-}
-
-function resetComplete(data) {
-  if (data.status == "success") {
-    var t = "<p><i>Alles problemlos!</i></p><p>Alle Familien wurden neu durchnummeriert.</p>";
-    alert(t, "Fertig", "Reset Nummern");
-  } else {
-    var t = "<p><i style='color:red'>Fehler sind aufgetreten!</i></p><br><p>" + JSON.stringify(data) + "</p>";
-    alert(t, "FEHLER", "Reset Nummern");
-    console.debug(data);
-  }
-}
-
-
-function saveTimeout() {
-  if (typeof (selected_fam) != "undefined" && keyboard_timeout) {
-    selected_fam.save();
-    fam_timeout = undefined;
-  } else if (typeof (selected_fam) != "undefined" && !keyboard_timeout) {
-    fam_timeout = setTimeout(saveTimeout, 500);
-  }
-}
 
 
 function schuldfieldChange() {
@@ -1500,21 +1117,6 @@ function schuldfieldChange() {
   }
 }
 
-
-//Calculate price
-function preis(erwachsene = 0, kinder = 0) {
-  var s = tdd_settings.Preis;
-  if (typeof (s) == "undefined") { return -1; }
-  s = s.replaceAll('e', +erwachsene);
-  s = s.replaceAll('k', +kinder);
-  s = s.replace(/[^0-9\+\-\*\/\(\)\.><=]/g, '');
-  try {
-    return eval(s);
-  } catch (e) {
-    console.debug(tdd_settings.Preis + ' invalide Preis-Formel (' + e + ')');
-    alert("<p>Fehler in der Preis-Formel!<br>" + e + "</p>", "Fehler");
-  }
-}
 
 
 //Familiy-construct
@@ -1658,52 +1260,5 @@ familie.prototype.save = function (tab = 'familie') {
   } else { console.debug(this, 'already saving'); }
 
 };
-
-
-
-
-String.prototype.replaceAll = function (search, replacement) {
-  var target = this;
-  return target.replace(new RegExp(search, 'g'), replacement);
-};
-
-function num_pad(num, size) {
-  var s = num + "";
-  while (s.length < size) s = "0" + s;
-  return s;
-}
-
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
-
-function highlightElement(el) {
-  el.addClass('highlight');
-  setTimeout(function () {
-    el.removeClass('highlight');
-  }, 400);
-}
-
-function alert(text, title = "Meldung:", footer = "") {
-  var m = modal;
-  var h = m.getElementsByClassName('modal-head')[0];
-  var f = m.getElementsByClassName('modal-foot')[0];
-  var b = m.getElementsByClassName('modal-body')[0];
-
-  b.innerHTML = text;
-  h.innerHTML = title;
-  f.innerHTML = footer;
-
-  modal.style.display = "block";
-  document.body.style.overflow = "hidden"
-}
 
 */

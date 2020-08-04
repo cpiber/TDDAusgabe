@@ -1,4 +1,7 @@
+import $ from 'jquery';
+import settings from './settings';
 
+// clone object
 function clone(obj: any) {
   if (null == obj || "object" != typeof obj) return obj;
   var copy = obj.constructor();
@@ -9,7 +12,7 @@ function clone(obj: any) {
 }
 
 
-// Minimum-height for tabs
+// minimum-height for tabs
 function tabH() {
   var b = document.getElementById('tab-body'),
     w = window.outerWidth,
@@ -21,4 +24,73 @@ function tabH() {
   }
 }
 
-export { clone, tabH };
+
+// pad number
+function numPad(num: number, size: number) {
+  var s = num + "";
+  while (s.length < size) s = "0" + s;
+  return s;
+}
+
+
+// format date string
+function formatDate(date: string) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+
+// short highlight
+function highlightElement(el: JQuery<HTMLElement>) {
+  el.addClass('highlight');
+  setTimeout(function () {
+    el.removeClass('highlight');
+  }, 400);
+}
+
+
+// alert using modal
+let modal: JQuery<HTMLElement> = null;
+function alert(text: string, title = "Meldung:", footer = "") {
+  var m = modal;
+  var h = m.find('.modal-head');
+  var f = m.find('.modal-foot');
+  var b = m.find('.modal-body');
+
+  b.html(text);
+  h.html(title);
+  f.html(footer);
+
+  modal.show();
+  document.body.style.overflow = "hidden"
+}
+$(() => {
+  modal = $('#modal').on('click', (e) => {
+    if (e.target.id === 'modal') modal.hide(); // backgroud
+  }).on('click', '.close', () => modal.hide());
+});
+
+
+// calculate price
+function preis(erwachsene = 0, kinder = 0) {
+  var s = settings.preis;
+  if (typeof (s) == "undefined") { return -1; }
+  s = s.replace(/e/g, ""+erwachsene);
+  s = s.replace(/k/g, ""+kinder);
+  s = s.replace(/[^0-9\+\-\*\/\(\)\.><=]/g, '');
+  try {
+    return eval(s);
+  } catch (e) {
+    console.debug(`<code>${settings.preis}</code> invalide Preis-Formel`, e);
+    alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
+  }
+}
+
+export { clone, tabH, numPad, formatDate, highlightElement, alert, preis };

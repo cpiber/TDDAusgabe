@@ -32,19 +32,19 @@ export interface famdirty {
 }
 
 export interface famelems {
-  ID?: any; //jQuery<HTMLInputElement>;
-  Name?: any; //jQuery<HTMLInputElement>;
-  Erwachsene?: any; //jQuery<HTMLInputElement>;
-  Kinder?: any; //jQuery<HTMLInputElement>;
-  Ort?: any; //jQuery<HTMLInputElement>;
-  Gruppe?: any; //jQuery<HTMLInputElement>;
-  Schulden?: any; //jQuery<HTMLInputElement>;
-  Karte?: any; //jQuery<HTMLInputElement>;
-  lAnwesenheit?: any; //jQuery<HTMLInputElement>;
-  Notizen?: any; //jQuery<HTMLInputElement>;
-  Num?: any; //jQuery<HTMLInputElement>;
-  Adresse?: any; //jQuery<HTMLInputElement>;
-  Telefonnummer?: any; //jQuery<HTMLInputElement>;
+  ID?: JQuery<HTMLInputElement>;
+  Name?: JQuery<HTMLInputElement>;
+  Erwachsene?: JQuery<HTMLInputElement>;
+  Kinder?: JQuery<HTMLInputElement>;
+  Ort?: JQuery<HTMLInputElement>;
+  Gruppe?: JQuery<HTMLInputElement>;
+  Schulden?: JQuery<HTMLInputElement>;
+  Karte?: JQuery<HTMLInputElement>;
+  lAnwesenheit?: JQuery<HTMLInputElement>;
+  Notizen?: JQuery<HTMLInputElement>;
+  Num?: JQuery<HTMLInputElement>;
+  Adresse?: JQuery<HTMLInputElement>;
+  Telefonnummer?: JQuery<HTMLInputElement>;
 }
 
 const fam: famelems = {

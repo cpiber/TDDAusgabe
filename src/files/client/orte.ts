@@ -1,12 +1,22 @@
-import $ from 'jquery'
+import $ from 'jquery';
+import { alert } from './helpers';
 
-export default function generate(orte: any[], ausgabe_sh: JQuery) {
+export interface OrtList extends Array<any> {
+  loading ?: boolean;
+}
+
+export default function generate(orte: OrtList, ausgabe_sh: JQuery) {
   let ort_cur = -1;
   const $ort = ausgabe_sh.eq(0);
   const $grp = ausgabe_sh.eq(1);
 
   function loadOrte() {
-    $.post('?api=ort').then((data: any) => {
+    if (orte.loading) {
+      console.debug("'Orte' already loading");
+      return;
+    }
+    orte.loading = true;
+    return $.post('?api=ort').then((data: any) => {
       if (data && data.status === "success") {
         orte.length = 0;
 
@@ -29,9 +39,19 @@ export default function generate(orte: any[], ausgabe_sh: JQuery) {
         ortChange(true);
       } else {
         console.error(`Failed getting 'Orte': ${data.message}`);
+        alert(`
+          <p>Fehler beim laden der Orte:<br />${data.message}</p>
+        `, "Fehler");
       }
     }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      console.error(status, error);
+      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
+      console.error(xhr.status, error, msg);
+      alert(`
+        <p>Fehler beim laden der Orte:<br />${xhr.status} ${error}</p>
+        <p>${msg}</p>
+      `, "Fehler");
+    }).always(() => {
+      orte.loading = false;
     });
   }
 
