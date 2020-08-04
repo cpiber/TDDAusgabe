@@ -5,6 +5,11 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
+    "@types/jquery": "^3.5.1",
+    "jquery": "^3.5.1",
+    "jsbarcode": "^3.11.0",
+    "phpinclude": "file:../PHPInclude/phpinclude-1.2.1.tgz",
+    "phpincludebabelts": "file:../PHPIncludeBabelTS/phpincludebabelts-1.0.0.tgz"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

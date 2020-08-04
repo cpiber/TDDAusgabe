@@ -1,0 +1,18 @@
+{
+  "exclude": [
+    "node_modules",
+    "index.ts",
+    "index.js"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  }
+}
