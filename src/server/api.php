@@ -40,7 +40,7 @@ if ( array_key_exists( 'api', $_GET ) ) {
       break;
   }
   $conn = null;
-  exit();
+  exit;
 }
 
 

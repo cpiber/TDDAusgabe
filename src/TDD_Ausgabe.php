@@ -14,7 +14,7 @@ $servername = "localhost";
 $admu = "root"; $admp = ""; //Admin login, keep blank while not using setup!
 
 define( 'VERSION', 2 );
-define( 'DB_VER', 6 );
+define( 'DB_VER', 7 );
 
 
 

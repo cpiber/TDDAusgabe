@@ -1,6 +1,63 @@
 <?php
 
 
+function setup_error($sql, $error) {
+  return sprintf( "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%%;padding:6px;\">%s: <strong>%s</strong><br></span></p>", $sql, $error );
+}
+
+$proc_resetFamNum = "
+  CREATE PROCEDURE resetFamNum()
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE f_id, f_gruppe INT;
+    DECLARE f_ort VARCHAR(255);
+    DECLARE f_num INT DEFAULT 1;
+    DECLARE o_gruppe INT DEFAULT 0;
+    DECLARE o_ort VARCHAR(255) DEFAULT '';
+
+    DECLARE fam CURSOR FOR SELECT `ID`, `Ort`, `Gruppe` FROM `tdd`.`familien` ORDER BY `Ort`, `Gruppe`, `Name`, `ID`;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    OPEN fam;
+
+    loop1: LOOP
+      FETCH fam INTO f_id, f_ort, f_gruppe;
+      IF done THEN
+        LEAVE loop1;
+      END IF;
+
+      IF f_ort <> o_ort OR f_gruppe <> o_gruppe THEN
+        SET o_ort = f_ort;
+        SET o_gruppe = f_gruppe;
+        SET f_num = 1;
+      END IF;
+
+      UPDATE `tdd`.`familien` SET `Num` = f_num WHERE `ID` = f_id;
+      SET f_num = f_num + 1;
+    END LOOP;
+    CLOSE fam;
+  END;
+  ";
+$proc_newNum = "
+  CREATE FUNCTION newNum(
+    q_ort VARCHAR(255),
+    q_gruppe INT
+  )
+  RETURNS int
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE next INT DEFAULT 1;
+    DECLARE f_num INT;
+
+    SELECT MIN(`f`.`Num`+1) INTO next FROM `tdd`.`familien` AS `f` LEFT JOIN `tdd`.`familien` AS `t` ON (`f`.`Num`+1 = `t`.`Num` AND `f`.`Ort` = `t`.`Ort` AND `f`.`Gruppe` = `t`.`Gruppe`) WHERE `t`.`Num` IS NULL AND `f`.`Ort` = q_ort AND `f`.`Gruppe` = q_gruppe;
+    IF next IS NULL THEN
+      SET next = 1;
+    END IF;
+
+    RETURN next;
+  END;
+  ";
+
+
 // Execute setup if needed
 if ( isset( $_GET['setup'] ) ) {
   echo "<!DOCTYPE html><html><head><title>Tischlein Deck Dich Setup</title><link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" /></head><body>";
@@ -61,7 +118,7 @@ if ( isset( $_GET['setup'] ) ) {
         echo "<p>Datenbank `tdd` erfolgreich (neu) angelegt.</p>";
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Datenbank `tdd`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
       echo "<p>&nbsp;</p><p><a href=\"?setup&step=2\">Nächster Schritt</a></p>";
       break;
@@ -82,7 +139,7 @@ if ( isset( $_GET['setup'] ) ) {
         }
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen des Nutzers $usern.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
       echo "<p>&nbsp;</p><p><a href=\"?setup&step=3\">Nächster Schritt</a></p>";
       break;
@@ -92,13 +149,13 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
         
-        $sql = "CREATE TABLE familien( ID int NOT NULL AUTO_INCREMENT, Name varchar(255), Erwachsene int, Kinder int, Ort varchar(255), Gruppe int, Schulden decimal(3,2), Karte date, lAnwesenheit date, Notizen varchar(255), PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE familien( ID int NOT NULL AUTO_INCREMENT, Name varchar(255), Erwachsene int, Kinder int, Ort varchar(255), Gruppe int, Schulden decimal(3,2), Karte date, lAnwesenheit date, Notizen varchar(255), Num int, Adresse varchar(255), Telefonnummer varchar(255), PRIMARY KEY (ID) )";
         $conn->exec( $sql );
-        echo "Tabelle `Familien` erfolgreich angelegt.";
+        echo "<p>Tabelle `Familien` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Tabelle `Familien`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
       
       try {
@@ -110,19 +167,19 @@ if ( isset( $_GET['setup'] ) ) {
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Tabelle `Orte`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
 
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "CREATE TABLE einstellungen( ID int NOT NULL AUTO_INCREMENT, Name varchar(255), Val longtext, PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE einstellungen( ID int NOT NULL AUTO_INCREMENT, Name varchar(255) UNIQUE, Val longtext, PRIMARY KEY (ID) )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Einstellungen` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Tabelle `Einstellungen`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
 
       try {
@@ -134,19 +191,36 @@ if ( isset( $_GET['setup'] ) ) {
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Initialisieren von `Preis`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
       }
 
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "INSERT INTO `einstellungen` ( Name, Val ) VALUES ( 'Kartendesigns', '%5B%0A%09%7B%0A%09%09%22name%22%3A%20%22Barcode%22%2C%0A%09%09%22elements%22%3A%20%5B%0A%09%09%09%7B%20%22html%22%3A%20%22%24img%22%20%7D%0A%09%09%5D%0A%09%7D%2C%0A%09%7B%0A%09%09%22name%22%3A%20%22Formular%22%2C%0A%09%09%22elements%22%3A%20%5B%0A%09%09%09%7B%20%22html%22%3A%20%22%3Ch1%3ETischlein%20Deck%20Dich%3C%2Fh1%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%20style%3D%5C%22font-style%3Aitalic%3Bfont-size%3A16px%5C%22%3EZulassung%20zur%20Ausgabe%3C%2Fp%3E%3Cbr%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%24img%3C%2Fp%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3EName%3C%2Fspan%3E%3A%20%24Name%20%28ID%3A%20%24ID%29%3C%2Fp%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3EOrt%3C%2Fspan%3E%3A%20%24Ort%2C%20%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3EGruppe%3C%2Fspan%3E%3A%20%24Gruppe%3C%2Fp%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3EErwachsene%2FKinder%3C%2Fspan%3E%3A%20%24Erwachsene%2F%24Kinder%20%28%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3E%24Preis%u20AC%3C%2Fspan%3E%29%3C%2Fp%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3EG%FCltig%20bis%3C%2Fspan%3E%3A%20%24Karte%3C%2Fp%3E%22%20%7D%2C%0A%09%09%09%7B%20%22html%22%3A%20%22%3Cp%3E%3Cspan%20style%3D%5C%22font-weight%3Abold%5C%22%3ENotizen%3A%3C%2Fspan%3E%3Cbr%3E%24Notizen%3C%2Fp%3E%22%20%7D%0A%09%09%5D%0A%09%7D%2C%0A%09%7B%0A%09%09%22name%22%3A%20%22Visitenkarte%201%20-%20Barcode%20Mitte%22%2C%0A%09%09%22format%22%3A%20%2254x86%22%2C%0A%09%09%22elements%22%3A%20%5B%0A%09%09%09%7B%20%22html%22%3A%20%22%24img%22%2C%20%22position%22%3A%20%5B31.2%2C6%5D%20%7D%0A%09%09%5D%0A%09%7D%0A%5D' )";
-        $conn->exec( $sql );
+        $designs = <<<'DESIGNS_NOWDOC____'
+require "../files/designs.json";
+DESIGNS_NOWDOC____;
+        $sql = "INSERT INTO `einstellungen` ( Name, Val ) VALUES ( 'Kartendesigns', :designs )";
+        $stmt = $conn->prepare( $sql );
+        $stmt->execute( array(":designs" => $designs) );
         echo "<p>`Kartendesigns` erfolgreich initialisiert.</p>";
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Initialisieren von `Kartendesigns`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+
+      try {
+        $conn->exec( "USE tdd" );
+
+        $ver = DB_VER;
+        $sql = "INSERT INTO `einstellungen` ( Name, Val ) VALUES ( 'Version', $ver )";
+        $conn->exec( $sql );
+        echo "<p>`Preis` erfolgreich initialisiert.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Initialisieren von `Preis`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
       }
 
       try {
@@ -158,10 +232,38 @@ if ( isset( $_GET['setup'] ) ) {
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Tabelle `Logs`.<br>";
-        echo "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%;padding:6px;\">" . $sql . ": <strong>" . $e->getMessage() . "</strong><br></span></p>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+      echo "<p>&nbsp;</p><p><a href=\"?setup&step=4\">Nächster Schritt</a></p>";
+      break;
+
+    case 4:
+      echo "<h1>Step 4: Prozeduren</h1><br>";
+      try {
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
+        $conn->exec( $proc_resetFamNum );
+        echo "<p>Prozedur `resetFamNum` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Anlegen der Prozedur `resetFamNum`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+      try {
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
+        $conn->exec( $proc_newNum );
+        echo "<p>Prozedur `newNum` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Anlegen der Prozedur `newNum`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
       }
       echo "<p>&nbsp;</p><p><a href=\"?login\">Fertig</a></p>";
       break;
+
     default:
       ?><h1>Setup</h1>
       <p style="color:red">Achtung: Bei diesem Prozess werden alle eventuell vorhandenen Daten gelöscht!</p>
@@ -170,6 +272,7 @@ if ( isset( $_GET['setup'] ) ) {
         <li><a href="?setup&step=1">Step 1</a>: Datenbank</li>
         <li><a href="?setup&step=2">Step 2</a>: Nutzer</li>
         <li><a href="?setup&step=3">Step 3</a>: Tabellen</li>
+        <li><a href="?setup&step=4">Step 4</a>: Prozeduren</li>
       </ul><?php
   }
 

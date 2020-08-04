@@ -42,7 +42,7 @@ if ( $ver < DB_VER ) {
       $ver = 2;
 
     } catch ( PDOException $e ) {
-      upgradeError( 2, $e );
+      upgrade_error( 2, $e );
     }
   }
 
@@ -57,7 +57,7 @@ if ( $ver < DB_VER ) {
       $ver = 3;
 
     } catch ( PDOException $e ) {
-      upgradeError( 3, $e );
+      upgrade_error( 3, $e );
     }
   }
 
@@ -67,44 +67,13 @@ if ( $ver < DB_VER ) {
     try {
       // prodecure for resetting nums
       $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
-      $conn->exec( "
-        CREATE PROCEDURE resetFamNum()
-        BEGIN
-          DECLARE done INT DEFAULT FALSE;
-          DECLARE f_id, f_gruppe INT;
-          DECLARE f_ort VARCHAR(255);
-          DECLARE f_num INT DEFAULT 1;
-          DECLARE o_gruppe INT DEFAULT 0;
-          DECLARE o_ort VARCHAR(255) DEFAULT '';
-
-          DECLARE fam CURSOR FOR SELECT `ID`, `Ort`, `Gruppe` FROM `tdd`.`familien` ORDER BY `Ort`, `Gruppe`, `Name`, `ID`;
-          DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-          OPEN fam;
-
-          loop1: LOOP
-            FETCH fam INTO f_id, f_ort, f_gruppe;
-            IF done THEN
-              LEAVE loop1;
-            END IF;
-
-            IF f_ort <> o_ort OR f_gruppe <> o_gruppe THEN
-              SET o_ort = f_ort;
-              SET o_gruppe = f_gruppe;
-              SET f_num = 1;
-            END IF;
-
-            UPDATE `tdd`.`familien` SET `Num` = f_num WHERE `ID` = f_id;
-            SET f_num = f_num + 1;
-          END LOOP;
-          CLOSE fam;
-        END;
-        " );
+      $conn->exec( $proc_resetFamNum );
       if ( !isset( $_GET['norenumber'] ) ) $conn->exec( "CALL resetFamNum();" );
 
       $ver = 5;
 
     } catch ( PDOException $e ) {
-      upgradeError( 5, $e );
+      upgrade_error( 5, $e );
     }
   }
 
@@ -113,30 +82,59 @@ if ( $ver < DB_VER ) {
     try {
       // function for changing num to new group
       $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
-      $conn->exec( "
-        CREATE FUNCTION newNum(
-          q_ort VARCHAR(255),
-          q_gruppe INT
-        )
-        RETURNS int
-        BEGIN
-          DECLARE done INT DEFAULT FALSE;
-          DECLARE next INT DEFAULT 1;
-          DECLARE f_num INT;
-
-          SELECT MIN(`f`.`Num`+1) INTO next FROM `tdd`.`familien` AS `f` LEFT JOIN `tdd`.`familien` AS `t` ON (`f`.`Num`+1 = `t`.`Num` AND `f`.`Ort` = `t`.`Ort` AND `f`.`Gruppe` = `t`.`Gruppe`) WHERE `t`.`Num` IS NULL AND `f`.`Ort` = q_ort AND `f`.`Gruppe` = q_gruppe;
-          IF next IS NULL THEN
-            SET next = 1;
-          END IF;
-
-          RETURN next;
-        END;
-        " );
+      $conn->exec( $proc_newNum );
 
       $ver = 6;
 
     } catch ( PDOException $e ) {
-      upgradeError( 6, $e );
+      upgrade_error( 6, $e );
+    }
+  }
+
+  if ( $ver == 6 ) {
+    try {
+      // function for decoding url-encoded string
+      $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" );
+      $conn->exec( "
+        CREATE FUNCTION `url_decode`(str VARCHAR(255) CHARSET utf8) RETURNS VARCHAR(255) DETERMINISTIC
+        BEGIN
+            DECLARE end INT;
+            DECLARE start INT;
+            SET start = LOCATE('%', str);
+            WHILE start > 0 DO
+                SET end = start;
+                WHILE SUBSTRING(str, end, 1) = '%' AND UPPER(SUBSTRING(str, end + 1, 1)) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') AND UPPER(SUBSTRING(str, end + 2, 1)) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') DO
+                    SET end = end + 3;
+                END WHILE;
+                IF start <> end THEN
+                    SET str = INSERT(str, start, end - start, UNHEX(REPLACE(SUBSTRING(str, start, end - start), '%', '')));
+                END IF;
+                SET start = LOCATE('%', str, start + 1);
+            END WHILE;
+            RETURN REPLACE(str, '+', ' ');
+        END;
+        " );
+      $conn->exec( "UPDATE `familien` SET `Name` = url_decode(`Name`), `Ort` = url_decode(`Ort`), `Notizen` = url_decode(`Notizen`), `Adresse` = url_decode(`Adresse`), `Telefonnummer` = url_decode(`Telefonnummer`)");
+      $conn->exec( "UPDATE `orte` SET `Name` = url_decode(`Name`)");
+      $conn->exec( "UPDATE `logs` SET `message` = url_decode(`message`)");
+      $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" ); // one-time use
+
+      $stmt = $conn->prepare( "SELECT `ID`, `Val` FROM `einstellungen`" );
+      $stmt->setFetchMode( PDO::FETCH_ASSOC );
+      $stmt->execute();
+
+      foreach ( $stmt->fetchAll() as $r ) {
+        $stmt2 = $conn->prepare( "UPDATE `einstellungen` SET `Val` = :Val WHERE `ID` = :ID" );
+        $stmt2->execute(array(
+          ":ID" => $r['ID'],
+          ":Val" => rawurldecode($r['Val'])
+        ));
+      }
+
+      $ver = 7;
+
+    } catch ( PDOException $e ) {
+      upgrade_error( 7, $e );
     }
   }
 
@@ -148,7 +146,7 @@ if ( $ver < DB_VER ) {
   }
 }
 
-function upgradeError( $ver, $e ) {
+function upgrade_error( $ver, $e ) {
   ?><!DOCTYPE html><html>
   <head>
     <title>Tischlein Deck Dich - ERROR</title>

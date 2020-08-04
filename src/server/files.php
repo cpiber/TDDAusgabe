@@ -37,7 +37,7 @@ FILE_NOWDOC____;
       http_response_code( 404 );
       break;
   }
-  exit();
+  exit;
 }
 
 
