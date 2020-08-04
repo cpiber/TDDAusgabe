@@ -72,9 +72,13 @@ function alert(text: string, title = "Meldung:", footer = "") {
   document.body.style.overflow = "hidden"
 }
 $(() => {
+  const close = () => {
+    document.body.style.overflow = "";
+    modal.hide();
+  }
   modal = $('#modal').on('click', (e) => {
-    if (e.target.id === 'modal') modal.hide(); // backgroud
-  }).on('click', '.close', () => modal.hide());
+    if (e.target.id === 'modal') close(); // backgroud
+  }).on('click', '.close', () => close());
 });
 
 

@@ -268,17 +268,18 @@ span.help:hover {
   cursor: pointer;
 }
 
-span.code, p.code {
+span.code, p.code, code.code {
   font-family: monospace, monospace;
   background-color: #9b9b9b;
   padding: 0 0.15em;
 }
-p.code {
+p.code, code.code {
+  display: block;
   padding: inherit;
   padding-left: 18px; padding-right: 18px;
   margin-bottom: 0;
 }
-p.code + p.code {
+p.code + p.code, code.code + code.code {
   margin-top: 0;
 }
 

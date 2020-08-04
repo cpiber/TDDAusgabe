@@ -1,4 +1,4 @@
-import $, { data } from 'jquery';
+import $ from 'jquery';
 import { alert } from './helpers';
 
 type p = JQuery.PromiseBase<void, never, never, never, never, never, never, never, never, never, never, never>;

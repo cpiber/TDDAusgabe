@@ -2,8 +2,9 @@ import jQuery from 'jquery';
 // import 'JsBarcode';
 import { ausgabeFam, verwaltungFam } from './client/familie';
 import ortGenerate, { OrtList } from './client/orte';
-import { tabH } from './client/helpers';
 import { optionsOrteUpdate } from './client/options';
+import { tabH, alert } from './client/helpers';
+import { karte_designs_help, preis_help } from './client/texts';
 
 
 const DEBUG = true;
@@ -18,6 +19,8 @@ if ( DEBUG ) {
   window.ausgabeFam = ausgabeFam;
   // @ts-ignore
   window.verwaltungFam = verwaltungFam;
+  // @ts-ignore
+  window.alert = alert;
 }
 
 
@@ -80,9 +83,6 @@ jQuery(($) => {
 
   const ausgabe_sh = $('#tab2 .search-header select');
 
-  // register handlers
-  jQuery(window).resize(tabH).on('keydown', keyboardHandler);
-
   // Orte
   const { loadOrte, ortChange } = ortGenerate(orte, ausgabe_sh);
   if ( DEBUG ) {
@@ -95,7 +95,7 @@ jQuery(($) => {
   ausgabe_sh.first().on('change', () => ortChange());
   tabLinks.get(4).onOpen = optionsOrteUpdate(loadOrte, orte);
 
-
+  // tabs
   if (window.location.hash == "") {
     changeTab(tabHs.first().find('a') as JQuery<TabElement>);
   } else {
@@ -106,7 +106,15 @@ jQuery(($) => {
 
   loadOrte();
   ortChange();
+
+  // Settings page
+  const $sett_help = $('#tab5 .help');
+  $sett_help.eq(0).on('click', () => alert(preis_help, "Hilfe zur Preisformel"));
+  $sett_help.eq(1).on('click', () => alert(karte_designs_help, "Hilfe zu Kartendesigns"));
   
+
+  // register handlers
+  jQuery(window).resize(tabH).on('keydown', keyboardHandler);
 
   // keyboard navigation
   function keyboardHandler(event: JQuery.KeyDownEvent) {

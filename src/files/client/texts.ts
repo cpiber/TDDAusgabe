@@ -40,18 +40,18 @@ const karte_designs_help = `
   <li><span class="code">$Notizen</span></li>
   <li><span class="code">$img</span>: Barcode Bildelement</li>
   <li><span class="code">$isrc</span>: Barcode data:image/png</li></ul><br><br>
-  <p>Kommentare beginnen mit <span class="code">//</span> und sind hier in grün dargestellt. Strings sind hier in rot.</p>
-  <p class="code">[ <span style="color:green">//Beginn der Design-Liste</span></p>
-  <p class="code">&nbsp;&nbsp;{ <span style="color:green">//Beginn Design-Objekt</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">name</span>": "<span style="color:red">Design1</span>", <span style="color:green">//Name festlegen (Komma!)</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">elements</span>": [ <span style="color:green">//Beginn der Element-Liste</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>" }, <span style="color:green">//Ein Element mit HTML-Inhalt (Komma!)</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:green">//Beginn Element 2</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>", <span style="color:green">//HTML-Eigenschaft (Komma!)</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">css</span>": "<span style="color:red">color:red</span>" <span style="color:green">//CSS-Eigenschaft</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <span style="color:green">//Ende Element 2</span></p>
-  <p class="code">&nbsp;&nbsp;&nbsp;&nbsp;] <span style="color:green">//Ende Element-Liste</span></p>
-  <p class="code">&nbsp;&nbsp;} <span style="color:green">//Ende Design-Objekt</span></p>
-  <p class="code">] <span style="color:green">//Ende Design-Liste</span></p><p></span></p>`;
+  <p>Kommentare beginnen mit <span class="code">//</span> und sind hier in grün dargestellt (gehören nicht ins Textfeld!). Strings sind hier in rot.</p>
+  <code class="code">[ <span style="color:green">// Beginn der Design-Liste</span></code>
+  <code class="code">&nbsp;&nbsp;{ <span style="color:green">// Beginn Design-Objekt</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">name</span>": "<span style="color:red">Design1</span>", <span style="color:green">// Name festlegen (Komma!)</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">elements</span>": [ <span style="color:green">// Beginn der Element-Liste</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>" }, <span style="color:green">// Ein Element mit HTML-Inhalt (Komma!)</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:green">// Beginn Element 2</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>", <span style="color:green">// HTML-Eigenschaft (Komma!)</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">css</span>": "<span style="color:red">color:red</span>" <span style="color:green">// CSS-Eigenschaft</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <span style="color:green">// Ende Element 2</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;] <span style="color:green">// Ende Element-Liste</span></code>
+  <code class="code">&nbsp;&nbsp;} <span style="color:green">// Ende Design-Objekt</span></code>
+  <code class="code">] <span style="color:green">// Ende Design-Liste</span></p><p></span></code>`;
 
 export { preis_help, karte_designs_help };

@@ -199,16 +199,17 @@
           </div>
           <div class="cols3" id="settings">
             <h2>Allgemein</h2>
-            <p class="heading" style="display: inline;">Preis Formel: <span class="help"
-                title="e ... Anzahl Erwachsene, k ... Anzahl Kinder&#xA;&#013;z.B.: e + k * 0.5&#xA;&#013;oder: (e > 0) * 2 + (k > 0)"
-                onclick="alert(preist,'Hilfe zur Preis-Formel')">(?)</span></p><br><input id="preisf"
-              class="w100pm400px" type="text" data-name="Preis" placeholder="Preisformel" />
+            <p class="heading" style="display: inline;">Preis Formel:
+              <span class="help" title="e ... Anzahl Erwachsene, k ... Anzahl Kinder&#xA;&#013;z.B.: e + k * 0.5&#xA;&#013;oder: (e > 0) * 2 + (k > 0)">(?)</span>
+            </p><br />
+            <input id="preisf" class="w100pm400px" type="text" data-name="Preis" placeholder="Preisformel" />
             <p></p>
-            <p class="heading" style="display: inline;">Karten-Designs: <span class="help"
-                onclick="alert(kartent,'Hilfe zu Kartendesigns')">(?)</span></p><br><textarea id="kartend"
-              class="w100pm400px" data-name="Kartendesigns" style="height: 120px;"></textarea>
-            <p><br></p><button id="sett-save" class="w100pm400px" title="Felder speichern bei ENTER automatisch">Alle
-              Speichern</button>
+            <p class="heading" style="display: inline;">Karten-Designs:
+              <span class="help" >(?)</span>
+            </p><br />
+            <textarea id="kartend" class="w100pm400px" data-name="Kartendesigns" style="height: 120px;"></textarea>
+            <p><br /></p>
+            <button id="sett-save" class="w100pm400px" title="Felder speichern bei ENTER automatisch">Alle Speichern</button>
           </div>
         </div>
       </div>
