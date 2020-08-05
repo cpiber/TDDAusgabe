@@ -3,17 +3,16 @@ import { alert } from './helpers';
 
 const settings = {
   preis: "",
-  designs: ""
+  designs: "",
+  _loading: false
 };
 
-let $preis: JQuery<HTMLElement>, $designs: JQuery<HTMLElement>;
-export function loadSettings() {
-  if (!$preis || !$designs) {
-    const $in = $('#settings :input');
-    $preis = $in.eq(0).data('name', 'Preis').data('prop', 'preis');
-    $designs = $in.eq(1).data('name', 'Kartendesigns').data('prop', 'designs');
-    $in.eq(2).on('click', () => update());
-  }
+export function optionsSettingsUpdate() {
+  const $in = $('#settings :input');
+  const $preis = $in.eq(0).data('name', 'Preis').data('prop', 'preis');
+  const $designs = $in.eq(1).data('name', 'Kartendesigns').data('prop', 'designs');
+  $in.eq(2).on('click', update.bind(null, null, $preis, $designs));
+
   [$preis, $designs].forEach(element => {
     let timeout: number;
     element.on('keyup', function () {
@@ -25,30 +24,41 @@ export function loadSettings() {
     });
   });
 
-  $.post('?api=setting').then((data: any) => {
-    if (data && data.status === "success") {
-      settings.preis = data.data.Preis;
-      settings.designs = data.data.Kartendesigns;
+  const load = () => {
+    if (settings._loading) {
+      console.debug("Settings already loading");
+      return;
+    }
+    settings._loading = true;
+    $.post('?api=setting').then((data: any) => {
+      if (data && data.status === "success") {
+        settings.preis = data.data.Preis;
+        settings.designs = data.data.Kartendesigns;
 
-      $preis.val(settings.preis);
-      $designs.val(settings.designs);
-    } else {
-      console.error(`Failed getting settings: ${data.message}`);
-      alert(`
+        $preis.val(settings.preis);
+        $designs.val(settings.designs);
+      } else {
+        console.error(`Failed getting settings: ${data.message}`);
+        alert(`
           <p>Fehler beim laden der Einstellungen:<br />${data.message}</p>
         `, "Fehler");
-    }
-  }).fail((xhr: JQueryXHR, status: string, error: string) => {
-    const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-    console.error(xhr.status, error, msg);
-    alert(`
+      }
+    }).fail((xhr: JQueryXHR, status: string, error: string) => {
+      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
+      console.error(xhr.status, error, msg);
+      alert(`
         <p>Fehler beim laden der Einstellungen:<br />${xhr.status} ${error}</p>
         <p>${msg}</p>
       `, "Fehler");
-  });
+    }).always(() => {
+      settings._loading = false;
+    });
+  }
+  return load;
 }
 
-function update (element: JQuery<HTMLElement> = null) {
+
+function update(element: JQuery<HTMLElement> = null, $preis: JQuery<HTMLElement> = null, $designs: JQuery<HTMLElement> = null) {
   const el = (element: JQuery<HTMLElement>) => {
     const name = element.data('name');
     const val = element.val();

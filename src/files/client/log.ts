@@ -20,16 +20,15 @@ export default function init() {
     d = new Date();
     d.setUTCMonth(d.getUTCMonth() + 1); d.setUTCDate(0); d.setUTCHours(23); d.setUTCMinutes(59); d.setUTCSeconds(59);
     write(d, 3);
-
-    info();
   };
 
   writeDefault();
-  logs();
   $inp.eq(0).on('submit', info);
-  $inp.eq(6).on('click', writeDefault);
+  $inp.eq(6).on('click', () => {writeDefault(); info();});
   $inp.eq(7).on('change', logs);
   $inp.eq(8).on('click', logs);
+
+  return { info, logs };
 }
 
 function updateInfo($inp: JQuery<HTMLElement>, $info: JQuery<HTMLElement>) {

@@ -5,7 +5,7 @@ import ortGenerate, { OrtList } from './client/orte';
 import { ausgabeFam, verwaltungFam } from './client/familie';
 import initLogs from './client/log';
 import { delFamDate, resetFam } from './client/actions';
-import settings, { loadSettings } from './client/settings';
+import settings, { optionsSettingsUpdate } from './client/settings';
 import { optionsOrteUpdate } from './client/orte_settings';
 import insertHelpHeadings from './client/help';
 import { tabH, alert } from './client/helpers';
@@ -101,13 +101,13 @@ jQuery(($) => {
   const { loadOrte, ortChange } = ortGenerate(orte, $ausgabe_sh);
   if ( DEBUG ) {
     // @ts-ignore
-    window.loadOrte = loadOrte;
-    // @ts-ignore
     window.orte = orte;
   }
 
   $ausgabe_sh.first().on('change', () => ortChange());
-  tabLinks.get(4).onOpen = optionsOrteUpdate(loadOrte, orte);
+  const updateOrte = optionsOrteUpdate(loadOrte, orte);
+  const updateSettings = optionsSettingsUpdate();
+  tabLinks.get(4).onOpen = () => {updateOrte(); updateSettings();};
 
   // tabs
   if (window.location.hash == "") {
@@ -122,7 +122,8 @@ jQuery(($) => {
   ortChange();
 
   // Logs tab
-  initLogs();
+  const { info: updateLogInfo, logs: updateLogs } = initLogs();
+  tabLinks.get(3).onOpen = () => { updateLogInfo(); updateLogs(); };
 
   // Settings tab
   const $sett_help = $('#tab5 .help');
@@ -135,7 +136,7 @@ jQuery(($) => {
   $sett_actions.eq(3).on('click', () => window.open('?create_backup'));
   $sett_actions.eq(4).on('click', () => window.open('?load_backup'));
 
-  loadSettings();
+  updateSettings();
 
   // Help tab
   insertHelpHeadings();
@@ -721,100 +722,6 @@ function verwFamNeu() {
   verw_fam = new familie({}, -1);
   verw_index = undefined;
 }
-
-
-//Logstab
-
-function getLogs(page = 0, search = []) {
-  if (page != null && typeof (page) == "object" && page.target) {
-    //page is change event
-    page = page.target.value;
-  }
-  var lgs = document.getElementById('complete-log');
-  if ((!Array.isArray(search) || search.length == 0) && typeof (lgs.search) !== "undefined") {
-    search = lgs.search;
-  }
-  get({ table: 'logs', meta: search, limit: 20, offset: page * 20, order_by: 'date_time', page: page, meta_connection: "OR" }, logs);
-}
-function searchLogs(element) {
-  var meta = [],
-    string = escape(element[0].value),
-    h = element.headings,
-    lgs = document.getElementById('complete-log');
-
-  string = string.replace(/^(?:%20)+|(?:%20)+$/g, '').replace(/(?:%20){2,}/g, '%20');
-  var a = string.split('%20');
-
-  for (var i = 0; i < a.length; i++) {
-    var str = a[i];
-    str = "%" + str + "%";
-    for (var j = 0; j < h.length; j++) {
-      meta.push({ key: h[j], value: str, compare: "LIKE" });
-    }
-  }
-
-  lgs.search = meta;
-  getLogs(0, meta);
-}
-function logs(data) {
-  var p = jQuery('#log-pagination'), lgs = jQuery('#complete-log'),
-    page = data.post.page, pages = Math.ceil(data.rows / 20);
-
-  if (p.children().length != pages || data.status != "success") {
-    var o = p.get(0);
-    while (o.lastChild) {
-      o.removeChild(o.lastChild);
-    }
-    for (var i = 0; i < pages; i++) {
-      var e = document.createElement('option');
-      e.value = i;
-      var t = document.createTextNode('Seite ' + (i + 1));
-      e.appendChild(t);
-      p.append(e);
-    }
-    o.removeEventListener('click', getLogs);
-    o.addEventListener('change', getLogs);
-    p.val(page);
-  }
-  if (p.val() != page) { p.val(page) };
-
-  lgs.html('');
-  if (data.status == "success") {
-    if (data.query.length > 0) {
-      var form = document.createElement('form');
-      form.action = "#";
-      form.onsubmit = function () { searchLogs(this); return false };
-      form.innerHTML = "<input type=\"text\" placeholder=\"Suchen\"><input type=\"submit\" value=\"Suchen\">";
-      form.headings = [];
-      var table = document.createElement('table');
-      table.classList.add('logs');
-      var tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      var tr = document.createElement('tr');
-      jQuery.each(data.query[0], function (e) {
-        var th = document.createElement('th');
-        var t = document.createTextNode(e);
-        form.headings.push(e);
-        th.appendChild(t);
-        tr.appendChild(th);
-      });
-      tbody.appendChild(tr);
-      for (var i = 0; i < data.query.length; i++) {
-        var tr = document.createElement('tr');
-        jQuery.each(data.query[i], function (e, n) {
-          var td = document.createElement('td');
-          var t = document.createTextNode(n);
-          td.appendChild(t);
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      }
-      lgs.append(form);
-      lgs.append(table);
-    }
-  }
-}
-
 
 
 

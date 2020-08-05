@@ -3,7 +3,7 @@ import { alert } from './helpers';
 
 type p = JQuery.PromiseBase<void, never, never, never, never, never, never, never, never, never, never, never>;
 
-function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
+export function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
   const $opt = $('#orte ul');
   const $l = $('<span>').text('Loading...').hide().insertBefore($opt);
 
@@ -143,5 +143,3 @@ function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
   }
   return update;
 }
-
-export { optionsOrteUpdate };
