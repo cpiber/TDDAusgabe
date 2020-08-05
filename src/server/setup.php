@@ -226,7 +226,7 @@ DESIGNS_NOWDOC____;
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "CREATE TABLE logs( ID int NOT NULL AUTO_INCREMENT, date_time DateTime, aff_table varchar(255), action varchar(255), message LONGTEXT, PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE logs( ID int NOT NULL AUTO_INCREMENT, DTime DateTime, Type varchar(255), Val varchar(255), PRIMARY KEY (ID) )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Logs` erfolgreich angelegt.</p>";
         
@@ -240,10 +240,12 @@ DESIGNS_NOWDOC____;
     case 4:
       echo "<h1>Step 4: Prozeduren</h1><br>";
       try {
+        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
         $conn->exec( $proc_resetFamNum );
+        $conn->commit();
         echo "<p>Prozedur `resetFamNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
@@ -251,10 +253,12 @@ DESIGNS_NOWDOC____;
         echo setup_error( $sql, $e->getMessage() );
       }
       try {
+        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
         $conn->exec( $proc_newNum );
+        $conn->commit();
         echo "<p>Prozedur `newNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {

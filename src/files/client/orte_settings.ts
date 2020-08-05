@@ -25,7 +25,7 @@ function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
       // save
       const id = $this.val();
       const $inp = $this.find('input');
-      const name = $inp.eq(0).val();
+      let name = $inp.eq(0).val();
       let grp = +$inp.eq(1).val();
       if (isNaN(grp) || grp < 0) grp = 0;
 
@@ -38,6 +38,8 @@ function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
         }).then((data: any) => {
           if (data && data.status === "success") {
             console.debug(`Updated 'Ort' with ID ${id}`);
+            // no name supplied means server ignores it
+            if (!name) name = $this.data('name');
             return true;
           } else {
             console.error(`Failed updating: ${data.message}`);

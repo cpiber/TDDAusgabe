@@ -36,8 +36,10 @@ if ( $ver < DB_VER ) {
     // add fam num column and procedures
     try {
       // update tables
+      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Num int;" );
       $conn->exec( "ALTER TABLE `einstellungen` ADD UNIQUE(`Name`);" );
+      $conn->commit();
 
       $ver = 2;
 
@@ -51,8 +53,10 @@ if ( $ver < DB_VER ) {
     // add address and telephone column
     try {
       // update tables
+      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Adresse varchar(255);" );
       $conn->exec( "ALTER TABLE `familien` ADD Telefonnummer varchar(255);" );
+      $conn->commit();
 
       $ver = 3;
 
@@ -66,9 +70,11 @@ if ( $ver < DB_VER ) {
     // originally added in version 2, then 3, now moved here and altered (and reverted) to new requirements
     try {
       // prodecure for resetting nums
+      $conn->beginTransaction();
       $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
       $conn->exec( $proc_resetFamNum );
       if ( !isset( $_GET['norenumber'] ) ) $conn->exec( "CALL resetFamNum();" );
+      $conn->commit();
 
       $ver = 5;
 
@@ -81,8 +87,10 @@ if ( $ver < DB_VER ) {
     // update procedures
     try {
       // function for changing num to new group
+      $conn->beginTransaction();
       $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
       $conn->exec( $proc_newNum );
+      $conn->commit();
 
       $ver = 6;
 
@@ -93,6 +101,8 @@ if ( $ver < DB_VER ) {
 
   if ( $ver == 6 ) {
     try {
+      $conn->beginTransaction();
+
       // function for decoding url-encoded string
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" );
       $conn->exec( "
@@ -116,7 +126,6 @@ if ( $ver < DB_VER ) {
         " );
       $conn->exec( "UPDATE `familien` SET `Name` = url_decode(`Name`), `Ort` = url_decode(`Ort`), `Notizen` = url_decode(`Notizen`), `Adresse` = url_decode(`Adresse`), `Telefonnummer` = url_decode(`Telefonnummer`)");
       $conn->exec( "UPDATE `orte` SET `Name` = url_decode(`Name`)");
-      $conn->exec( "UPDATE `logs` SET `message` = url_decode(`message`)");
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" ); // one-time use
 
       $stmt = $conn->prepare( "SELECT `ID`, `Val` FROM `einstellungen`" );
@@ -130,6 +139,39 @@ if ( $ver < DB_VER ) {
           ":Val" => rawurldecode($r['Val'])
         ));
       }
+
+      $stmt = $conn->prepare( "SELECT `date_time`, `aff_table`, `action`, `message` FROM `logs`" );
+      $stmt->setFetchMode( PDO::FETCH_ASSOC );
+      $stmt->execute();
+      $logs = $stmt->fetchAll();
+      $conn->exec( "TRUNCATE TABLE `logs`" );
+
+      $stmt2 = $conn->prepare( "INSERT INTO `logs` (`date_time`, `action`, `message`) VALUES (:dtime, :type, :val)" );
+      foreach ( $logs as $r ) {
+        if ( $r['aff_table'] != 'familien' || $r['action'] != 'UPDATE' ) continue;
+        $msg = rawurldecode($r['message']);
+        if ( substr( $msg, -1 ) !== "}" ) $msg .= "null}}"; // fix callback error
+        $data = json_decode( $msg, true );
+        if ( $data['geld'] == 0 ) continue;
+
+        $stmt2->execute(array(
+          ":dtime" => $r['date_time'],
+          ":type" => 'money',
+          ":val" => $data['geld']
+        ));
+        $stmt2->execute(array(
+          ":dtime" => $r['date_time'],
+          ":type" => 'attendance',
+          ":val" => sprintf( "%s/%s", $data['post']['set']['Erwachsene'], $data['post']['set']['Kinder'] )
+        ));
+      }
+
+      $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` datetime" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255)" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255)" );
+      $conn->exec( "ALTER TABLE `logs` DROP `aff_table`" );
+
+      $conn->commit();
 
       $ver = 7;
 

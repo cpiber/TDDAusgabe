@@ -5,8 +5,8 @@
   <title>Tischlein Deck Dich</title>
   <meta charset="UTF-8">
   <link href="?file=favicon" rel="icon" type="image/x-icon" />
-  <link href="?file=css" rel="stylesheet" />
-  <script src="?file=js"></script>
+  <link href="?file=css" rel="stylesheet" defer />
+  <script src="?file=js" defer></script>
 </head>
 
 <body>
