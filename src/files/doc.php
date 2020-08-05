@@ -160,14 +160,24 @@
       <div id="tab4">
         <h1>Logs</h1>
         <h2>Einnahmen</h2>
-        <p><input type="datetime-local" id="log-from"> - <input type="datetime-local" id="log-to"> <button
-            id="log-go">Go</button><br>
-          Einnahmen im angegebenen Bereich: <span id="einnahmen"></span><br>Personen im angegebenen Bereich: <span
-            id="log_erw"></span> Erwachsene(r), <span id="log_kinder"></span> Kind(er)</p>
+        <p><form>
+          <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
+          <button type="submit">Go</button>
+          &nbsp; &nbsp;
+          <button type="button">Monat</button>
+        </form></p>
+        <p class="log-info">
+          Einnahmen im angegebenen Bereich: <span></span>€<br />
+          Personen im angegebenen Bereich: <span></span> Erwachsene(r), <span></span> Kind(er) / <span></span> Familie(n)
+        </p>
         <p>&nbsp;</p>
         <h2>Kompletter Log</h2>
-        <div id="complete-log"></div><br>
-        <select id="log-pagination"></select>
+        <div class="log"></div>
+        <p>
+          Seite <select></select>
+          &nbsp; &nbsp;
+          <button type="button">Aktualisieren</button>
+        </p>
       </div>
       <div id="tab5">
         <h1>Einstellungen</h1>

@@ -6,9 +6,8 @@ function api_getorte($msg) {
   try {
     $sql = "SELECT * FROM `orte`";
     
-    $stmt = $conn->prepare( $sql );
+    $stmt = $conn->query( $sql );
     $stmt->setFetchMode( PDO::FETCH_ASSOC );
-    $stmt->execute();
     $msg['data'] = $stmt->fetchAll();
 
     $msg['status'] = 'success';

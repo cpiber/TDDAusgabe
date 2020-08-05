@@ -8,6 +8,7 @@
     "@types/jquery": "^3.5.1",
     "jquery": "^3.5.1",
     "jsbarcode": "^3.11.0",
+    "object.values": "^1.1.1",
     "phpinclude": "file:../PHPInclude/phpinclude-1.2.1.tgz",
     "phpincludebabelts": "file:../PHPIncludeBabelTS/phpincludebabelts-1.0.0.tgz"
   },

@@ -56,6 +56,17 @@ $proc_newNum = "
     RETURN next;
   END;
   ";
+$proc_splitStr = "
+  CREATE FUNCTION splitStr (
+    x VARCHAR(255),
+    delim VARCHAR(12),
+    pos INT
+  )
+  RETURNS VARCHAR(255)
+  RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
+         LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
+         delim, '');
+  "; // https://stackoverflow.com/a/14950556/
 
 
 // Execute setup if needed
@@ -263,6 +274,19 @@ DESIGNS_NOWDOC____;
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Anlegen der Prozedur `newNum`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+      try {
+        $conn->beginTransaction();
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP FUNCTION IF EXISTS splitStr;" );
+        $conn->exec( $proc_splitStr );
+        $conn->commit();
+        echo "<p>Prozedur `splitStr` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Anlegen der Prozedur `splitStr`.<br>";
         echo setup_error( $sql, $e->getMessage() );
       }
       echo "<p>&nbsp;</p><p><a href=\"?login\">Fertig</a></p>";

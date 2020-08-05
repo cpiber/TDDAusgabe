@@ -30,11 +30,9 @@ export default function insert() {
         f = "0.65em";
         break;
     }
-    const $li = $('<li>');
+    const $li = $('<li>').css('marginLeft', m).css('marginRight', m).appendTo($ul);
     const $a = $('<a>').attr('href', '#').addClass('link').text($e.text())
-      .css('fontSize', f).data('to', $e);
-
-    $ul.append($li.append($a).css('marginLeft', m).css('marginRight', m));
+      .css('fontSize', f).data('to', $e).appendTo($li);
   });
 
   $ul.on('click', 'a', function () {

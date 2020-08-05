@@ -24,8 +24,7 @@ function api_backupdb($msg) {
     $conn->exec( "USE `tdd`" );
 
     $sql = "SHOW TABLES";
-    $stmt = $conn->prepare( $sql );
-    $stmt->execute();
+    $stmt = $conn->query( $sql );
     $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
     $tables = $stmt->fetchAll();
     $msg['status'] = 'success';

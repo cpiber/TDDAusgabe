@@ -8,6 +8,9 @@ require "api/ort_delete.php";
 require "api/get_settings.php";
 require "api/setting_update.php";
 
+require "api/get_logs.php";
+require "api/get_loginfo.php";
+
 require "api/action_backupdb.php";
 require "api/action_resetfam.php";
 require "api/action_deldate.php";
@@ -35,6 +38,13 @@ if ( array_key_exists( 'api', $_GET ) ) {
       break;
     case "setting/update":
       api_updatesetting($msg);
+      break;
+
+    case "log":
+      api_getlogs($msg);
+      break;
+    case "log/info":
+      api_getloginfo($msg);
       break;
 
     case "action/backupDB":

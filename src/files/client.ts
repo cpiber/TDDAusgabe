@@ -1,13 +1,22 @@
 import jQuery from 'jquery';
 // import 'JsBarcode';
-import { ausgabeFam, verwaltungFam } from './client/familie';
+
 import ortGenerate, { OrtList } from './client/orte';
+import { ausgabeFam, verwaltungFam } from './client/familie';
+import initLogs from './client/log';
 import { delFamDate, resetFam } from './client/actions';
-import insertHelpHeadings from './client/help';
 import settings, { loadSettings } from './client/settings';
 import { optionsOrteUpdate } from './client/orte_settings';
+import insertHelpHeadings from './client/help';
 import { tabH, alert } from './client/helpers';
 import { karte_designs_help, preis_help } from './client/texts';
+
+// @ts-ignore
+const values = require('object.values');
+// @ts-ignore
+if (!Object.values) {
+  values.shim();
+}
 
 
 const DEBUG = true;
@@ -112,7 +121,10 @@ jQuery(($) => {
   loadOrte();
   ortChange();
 
-  // Settings page
+  // Logs tab
+  initLogs();
+
+  // Settings tab
   const $sett_help = $('#tab5 .help');
   $sett_help.eq(0).on('click', () => alert(preis_help, "Hilfe zur Preisformel"));
   $sett_help.eq(1).on('click', () => alert(karte_designs_help, "Hilfe zu Kartendesigns"));
@@ -125,7 +137,7 @@ jQuery(($) => {
 
   loadSettings();
 
-  // Help page
+  // Help tab
   insertHelpHeadings();
   
 
@@ -712,59 +724,6 @@ function verwFamNeu() {
 
 
 //Logstab
-function displayLogs() {
-  var lf = jQuery('#log-from'), lt = jQuery('#log-to');
-
-  var d = new Date();
-  d.setUTCDate(1); d.setUTCHours(0); d.setUTCMinutes(0); d.setUTCSeconds(0);
-  lf.val(d.toISOString().replace(/\.[0-9]{3}Z/, ""));
-
-  var d = new Date();
-  d.setUTCMonth(d.getUTCMonth() + 1); d.setUTCDate(0); d.setUTCHours(23); d.setUTCMinutes(59); d.setUTCSeconds(59);
-  lt.val(d.toISOString().replace(/\.[0-9]{3}Z/, ""));
-
-  getEinnahmen();
-  getLogs();
-}
-
-function getEinnahmen() {
-  var lf = jQuery('#log-from'), lt = jQuery('#log-to');
-  var d1 = lf.val().replaceAll(':', '.');
-  var d2 = lt.val().replaceAll(':', '.');
-  get({ table: 'logs', meta: [{ key: 'date_time', value: d1, compare: '>=' }, { key: 'date_time', value: d2, compare: '<=' }, { key: 'aff_table', value: 'familien' }, { key: 'action', value: 'UPDATE' }] }, einnahmenC);
-}
-function einnahmenC(data) {
-  var ein = jQuery('#einnahmen'),
-    kinder = jQuery('#log_kinder'),
-    erw = jQuery('#log_erw');
-
-  if (data.status == "success") {
-    var g = 0, k = 0, e = 0;
-
-    for (var i = 0; i < data.query.length; i++) {
-      var j = JSON.parse(data.query[i].message);
-      if (typeof (j.geld) != "undefined" && j.geld != "NaN") {
-        g += +j.geld;
-      }
-      if (j.post && typeof (j.post.anw) != "undefined" && j.post.anw == "true") {
-        // only count if properly set to "anwesend"
-        if (j.post && j.post.set) {
-          if (j.post.set.Kinder && +j.post.set.Kinder != NaN) {
-            k += +j.post.set.Kinder;
-          }
-          if (j.post.set.Erwachsene && +j.post.set.Erwachsene != NaN) {
-            e += +j.post.set.Erwachsene;
-          }
-        }
-      }
-    }
-
-    ein.html(g.toFixed(2) + "€");
-    kinder.html(k);
-    erw.html(e);
-
-  } else { ein.html("<i>Fehler</i>"); console.debug(data); }
-}
 
 function getLogs(page = 0, search = []) {
   if (page != null && typeof (page) == "object" && page.target) {

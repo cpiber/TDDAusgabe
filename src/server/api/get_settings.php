@@ -6,9 +6,8 @@ function api_getsettings($msg) {
   try {
     $sql = "SELECT * FROM `einstellungen`";
     
-    $stmt = $conn->prepare( $sql );
+    $stmt = $conn->query( $sql );
     $stmt->setFetchMode( PDO::FETCH_ASSOC );
-    $stmt->execute();
     $msg['data'] = array();
     foreach ( $stmt->fetchAll() as $r ) {
       $msg['data'][$r['Name']] = $r['Val'];

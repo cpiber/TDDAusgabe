@@ -15,7 +15,7 @@ export function loadSettings() {
     $in.eq(2).on('click', () => update());
   }
   [$preis, $designs].forEach(element => {
-    let timeout;
+    let timeout: number;
     element.on('keyup', function () {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {

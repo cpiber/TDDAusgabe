@@ -2,8 +2,7 @@
 
 
 //Check version and upgrade database
-$stmt = $conn->prepare( "SELECT Val FROM `einstellungen` WHERE `Name` = 'Version'" );
-$stmt->execute();
+$stmt = $conn->query( "SELECT Val FROM `einstellungen` WHERE `Name` = 'Version'" );
 $ver = $stmt->fetchColumn();
 while (!is_int($ver)) {
   if ( $ver === false ) {
@@ -128,9 +127,8 @@ if ( $ver < DB_VER ) {
       $conn->exec( "UPDATE `orte` SET `Name` = url_decode(`Name`)");
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" ); // one-time use
 
-      $stmt = $conn->prepare( "SELECT `ID`, `Val` FROM `einstellungen`" );
+      $stmt = $conn->query( "SELECT `ID`, `Val` FROM `einstellungen`" );
       $stmt->setFetchMode( PDO::FETCH_ASSOC );
-      $stmt->execute();
 
       foreach ( $stmt->fetchAll() as $r ) {
         $stmt2 = $conn->prepare( "UPDATE `einstellungen` SET `Val` = :Val WHERE `ID` = :ID" );
@@ -140,9 +138,8 @@ if ( $ver < DB_VER ) {
         ));
       }
 
-      $stmt = $conn->prepare( "SELECT `date_time`, `aff_table`, `action`, `message` FROM `logs`" );
+      $stmt = $conn->query( "SELECT `date_time`, `aff_table`, `action`, `message` FROM `logs`" );
       $stmt->setFetchMode( PDO::FETCH_ASSOC );
-      $stmt->execute();
       $logs = $stmt->fetchAll();
       $conn->exec( "TRUNCATE TABLE `logs`" );
 
@@ -170,6 +167,9 @@ if ( $ver < DB_VER ) {
       $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255)" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255)" );
       $conn->exec( "ALTER TABLE `logs` DROP `aff_table`" );
+
+      $conn->exec( "DROP FUNCTION IF EXISTS splitStr;" );
+      $conn->exec( $proc_splitStr );
 
       $conn->commit();
 
