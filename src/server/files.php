@@ -20,7 +20,7 @@ FILE_NOWDOC____;
     case "favicon":
       header( 'Content-type: image/vnd.microsoft.icon' );
       $file = <<<'FILE_NOWDOC____'
-require "../files/favicon.txt";
+require "../files/favicon.ico!base64";
 FILE_NOWDOC____;
       echo base64_decode( $file );
       break;
@@ -28,7 +28,7 @@ FILE_NOWDOC____;
     case "logo":
       header( 'Content-type: image/png' );
       $file = <<<'FILE_NOWDOC____'
-require "../files/logo.txt";
+require "../files/logo.png!base64";
 FILE_NOWDOC____;
       echo base64_decode( $file );
       break;
