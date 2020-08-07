@@ -84,6 +84,7 @@ export default function generate($selects: JQuery) {
       el.val(i).text(`Gruppe ${i}`);
       $grp.append(el);
     }
+    $grp.val(-1);
   }
 
   return loadOrte;

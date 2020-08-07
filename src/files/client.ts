@@ -113,8 +113,8 @@ jQuery(($) => {
   $sett_actions.eq(0).on('click', () => delFamDate());
   $sett_actions.eq(1).on('click', () => delFamDate(-1, 'Karte'));
   $sett_actions.eq(2).on('click', () => resetFam());
-  $sett_actions.eq(3).on('click', () => window.open('?create_backup'));
-  $sett_actions.eq(4).on('click', () => window.open('?load_backup'));
+  $sett_actions.eq(3).on('click', () => window.open('?page=backup/create'));
+  $sett_actions.eq(4).on('click', () => window.open('?page=backup/load'));
 
   updateOrte();
   updateSettings();

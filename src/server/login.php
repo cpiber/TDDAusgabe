@@ -49,8 +49,10 @@ function connect_error($error = false) {
     header("Content-Type: application/json; charset=UTF-8");
     printf( '{"status":"failure", "type":"Connection failed", "message":"%s"}', $error ? $conn->getMessage() : "Not logged in." );
   } else {
-    echo "<html><body>";
+    echo "<html><head>";
     echo "<title>Tischlein Deck Dich Login</title>";
+    echo "<meta charset=\"UTF-8\">";
+    echo "</head><body>";
     echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
     loginform( $error ? "<span style=\"color:red\">Login failed.</span>" : "", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
     echo "</body></html>";

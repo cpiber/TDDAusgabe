@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="main">
 
 <head>
   <title>Tischlein Deck Dich</title>
@@ -15,7 +15,7 @@
     <div><span><a href=""><img src="?file=logo" style="max-height:120px;max-width:100%" /></a></span></div>
   </div>
 
-  <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a class="button" href="?print"
+  <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a class="button" href="?page=print"
       target="_blank">Druckversion</a> <a class="button" href="?login">Log Out</a></p>
   <img id="barcode" style="display:none" />
 
@@ -137,12 +137,16 @@
         <h1>Familienverwaltung</h1>
         <div>
           <div class="cols2 cw100p">
-            <input id="verwaltung-search" type="text" placeholder="Suche" />
-            <input type="submit" value="Suchen" />
+            <div class="cw100p search-header" style="margin-bottom: 10px">
+              <input id="verwaltung-search" type="text" placeholder="Suche" />
+              <input type="submit" value="Suchen" />
+            </div>
             <div class="select-list">
               <ul id="verwaltung-list"></ul>
             </div>
-            <button id="verw-bneu" style="width:100%;border:2px outset #606060;">+</button>
+            <div class="cw100p">
+              <button class="button-add">+</button>
+            </div>
           </div>
           <div class="cols2 familie-data">
             <p class="w100pm400px">
@@ -394,7 +398,7 @@
         <span class="close">&times;</span>
         <h2 class="modal-head">Karte drucken</h2>
       </div>
-      <div class="modal-body"><iframe src="?karte"></iframe></div>
+      <div class="modal-body"><iframe src="?page=card"></iframe></div>
       <div class="modal-footer">
         <h3 class="modal-foot"></h3>
       </div>

@@ -143,7 +143,7 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
         $('<li>').val(ort.ID).text(text(ort.Name, ort.Gruppen))
           .data('name', ort.Name).data('gruppen', ort.Gruppen).appendTo($opt);
       })
-      $('<li>').addClass('add').text('+').appendTo($opt);
+      $('<li>').addClass('button-add').text('+').appendTo($opt);
     });
   }
   return update;
