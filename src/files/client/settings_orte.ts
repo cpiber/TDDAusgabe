@@ -1,9 +1,14 @@
 import $ from 'jquery';
 import { alert } from './helpers';
+import { orte } from './settings';
 
-type p = JQuery.PromiseBase<void, never, never, never, never, never, never, never, never, never, never, never>;
+export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
 
-export function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
+export interface OrtList extends Array<any> {
+  loading?: JPromise<void>;
+}
+
+export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
   const $opt = $('#orte ul');
   const $l = $('<span>').text('Loading...').hide().insertBefore($opt);
 
@@ -29,7 +34,7 @@ export function optionsOrteUpdate(loadOrte: () => p, orte: any[]) {
       let grp = +$inp.eq(1).val();
       if (isNaN(grp) || grp < 0) grp = 0;
 
-      let req: JQuery.PromiseBase<boolean, never, never, never, never, never, never, never, never, never, never, never>;
+      let req: JPromise<boolean>;
       if (id > 0) {
         req = $.post('?api=ort/update', {
           ID: id,

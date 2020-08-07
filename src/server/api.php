@@ -1,5 +1,7 @@
 <?php
 
+require "api/get_familien.php";
+
 require "api/get_orte.php";
 require "api/ort_update.php";
 require "api/ort_insert.php";
@@ -20,6 +22,10 @@ if ( array_key_exists( 'api', $_GET ) ) {
   $msg = array( "status" => "pending" );
 
   switch ( $_GET['api'] ) {
+    case "familie":
+      api_getfam($msg);
+      break;
+    
     case "ort":
       api_getorte($msg);
       break;

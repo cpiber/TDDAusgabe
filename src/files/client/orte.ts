@@ -1,42 +1,25 @@
 import $ from 'jquery';
 import { alert } from './helpers';
+import { orte } from './settings';
 
-export interface OrtList extends Array<any> {
-  loading ?: boolean;
-}
+export default function generate($selects: JQuery) {
+  const $A = [ $selects.eq(0), $selects.eq(1) ];
+  const $V = [ $selects.eq(2), $selects.eq(3) ];
 
-export default function generate(orte: OrtList, $header: JQuery) {
-  let ort_cur = -1;
-  const $ort = $header.eq(0);
-  const $grp = $header.eq(1);
+  const ausgabeOrtChange: () => void = ortChange.bind(null, $A[0], $A[1], true);
+  $A[0].on('change', ausgabeOrtChange);
+  const verwaltungOrtChange: () => void = ortChange.bind(null, $V[0], $V[1], false);
+  $V[0].on('change', verwaltungOrtChange);
 
   function loadOrte() {
     if (orte.loading) {
       console.debug("'Orte' already loading");
-      return;
+      return orte.loading;
     }
-    orte.loading = true;
-    return $.post('?api=ort').then((data: any) => {
+    const promise = $.post('?api=ort').then((data: any) => {
       if (data && data.status === "success") {
         orte.length = 0;
-
-        const val = $ort.val();
-        $ort.empty();
-
-        // option to not restrict
-        const el = $('<option>');
-        el.val(-1).text("Alle");
-        $ort.append(el);
-
-        // load
-        data.data.forEach((element: any, index: number) => {
-          const el = $('<option>');
-          el.val(index).text(element.Name);
-          $ort.append(el);
-          orte.push(element);
-        });
-        $ort.val(val || -1);
-        ortChange(true);
+        updateOrte(data);
       } else {
         console.error(`Failed getting 'Orte': ${data.message}`);
         alert(`
@@ -51,37 +34,57 @@ export default function generate(orte: OrtList, $header: JQuery) {
         <p>${msg}</p>
       `, "Fehler");
     }).always(() => {
-      orte.loading = false;
+      orte.loading = null;
+    });
+    return orte.loading = promise;
+  }
+
+  function updateOrte(data: any) {
+    [$A, $V].forEach(([$ort, $grp], index) => {
+      const val = $ort.val();
+      $ort.empty();
+
+      if (index === 0) {
+        // option to not restrict
+        const el = $('<option>');
+        el.val(-1).text("Alle");
+        $ort.append(el);
+      }
+
+      // load
+      data.data.forEach((element: any, i: number) => {
+        const el = $('<option>');
+        el.val(i).text(element.Name);
+        $ort.append(el);
+        if (index === 0)
+          orte[i] = element;
+      });
+      $ort.val(val || -1);
+      ortChange($ort, $grp, index === 0);
     });
   }
 
-  function ortChange(force = false) {
-    const cur = ort_cur, n = +$ort.val(), val = $grp.val();
-    if (!force && cur === n) return;
-
+  function ortChange($ort: JQuery<HTMLElement>, $grp: JQuery<HTMLElement>, all) {
+    const n = +$ort.val();
     $grp.empty();
 
-    if (!orte[n]) {
-      $grp.prop('disabled', true);
-      return;
+    if (all) {
+      // option to not restrict
+      const el = $('<option>');
+      el.val(-1).text("Alle");
+      $grp.append(el);
     }
 
-    $grp.prop('disabled', false);
-
-    // option to not restrict
-    const el = $('<option>');
-    el.val(-1).text("Alle");
-    $grp.append(el);
+    if (!orte[n]) {
+      return;
+    }
 
     for (let i = 1; i <= orte[n].Gruppen; i++) {
       const el = $('<option>');
       el.val(i).text(`Gruppe ${i}`);
       $grp.append(el);
     }
-    ort_cur = n;
-
-    if (cur === n) $grp.val(val);
   }
 
-  return { loadOrte, ortChange };
+  return loadOrte;
 }

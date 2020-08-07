@@ -2,7 +2,7 @@ import $ from 'jquery';
 import settings from './settings';
 
 // clone object
-function clone(obj: any) {
+export function clone(obj: any) {
   if (null == obj || "object" != typeof obj) return obj;
   var copy = obj.constructor();
   for (var attr in obj) {
@@ -13,7 +13,7 @@ function clone(obj: any) {
 
 
 // minimum-height for tabs
-function tabH() {
+export function tabH() {
   var b = document.getElementById('tab-body'),
     w = window.outerWidth,
     h = document.getElementById('tab-head').offsetHeight;
@@ -26,7 +26,7 @@ function tabH() {
 
 
 // pad number
-function numPad(num: number, size: number) {
+export function numPad(num: number, size: number) {
   var s = num + "";
   while (s.length < size) s = "0" + s;
   return s;
@@ -34,7 +34,7 @@ function numPad(num: number, size: number) {
 
 
 // format date string
-function formatDate(date: number|Date) {
+export function formatDate(date: number|Date) {
   let d: Date;
   if (date instanceof Date) {
     d = date;
@@ -53,7 +53,7 @@ function formatDate(date: number|Date) {
 
 
 // short highlight
-function highlightElement(el: JQuery<HTMLElement>) {
+export function highlightElement(el: JQuery<HTMLElement>) {
   el.addClass('highlight');
   setTimeout(function () {
     el.removeClass('highlight');
@@ -63,7 +63,7 @@ function highlightElement(el: JQuery<HTMLElement>) {
 
 // alert using modal
 let modal: JQuery<HTMLElement> = null;
-function alert(text: string, title = "", footer = "") {
+export function alert(text: string, title = "", footer = "") {
   var m = modal;
   var h = m.find('.modal-head');
   var f = m.find('.modal-foot');
@@ -88,7 +88,7 @@ $(() => {
 
 
 // calculate price
-function preis(erwachsene = 0, kinder = 0) {
+export function preis(erwachsene = 0, kinder = 0) {
   var s = settings.preis;
   if (typeof (s) == "undefined") { return -1; }
   s = s.replace(/e/g, ""+erwachsene);
@@ -101,5 +101,3 @@ function preis(erwachsene = 0, kinder = 0) {
     alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
   }
 }
-
-export { clone, tabH, numPad, formatDate, highlightElement, alert, preis };

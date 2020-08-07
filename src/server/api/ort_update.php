@@ -39,6 +39,7 @@ function api_updateort($msg) {
       $msg['message'] = $e->getMessage();
     }
     if ( DEBUG ) $msg['sql'] = $sql;
+    if ( DEBUG ) $msg['_data'] = $data;
   }
   
   $json = json_encode( $msg );

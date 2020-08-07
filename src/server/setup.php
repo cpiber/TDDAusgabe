@@ -121,9 +121,14 @@ if ( isset( $_GET['setup'] ) ) {
     case 1:
       echo "<h1>Step 1: Datenbank</h1><br>";
       try {
-        $sql = "DROP DATABASE IF EXISTS tdd;
-        CREATE DATABASE tdd COLLATE utf8_unicode_ci";
-        // use exec() because no results are returned
+        $sql = "DROP DATABASE IF EXISTS tdd";
+        $conn->exec( $sql );
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Löschen der Datenbank `tdd`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+      try {
+        $sql = "CREATE DATABASE tdd COLLATE utf8mb4_unicode_ci";
         $conn->exec( $sql );
         
         echo "<p>Datenbank `tdd` erfolgreich (neu) angelegt.</p>";
@@ -136,21 +141,30 @@ if ( isset( $_GET['setup'] ) ) {
     
     case 2:
       echo "<h1>Step 2: Nutzer</h1><br>";
-      try {
-        if ( !isset( $_POST['u'] ) || !isset( $_POST['p'] ) ) {
-          ?><p>Nutzername und Passwort für Normal-benutzer eingeben:<br><form action="?setup&step=2" method="POST"><input type="text" name="u" placeholder="Username"><br><input type="text" name="p" placeholder="Pasword"><br><input type="submit" value="Anlegen"></form></p><p>Dieser Login ist sowohl der Datenbanknutzer als auch Ihr Login für das Programm.</p><p>Es können mehrere Nutzer angelegt werden, allerdings nur in der SQL-Administrationsoverfläche gelöscht werden.</p><?php
-        } else {
-          $usern = $_POST['u'];
-          $userp = $_POST['p'];
-          $sql = "GRANT ALL ON `tdd`.* TO '$usern'@'localhost' IDENTIFIED BY '$userp';
-          GRANT CREATE, INSERT ON *.* TO '$usern'@'localhost'";
+      if ( !isset( $_POST['u'] ) || !isset( $_POST['p'] ) ) {
+        ?><p>Nutzername und Passwort für Normal-benutzer eingeben:<br><form action="?setup&step=2" method="POST"><input type="text" name="u" placeholder="Username"><br><input type="text" name="p" placeholder="Pasword"><br><input type="submit" value="Anlegen"></form></p><p>Dieser Login ist sowohl der Datenbanknutzer als auch Ihr Login für das Programm.</p><p>Es können mehrere Nutzer angelegt werden, allerdings nur in der SQL-Administrationsoverfläche gelöscht werden.</p><?php
+      } else {
+        $usern = $_POST['u'];
+        $userp = $_POST['p'];
+
+        try {
+          $sql = "GRANT ALL ON `tdd`.* TO '$usern'@'localhost' IDENTIFIED BY '$userp'";
           $conn->exec( $sql );
 
           echo "<p>Nutzer $usern erfolgreich angelegt.</p>";
+        } catch ( PDOException $e ) {
+          echo "<p>Fehler beim Anlegen des Nutzers $usern.<br>";
+          echo setup_error( $sql, $e->getMessage() );
         }
-      } catch ( PDOException $e ) {
-        echo "<p>Fehler beim Anlegen des Nutzers $usern.<br>";
-        echo setup_error( $sql, $e->getMessage() );
+        try {
+          $sql = "GRANT CREATE, INSERT ON *.* TO '$usern'@'localhost'";
+          $conn->exec( $sql );
+
+          echo "<p>Privilegien von $usern erfolgreich erweitert.</p>";
+        } catch ( PDOException $e ) {
+          echo "<p>Fehler beim Erweitern der Privilegien des Nutzers $usern.<br>";
+          echo setup_error( $sql, $e->getMessage() );
+        }
       }
       echo "<p>&nbsp;</p><p><a href=\"?setup&step=3\">Nächster Schritt</a></p>";
       break;

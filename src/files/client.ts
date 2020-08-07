@@ -1,25 +1,22 @@
 import jQuery from 'jquery';
-// import 'JsBarcode';
+// @ts-ignore
+export const JsBarcode = require('jsbarcode');
 
-import ortGenerate, { OrtList } from './client/orte';
+import polyfills from './client/polyfills';
+import ortGenerate from './client/orte';
 import { ausgabeFam, verwaltungFam } from './client/familie';
 import initLogs from './client/log';
 import { delFamDate, resetFam } from './client/actions';
 import settings, { optionsSettingsUpdate } from './client/settings';
-import { optionsOrteUpdate } from './client/orte_settings';
+import { optionsOrteUpdate } from './client/settings_orte';
 import insertHelpHeadings from './client/help';
 import { tabH, alert } from './client/helpers';
 import { karte_designs_help, preis_help } from './client/texts';
 
-// @ts-ignore
-const values = require('object.values');
-// @ts-ignore
-if (!Object.values) {
-  values.shim();
-}
+polyfills();
 
 
-const DEBUG = true;
+export const DEBUG = true;
 
 
 
@@ -27,6 +24,8 @@ const DEBUG = true;
 if ( DEBUG ) {
   // @ts-ignore
   window.$ = jQuery;
+  // @ts-ignore
+  window.JsBarcode = JsBarcode;
   // @ts-ignore
   window.ausgabeFam = ausgabeFam;
   // @ts-ignore
@@ -50,8 +49,6 @@ jQuery(($) => {
   // init tabs
   const $tabHs = $('#tab-head li');
   let $current_tab: JQuery<TabElement>;
-  const orte: OrtList = [];
-  orte.loading = false;
   
   const tabLinks = $tabHs.find('a') as JQuery<TabElement>
   tabLinks.each((_, element) => {
@@ -87,6 +84,8 @@ jQuery(($) => {
     // if (h == '#tab5') { getOrte(); }
   };
 
+  // Ausgabe + Verwaltung Tabs
+
   // load forms and reset
   ausgabeFam.linkHtml();
   ausgabeFam.clear();
@@ -95,37 +94,18 @@ jQuery(($) => {
   verwaltungFam.clear();
   verwaltungFam.disable();
 
-  const $ausgabe_sh = $('#tab2 .search-header select');
-
-  // Orte
-  const { loadOrte, ortChange } = ortGenerate(orte, $ausgabe_sh);
-  if ( DEBUG ) {
-    // @ts-ignore
-    window.orte = orte;
-  }
-
-  $ausgabe_sh.first().on('change', () => ortChange());
-  const updateOrte = optionsOrteUpdate(loadOrte, orte);
-  const updateSettings = optionsSettingsUpdate();
-  tabLinks.get(4).onOpen = () => {updateOrte(); updateSettings();};
-
-  // tabs
-  if (window.location.hash == "") {
-    changeTab($tabHs.first().find('a') as JQuery<TabElement>);
-  } else {
-    changeTab($tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
-  }
-  $tabHs.on('click', 'a', function (e) { changeTab($(this)); });
-  tabH();
-
-  loadOrte();
-  ortChange();
-
+  const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select');
+  
   // Logs tab
   const { info: updateLogInfo, logs: updateLogs } = initLogs();
   tabLinks.get(3).onOpen = () => { updateLogInfo(); updateLogs(); };
-
+  
   // Settings tab
+  const loadOrte = ortGenerate($os_select);
+  const updateOrte = optionsOrteUpdate(loadOrte);
+  const updateSettings = optionsSettingsUpdate();
+  tabLinks.get(4).onClose = () => {updateOrte(); updateSettings();};
+
   const $sett_help = $('#tab5 .help');
   $sett_help.eq(0).on('click', () => alert(preis_help, "Hilfe zur Preisformel"));
   $sett_help.eq(1).on('click', () => alert(karte_designs_help, "Hilfe zu Kartendesigns"));
@@ -136,11 +116,22 @@ jQuery(($) => {
   $sett_actions.eq(3).on('click', () => window.open('?create_backup'));
   $sett_actions.eq(4).on('click', () => window.open('?load_backup'));
 
+  updateOrte();
   updateSettings();
 
   // Help tab
   insertHelpHeadings();
-  
+
+
+  // Init tab
+  if (window.location.hash == "") {
+    changeTab($tabHs.first().find('a') as JQuery<TabElement>);
+  } else {
+    changeTab($tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
+  }
+  $tabHs.on('click', 'a', function (e) { changeTab($(this)); });
+  tabH();
+
 
   // register handlers
   $(window).resize(tabH); //.on('keydown', keyboardHandler);
@@ -153,144 +144,7 @@ jQuery(($) => {
 
 
 /*
-window.onload = function () {
 
-  keyboard_timeout = true;
-  keyboard_timeout_ = undefined;
-  fam_timeout = undefined;
-
-  jQuery('#ort-select').change(ortChange);
-  jQuery('#gruppe-select').change(gruppeChange);
-  jQuery('#verw-ort').change(ortChangeV);
-
-  tdd_orte = { length: 0 };
-  tdd_ort = {};
-  tdd_familien = { query: { length: 0 } };
-  tdd_fam_curr = { query: { length: 0 } };
-  tdd_fam_neu = { query: { length: 0 } };
-  tdd_unsaved_queue = [];
-  tdd_unsaved_queue.callback = function (data) {
-    var pc = data.post.set;
-    var nd = { ID: data.post.meta.value };
-    //jQuery.each( pc, function(i,e) { s = e; nd[i] = s.replaceAll( "'", "" ); } );
-    jQuery.each(pc, function (i, e) { nd[i] = e; });
-    console.debug(nd);
-
-    var index = -1;
-    jQuery.each(tdd_unsaved_queue, function (i, e) { if (JSON.stringify(e.newdata) == JSON.stringify(nd)) { index = i; } });
-
-    var f = tdd_unsaved_queue[index];
-    if (data.status == "success") {
-      if (JSON.stringify(tdd_fam_curr[f.index]) == JSON.stringify(f.data)) {
-        tdd_fam_curr[f.index] = clone(f.newdata);
-        if (typeof (selected_fam) != "undefined" && f.index == selected_fam.index) {
-          var new_fam = new familie(tdd_fam_curr[f.index], f.index);
-          selected_fam = new_fam;
-          console.debug(selected_fam, 'saved');
-          displayFam();
-        } else {
-          console.debug(data, 'saved');
-        }
-      } else {
-        console.debug(data, 'saved');
-      }
-      if (typeof (fam_for_v) != "undefined") {
-        var nd = { ID: data.post.id };
-        jQuery.each(data.post.set, function (i, e) {
-          nd[i] = e;
-        });
-        fam_for_v = { data: nd };
-        jumpToV();
-      }
-    } else {
-      f.error = clone(data);
-      tdd_save_error.push(f);
-      alert("<p>Fehler beim Speichern:</p><p><b>" + data.post.set.Name + "</b></p><p>Mehr in der Konsole</p>", "Achtung!");
-      console.debug('Fehler:', tdd_save_error);
-    }
-    tdd_unsaved_queue.splice(index, 1);
-    var e = document.getElementById('familie-search');
-    e.focus();
-    e.select();
-    e.setSelectionRange(0, e.value.length);
-  };
-  tdd_save_error = [];
-
-  getOrte();
-  getSettings();
-  displayLogs();
-
-  fam = 0;
-  jQuery('.fam-count, #fam-anw').each(function (i, e) {
-    e.addEventListener('click', function () {
-      var el = document.getElementById('familie-count');
-      el.innerText = fam;
-    });
-  });
-  jQuery('#familie-count').on('click', function () {
-    if (this.firstChild.tagName != "INPUT") {
-      var e = document.createElement('input');
-      e.type = "number";
-      e.value = fam;
-      e.style.width = "55px";
-      this.replaceChild(e, this.firstChild);
-      e.focus();
-      e.select();
-    }
-  })
-    .on('keyup', function () {
-      var code = event.keyCode ? event.keyCode : event.which;
-      if (code == 13) {
-        var v = this.firstChild.value;
-        fam = (v == "" ? 0 : v);
-        this.innerHTML = fam;
-      }
-    })
-    .on('focusout', function () {
-      var v = this.firstChild.value;
-      fam = (v == "" ? 0 : v);
-      this.innerHTML = fam;
-    });
-
-  jQuery('#fam-reload').on('click', function () {
-    if (typeof (tdd_orte) !== "undefined") { gruppeChange(); }
-  });
-  jQuery('#fam-anw').on('click', function () {
-    if (selected_fam.retry) {
-      this.checked = false;
-      selected_fam.retry = false;
-      highlightElement(jQuery('#fam-szh'));
-    }
-  });
-  jQuery('#verw-bneu').on('click', verwFamNeu);
-  jQuery('#verw-del').on('click', function () {
-    jQuery('#verw-save, #verw-del').prop('disabled', true);
-    remove({ table: 'familien', meta: { key: 'ID', value: verw_fam.data.ID } }, delFamV);
-  });
-  jQuery('#fam-schuld').on('keyup', schuldfieldChange).on('change', schuldfieldChange);
-  jQuery('#fam-gv').on('click', function () {
-    jQuery('#fam-schuld').prop('disabled', true);
-    if (+selected_fam.data.Schulden + selected_fam.preis >= selected_fam.preis * 3) {
-      jQuery('#fam-szh').html("Darf nächstes Mal nur noch nach Begleichen der Schulden hinein.");
-    }
-  });
-  jQuery('#fam-sb').on('click', function () {
-    jQuery('#fam-schuld').prop('disabled', true);
-    if (selected_fam.schuld) {
-      jQuery('#fam-anw').prop('disabled', false);
-      jQuery('#fam-szh').html("");
-    }
-  });
-
-  jQuery('#log-go').on('click', getEinnahmen);
-
-  jQuery('#sett-save').on('click', function () { saveSettings() });
-  jQuery('#settings input').each(function (i, e) {
-    jQuery(e).on('keypress', function (event) { var code = event.keyCode ? event.keyCode : event.which; if (code == 13) { saveSettings(this); } });
-  });
-
-  
-};
 
 window.onkeydown = function (evt) {
   evt = evt || window.event;
@@ -367,141 +221,6 @@ window.onkeydown = function (evt) {
 
 
 
-
-function getSearch(string, callback) {
-  var meta = [], byid = false;
-  string = string.replace(/^(?: )+|(?: )+$/g, '').replace(/(?: ){2,}/g, ' ');
-  var a = string.split(/ (?=(?:[^'|"]*(?:'|")[^'|"]*(?:'|"))*[^'|"]*$)/g);
-  // regex by https://stackoverflow.com/a/3147901
-
-  if (Number.isInteger(+string) && string != "") {
-    meta.push({ value: string });
-    byid = true;
-  } else {
-    for (var i = 0; i < a.length; i++) {
-      var str = a[i], c = "LIKE", con = "";
-      if (str.slice(0, 1) === "!") {
-        str = str.slice(1);
-        con = "NOT";
-      }
-      if (str.slice(0, 1) === "=") {
-        str = str.slice(1);
-        c = "=";
-      }
-      str = escape(str.replace(/^(?:'|")|(?:'|")$/g, ''));
-      if (c === "LIKE") {
-        str = "%" + str + "%";
-      }
-      meta.push({ compare: c, value: str, connect: con });
-    }
-  }
-
-  post('?post&getSearch', { meta: meta, byid: byid }, callback);
-}
-
-
-
-//Make familien-list + selecting functions
-function famList(first = false) {
-  var l = document.getElementById('familie-list');
-  var lis = l.children;
-  for (var i = 0; i < lis.length; i++) {
-    lis[i].removeEventListener('click', selectFam);
-    if (lis[i].getAttribute('value') !== null) {
-      lis[i].addEventListener('click', selectFam);
-      // if ( first ) {
-      //     //Only one: set directly as present and prepare for next search
-      //     lis[i].click();
-      //     document.getElementById( 'fam-anw' ).click();
-      // }
-    }
-  }
-
-  var e = document.getElementById('familie-search');
-  e.focus();
-  e.select();
-  e.setSelectionRange(0, e.value.length);
-
-}
-
-
-function displayFam() {
-  var f = getFamForm(),
-    d = selected_fam.data;
-
-  f[0].html(unescape(d.Ort));
-  f[1].html(d.Gruppe);
-  if (d.lAnwesenheit != "0000-00-00" && d.lAnwesenheit != "") {
-    var date = new Date(d.lAnwesenheit);
-    var date = date.toLocaleDateString();
-  } else {
-    var date = "";
-  }
-  f[2].html(date);
-  var karte = (d.Karte != "0000-00-00" ? d.Karte : "");
-  f[3].val(karte);
-  f[4].html(d.Erwachsene);
-  f[5].html(d.Kinder);
-  var pr = +preis(+d.Erwachsene, +d.Kinder);
-  selected_fam.preis = pr;
-  f[6].html(pr.toFixed(2) + "€&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; " + (pr + +d.Schulden).toFixed(2));
-  f[7].val((+d.Schulden).toFixed(2));
-  f[8].val(unescape(d.Notizen));
-  var lt = (date == new Date().toLocaleDateString());
-  f[9].prop("checked", lt);
-  f[12].html(d.Num);
-  f[13].html("(" + unescape(d.Name) + ", " + d.ID + ")</span>");
-  f[14].html(unescape(d.Adresse).replace(/\n/g, '<br />'));
-  f[15].html(unescape(d.Telefonnummer));
-
-  jQuery(f).each(function (i, e) { e.prop('disabled', false); });
-  f[9].prop("disabled", lt);
-
-  jQuery('#barcode').JsBarcode(num_pad(d.ID, 6), { height: 28, width: 1, textMargin: 0, fontSize: 11, background: 0, marginLeft: 15, marginRight: 15, margin: 0, displayValue: true });
-
-  //Karte abgelaufen?
-  var date = new Date(karte);
-  var t = new Date();
-  var diff = (t.getTime() - date.getTime());
-  var days = Math.ceil(diff / (1000 * 3600 * 24));
-  if (days > 0) {
-    jQuery('#fam-ab').html("Karte abgelaufen!");
-  } else if (karte == "") {
-    jQuery('#fam-ab').html("Ablaufdatum eingeben!");
-  } else {
-    jQuery('#fam-ab').html("");
-  }
-
-  //Schulden zu hoch?
-  var date = new Date(d.lAnwesenheit);
-  var t = new Date();
-  var diff = (t.getTime() - date.getTime());
-  var days = Math.ceil(diff / (1000 * 3600 * 24));
-  if (+d.Schulden >= pr * 3 && days != 1) {
-    f[9].prop('disabled', true);
-    selected_fam.schuld = true;
-    jQuery('#fam-szh').html("Schulden zu hoch! Muss erst Schulden begleichen!");
-  } else if (+d.Schulden >= pr * 3 && days == 1) {
-    selected_fam.schuld = false;
-    jQuery('#fam-szh').html("Darf nächstes Mal nur noch nach Begleichen der Schulden hinein.");
-  } else {
-    selected_fam.schuld = false;
-    jQuery('#fam-szh').html("");
-  }
-
-  //Bereits abgeholt diese Woche?
-  if (days <= t.getDay()) {
-    var t = jQuery('#fam-szh').html();
-    if (t != "") t += '<br>';
-    jQuery('#fam-szh').html(t + "Hat diese Woche bereits abgeholt!");
-    selected_fam.retry = true;
-  }
-
-  if (typeof (fam_timeout) != "undefined") { clearTimeout(fam_timeout); }
-  var timeout = setTimeout(saveTimeout, 20000);
-  fam_timeout = timeout;
-}
-
 function insertFam(data, list = "") {
   if (data.status == "success") {
     var f = document.getElementById('familie-list'),
@@ -548,181 +267,6 @@ function selectFamV() {
     bs.on('click', function () { verw_fam.save('verwaltung'); });
   }
 }
-
-function displayFamV(e) {
-  var f = getVerwForm(),
-    d = e.data;
-
-  if (typeof (d) == "undefined") { return; }
-  jQuery('#verw-save, #verw-del').prop('disabled', false)
-    .css('display', 'inline-block');
-  jQuery('#verw-neu').css('display', 'none');
-
-  var ort = -1;
-  jQuery.each(tdd_orte, function (i, e) { if (e.Name == d.Ort) { ort = i; } });
-  e.ort = ort;
-
-  var o = f[0].get(0);
-
-  var g = o;
-  while (g.lastChild) {
-    g.lastChild.removeEventListener('click', selectFamV);
-    g.removeChild(g.lastChild);
-  }
-
-  var oa = tdd_orte;
-  for (var i = 0; i < oa.length; i++) {
-    var el = document.createElement('option');
-    el.value = i;
-    var t = document.createTextNode(unescape(oa[i].Name));
-    el.appendChild(t);
-    o.appendChild(el);
-  }
-
-  ortChangeV();
-
-  f[0].val(e.ort);
-  if (d.Gruppe != 0) { f[1].val(d.Gruppe) };
-  if (d.lAnwesenheit != "0000-00-00") {
-    var date = d.lAnwesenheit;
-  } else { var date = ""; }
-  f[2].val(date);
-  f[3].val(d.Karte);
-  f[4].val(d.Erwachsene);
-  f[5].val(d.Kinder);
-  f[6].html(d.ID);
-  f[7].val(d.Schulden);
-  f[8].val(unescape(d.Notizen));
-  f[9].val(unescape(d.Name));
-  f[10].val(d.Num);
-  f[11].val(unescape(d.Adresse));
-  f[12].val(unescape(d.Telefonnummer));
-  jQuery('#barcode').JsBarcode(num_pad(d.ID, 6), { height: 28, width: 1, textMargin: 0, fontSize: 11, background: 0, marginLeft: 15, marginRight: 15, margin: 0, displayValue: true });
-
-  jQuery(f).each(function (i, e) { e.prop('disabled', false); });
-}
-
-function savedVerw(data) {
-  if (data.status == "success") {
-    searchV(searchFamV);
-
-    verw_fam = new familie(verw_neu.newdata, verw_neu.index);
-    verw_fam.saved = true;
-    console.debug(verw_fam, 'saved');
-
-    tdd_fam_curr[verw_fam.index] = clone(verw_fam.data);
-
-    displayFamV(verw_fam);
-    verw_neu = undefined;
-
-    jQuery('#verw-save, #verw-del').prop('disabled', false);
-  } else { console.debug(data); saveErrorV(data); }
-}
-
-function savedVerwN(data) {
-  if (data.status == "success") {
-    console.debug(data);
-    if (data.ID) {
-      searchV(searchFamV);
-
-      verw_fam = new familie({ ID: data.ID }, -1);
-      delete verw_neu.newdata.ID;
-      jQuery.each(verw_neu.newdata, function (i, e) { verw_fam.data[i] = e; });
-      verw_fam.saved = true;
-      console.debug(verw_fam, 'saved');
-
-      try {
-        tdd_orte[tdd_ort[verw_fam.data.Ort]].Personen[verw_fam.data.Gruppe]++;
-      } catch (e) { }
-      displayFamV(verw_fam);
-      verw_neu = undefined;
-
-      var i = tdd_fam_neu.query.length;
-      tdd_fam_neu.query[i] = verw_fam.data;
-      tdd_fam_neu.query.length = ++i;
-
-      jQuery('#verw-save, #verw-del, #verw-neu').prop('disabled', false)
-        .css('display', 'inline-block');
-      jQuery('#verw-neu').css('display', '');
-    } else {
-      alert("<p>Keine ID bekommen...<br>Bitte neu probieren.</p>", "Fehler");
-    }
-  } else { saveErrorV(data); }
-}
-
-function saveErrorV(data) {
-  if (data.status == "success") {
-    console.debug("Something went wrong.......\n", data);
-  } else { console.debug(data); alert("<p>Fehler beim Speichern:</p><p><b>" + data.post.set.Name + "</b></p><p>Mehr in der Konsole</p>", "Achtung!"); }
-}
-
-function delFamV(data) {
-  if (data.status == "success") {
-    if (data.rows == 1) {
-      var f = getVerwForm();
-      resetForm(f);
-      jQuery('#verw-barcode').attr('src', '');
-      searchV(searchFamV);
-    } else { console.debug(data); }
-  } else { console.debug(data); }
-}
-
-function famInV() {
-  if (selected_fam != "undefined") {
-    fam_for_v = selected_fam;
-    var tabHs = document.getElementById('tab-head').firstElementChild.children;
-    a = tabHs[2].getElementsByTagName('a')[0];
-    changeTab(a);
-  }
-}
-function jumpToV() {
-  verw_fam = new familie(fam_for_v.data, -1);
-  selectFamV();
-  fam_for_v = undefined;
-}
-
-function verwFamNeu() {
-  var f = getVerwForm();
-  resetForm(f);
-  jQuery(f).each(function (i, e) { e.prop('disabled', false); });
-
-  var bn = jQuery('#verw-neu');
-  jQuery('#verw-save, #verw-del').css('display', 'none');
-  bn.css('display', 'inline-block');
-  bn.prop('disabled', false);
-  bn.off('click');
-  bn.on('click', function () { verw_fam.save('verwaltung-neu'); });
-
-  var ort = -1;
-
-  var o = f[0].get(0);
-
-  var g = o;
-  while (g.lastChild) {
-    g.lastChild.removeEventListener('click', selectFamV);
-    g.removeChild(g.lastChild);
-  }
-
-  var oa = tdd_orte;
-  for (var i = 0; i < oa.length; i++) {
-    var el = document.createElement('option');
-    el.value = i;
-    var t = document.createTextNode(unescape(oa[i].Name));
-    el.appendChild(t);
-    o.appendChild(el);
-  }
-
-  ortChangeV();
-
-  if (typeof (verw_index) !== "undefined") {
-    var cf = verw_index;
-    var ce = jQuery('ul#verwaltung-list li[value=' + cf + ']')[0];
-    if (typeof (ce) !== "undefined") { ce.classList.remove('selected'); }
-  }
-  verw_fam = new familie({}, -1);
-  verw_index = undefined;
-}
-
 
 
 
@@ -853,24 +397,6 @@ function postFamKarte(familie) {
 
 }
 
-
-
-
-function schuldfieldChange() {
-  jQuery('#fam-gv, #fam-sb').prop('disabled', true);
-  if (this.value >= selected_fam.preis * 3 && !selected_fam.schuld) {
-    jQuery('#fam-szh').html("Darf nächstes Mal nur noch nach Begleichen der Schulden hinein.");
-  } else {
-    jQuery('#fam-szh').html("");
-  }
-  if (selected_fam.schuld) {
-    if (this.value == 0) {
-      jQuery('#fam-anw').prop('disabled', false);
-    } else {
-      jQuery('#fam-szh').html("Schulden zu hoch! Muss erst Schulden begleichen!");
-    }
-  }
-}
 
 
 

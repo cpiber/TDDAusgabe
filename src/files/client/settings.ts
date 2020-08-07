@@ -1,11 +1,25 @@
 import $ from 'jquery';
 import { alert } from './helpers';
+import { OrtList } from './settings_orte';
+import { DEBUG } from '../client';
 
-const settings = {
+export const settings = {
   preis: "",
   designs: "",
   _loading: false
 };
+
+export const orte: OrtList = [];
+orte.loading = null;
+
+
+if (DEBUG) {
+  // @ts-ignore
+  window.settings = settings;
+  // @ts-ignore
+  window.ortList = orte;
+}
+
 
 export function optionsSettingsUpdate() {
   const $in = $('#settings :input');

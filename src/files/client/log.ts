@@ -83,7 +83,6 @@ function loadLogs($div: JQuery<HTMLElement>, $select: JQuery<HTMLSelectElement>)
       const $tbody = $('<tbody>').appendTo($table);
       tr(['ID', 'Zeit', 'Typ', 'Wert'], $tbody, true);
       data.data.forEach(element => {
-        // @ts-ignore
         tr(Object.values(element), $tbody);
       });
 

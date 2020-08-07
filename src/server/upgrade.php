@@ -107,22 +107,42 @@ if ( $ver < DB_VER ) {
       $conn->exec( "
         CREATE FUNCTION `url_decode`(str VARCHAR(255) CHARSET utf8) RETURNS VARCHAR(255) DETERMINISTIC
         BEGIN
-            DECLARE end INT;
-            DECLARE start INT;
-            SET start = LOCATE('%', str);
-            WHILE start > 0 DO
-                SET end = start;
-                WHILE SUBSTRING(str, end, 1) = '%' AND UPPER(SUBSTRING(str, end + 1, 1)) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') AND UPPER(SUBSTRING(str, end + 2, 1)) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') DO
-                    SET end = end + 3;
-                END WHILE;
-                IF start <> end THEN
-                    SET str = INSERT(str, start, end - start, UNHEX(REPLACE(SUBSTRING(str, start, end - start), '%', '')));
-                END IF;
-                SET start = LOCATE('%', str, start + 1);
-            END WHILE;
-            RETURN REPLACE(str, '+', ' ');
+          DECLARE X  INT;
+          SET X = 128;
+          WHILE X  < 192 DO
+            SET str = REPLACE(str, CONCAT('%C5%', HEX(X)), UNHEX(CONCAT('C5', HEX(X))));
+            SET str = REPLACE(str, CONCAT('%C4%', HEX(X)), UNHEX(CONCAT('C4', HEX(X))));
+            SET str = REPLACE(str, CONCAT('%C3%', HEX(X)), UNHEX(CONCAT('C3', HEX(X))));
+            SET  X = X + 1;
+          END WHILE;
+          SET X = 32;
+          WHILE X  < 127 DO
+            SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(HEX(X)));
+            SET  X = X + 1;
+          END WHILE;
+          SET X = 168; -- C2
+          WHILE X  < 192 DO
+            SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(CONCAT('C2', HEX(X))));
+            SET  X = X + 1;
+          END WHILE;
+          SET X = 192; -- C3
+          WHILE X  < 256 DO
+            SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(CONCAT('C3', HEX(X-64))));
+            SET  X = X + 1;
+          END WHILE;
+          SET X = 256; -- C4
+          WHILE X  < 320 DO
+            SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(CONCAT('C4', HEX(X-128))));
+            SET  X = X + 1;
+          END WHILE;
+          SET X = 320; -- C5
+          WHILE X  < 384 DO
+            SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(CONCAT('C5', HEX(X-192))));
+            SET  X = X + 1;
+          END WHILE;
+          RETURN REPLACE(str, '+', ' ');
         END;
-        " );
+        " ); // https://stackoverflow.com/a/61549664/
       $conn->exec( "UPDATE `familien` SET `Name` = url_decode(`Name`), `Ort` = url_decode(`Ort`), `Notizen` = url_decode(`Notizen`), `Adresse` = url_decode(`Adresse`), `Telefonnummer` = url_decode(`Telefonnummer`)");
       $conn->exec( "UPDATE `orte` SET `Name` = url_decode(`Name`)");
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" ); // one-time use

@@ -21,30 +21,17 @@ if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
 
   $conn = connectdb($servername, $username, $password);
   if ( get_class($conn) != "PDO" ) {
-    if ( isset( $_GET['post'] ) ) {
-      header("Content-Type: application/json; charset=UTF-8");
-      echo '{"status":"failure", "type":"Connection failed", "message":"' . $conn->getMessage() . '"}';
-      exit;
-    } else {
-      echo "<html><body>";
-      loginform( "<span style=\"color:red\">Login failed.</span>", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
-      echo "</body></html>";
-      exit;
-    }
+    connect_error(true);
   }
 
 } else {
-  echo "<html><body>";
-  echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
-  loginform( '', ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
-  echo "</body></html>";
-  exit;
+  connect_error();
 }
 
 
 function connectdb($servername, $username, $password) {
   try {
-    $c = new PDO( "mysql:host=$servername;dbname=tdd", $username, $password );
+    $c = new PDO( "mysql:host=$servername;dbname=tdd;charset=utf8", $username, $password );
     // set the PDO error mode to exception
     $c->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     //echo "Connected successfully";
@@ -54,6 +41,21 @@ function connectdb($servername, $username, $password) {
     $c = null;
     return $e;
   }
+}
+
+function connect_error($error = false) {
+  global $conn;
+  if ( isset( $_GET['api'] ) ) {
+    header("Content-Type: application/json; charset=UTF-8");
+    printf( '{"status":"failure", "type":"Connection failed", "message":"%s"}', $error ? $conn->getMessage() : "Not logged in." );
+  } else {
+    echo "<html><body>";
+    echo "<title>Tischlein Deck Dich Login</title>";
+    echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
+    loginform( $error ? "<span style=\"color:red\">Login failed.</span>" : "", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
+    echo "</body></html>";
+  }
+  exit;
 }
 
 function loginform( $msg = "", $url = "" ) { ?>
@@ -68,6 +70,7 @@ function loginform( $msg = "", $url = "" ) { ?>
     }
     form input {
       width: 100%;
+      box-sizing: border-box;
     }
   </style>
   <div class="float-middle"><form action="<?php echo "?login" . ( $url == "" ? "" : "&url=".urlencode($url) ); ?>" method="POST">

@@ -89,39 +89,47 @@
             <ul id="familie-list"></ul>
           </div>
           <div class="cols2 familie-data">
-            <p style="font-weight: bolder;" id="fam-ab"></p>
-            <p><b>Familien-Nummer: <span id="familie-count">0</span></b> <button class="fam-count o"
-                onclick="return void(--fam)">-</button><button class="fam-count o"
-                onclick="return void(fam=0)">0</button><button class="fam-count o"
-                onclick="return void(++fam)">+</button></p>
-            <p class="w100pm400px"><a href="#" class="link" onclick="postFamKarte(selected_fam);return false">Karte
-                drucken</a> <span id="fam-info" style="font-size:85%"></span></p>
-            <p>Ort: <span id="fam-ort"></span> | Gruppe: <span id="fam-gruppe"></span> | Nummer: <span
-                id="fam-num"></span></p>
-            <p>Letzte Anwesenheit: <span id="fam-lan"></span></p>
-            <p>Karte gültig bis: <input id="fam-karte" type="date"></p>
-            <p>Erwachsene / Kinder: <span id="fam-erw"></span> / <span id="fam-kinder"></span></p>
-            <p>zu zahlen: <span id="fam-preis"></span>€</p>
-            <p>Schulden: <input id="fam-schuld" type="number" style="width:60px">€</p>
-            <p>Notizen:<br><textarea id="fam-notiz" class="w100pm400px"></textarea></p>
-            <p>Zusatzinfo: <button
-                onclick="this.nextSibling.style.display=this.nextSibling.style.display=='none'?'':'none'">Umschalten</button><span
-                style="display:none;"><br />Adresse:<br /><span
-                  id="fam-adresse"></span><br /><br />Telefonnummer:<br /><span id="fam-tel"></span></span></p>
-            <br>
+            <p style="font-weight: bolder;" class="w100pm400px"><span></span></p>
+            <p class="w100pm400px">
+              <b>Familien-Nummer: <span>0</span></b>
+              <button class="fam-count o">-</button>
+              <button class="fam-count o">0</button>
+              <button class="fam-count o">+</button>
+            </p>
+            <p class="w100pm400px">
+              <span class="link">Karte drucken</span> &nbsp; <span></span>
+            </p>
+            <p class="w100pm400px">Ort: <span></span> | Gruppe: <span></span> | Nummer: <span></span></p>
+            <p class="w100pm400px">Letzte Anwesenheit: <span></span></p>
+            <p class="w100pm400px">Karte gültig bis: <input type="date" /></p>
+            <p class="w100pm400px">Erwachsene / Kinder: <span></span> / <span></span></p>
+            <p class="w100pm400px">zu zahlen: <span></span>€</p>
+            <p class="w100pm400px">Schulden: <input type="number" style="width:60px" step="0.01" />€</p>
+            <p class="w100pm400px">Notizen:<br><textarea class="w100pm400px"></textarea></p>
+            <p class="no-space">Zusatzinfo:
+              <button onclick="var s=this.parentElement.nextElementSibling;s.style.display=s.style.display=='none'?'':'none'">Umschalten</button>
+            </p>
+            <p style="display:none;" class="w100pm400px">
+              Adresse:<br /><span ></span><br /><br />
+              Telefonnummer:<br /><span></span>
+            </p>
+            <br />
             <div class="w100pm400px">
-              <div class="cols3"><input id="fam-anw" type="checkbox" onclick="if(this.checked){++fam}else{--fam}">
-                Anwesend</div>
-              <div class="cols3"><input id="fam-gv" type="checkbox" title="Fügt gesamten Preis zu den Schulden hinzu">
-                Geld vergessen</div>
-              <div class="cols3"><input id="fam-sb" type="checkbox"
-                  title="Setzt Schulden auf Null&#xA;&#013;Nur wenn ALLE Schulden bezahlt wurden"> Schulden beglichen
+              <div class="cols3">
+                <label><input type="checkbox" /> Anwesend</label>
               </div>
+              <div class="cols3">
+                <label><input type="checkbox" title="Fügt gesamten Preis zu den Schulden hinzu" /> Geld vergessen</label>
+              </div>
+              <div class="cols3">
+                <label><input type="checkbox" title="Setzt Schulden auf Null&#xA;&#013;Nur wenn ALLE Schulden bezahlt wurden" /> Schulden beglichen</label>
+              </div>
+              <div class="clear"></div>
             </div>
-            <p>&nbsp;</p>
-            <p class="w100pm400px msg-box" id="fam-szh"></p>
-            <p>&nbsp;</p>
-            <button class="w100pm400px" onclick="famInV()">Familie bearbeiten</button>
+            <p class="w100pm400px">&nbsp;</p>
+            <span class="w100pm400px msg-box"></span>
+            <p class="w100pm400px">&nbsp;</p>
+            <button class="w100pm400px">Familie bearbeiten</button>
           </div>
         </div>
       </div>
@@ -137,23 +145,24 @@
             <button id="verw-bneu" style="width:100%;border:2px outset #606060;">+</button>
           </div>
           <div class="cols2 familie-data">
-            <p class="w100pm400px"><a href="#" class="link" onclick="postFamKarte(verw_fam);return false">Karte
-                drucken</a>&nbsp;&nbsp;&nbsp; ID: <span id="verw-id"></span></p>
-            <p>Name:<br><input id="verw-name" class="w100pm400px" type="text" placeholder="Name" /></p>
-            <p>Ort: <select id="verw-ort"></select></p>
-            <p>Gruppe: <select id="verw-gruppe"></select></p>
-            <p>Nummer: <input id="verw-num" type="number" style="width:60px;" /></p>
-            <p>Erwachsene: <input id="verw-erw" type="number" style="width:60px;" /></p>
-            <p>Kinder: <input id="verw-kinder" type="number" style="width:60px;" /></p>
-            <p>Letzte Anwesenkeit: <input id="verw-lan" type="date" /></p>
-            <p>Ablaufdatum Karte: <input id="verw-karte" type="date" /></p>
-            <p>Schulden: <input id="verw-schuld" type="number" style="width:60px;" />€</p>
-            <p>Notizen:<br><textarea id="verw-notiz" class="w100pm400px"></textarea></p>
-            <p>Adresse:<br><textarea id="verw-adresse" class="w100pm400px"></textarea></p>
-            <p>Telefonnummer:<br><input id="verw-tel" class="w100pm400px" type="text" placeholder="Telefon" /></p>
+            <p class="w100pm400px">
+              <span class="link">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span></span>
+            </p>
+            <p>Name:<br><input class="w100pm400px" type="text" placeholder="Name" /></p>
+            <p>Ort: <select></select></p>
+            <p>Gruppe: <select></select></p>
+            <p>Nummer: <input type="number" style="width:60px;" /></p>
+            <p>Erwachsene: <input type="number" style="width:60px;" /></p>
+            <p>Kinder: <input type="number" style="width:60px;" /></p>
+            <p>Letzte Anwesenkeit: <input type="date" /></p>
+            <p>Ablaufdatum Karte: <input type="date" /></p>
+            <p>Schulden: <input type="number" style="width:60px;" step="0.01" />€</p>
+            <p>Notizen:<br><textarea class="w100pm400px"></textarea></p>
+            <p>Adresse:<br><textarea class="w100pm400px"></textarea></p>
+            <p>Telefonnummer:<br><input class="w100pm400px" type="text" placeholder="Telefon" /></p>
             <br>
-            <p><button id="verw-save" class="w100pm400px" data-save="Speichern" data-create="Anlegen"></button></p>
-            <p><button id="verw-del" class="w100pm400px">Löschen</button></p>
+            <p><button class="w100pm400px" data-save="Speichern" data-create="Anlegen"></button></p>
+            <p><button class="w100pm400px">Löschen</button></p>
           </div>
         </div>
       </div>
@@ -377,7 +386,19 @@
         <h3 class="modal-foot">Modal Footer</h3>
       </div>
     </div>
+  </div>
 
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close">&times;</span>
+        <h2 class="modal-head">Karte drucken</h2>
+      </div>
+      <div class="modal-body"><iframe src="?karte"></iframe></div>
+      <div class="modal-footer">
+        <h3 class="modal-foot"></h3>
+      </div>
+    </div>
   </div>
 
 </body>

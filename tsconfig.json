@@ -1,8 +1,6 @@
 {
   "exclude": [
-    "node_modules",
-    "index.ts",
-    "index.js"
+    "node_modules"
   ],
   "compilerOptions": {
     "outDir": "./dist/",
@@ -12,7 +10,8 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
+      "src/ts-types"
     ]
   }
 }

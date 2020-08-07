@@ -303,6 +303,10 @@ if ( isset( $_GET['load_backup'] ) ) {
               if ( $id ) $set[":ID"] = $id;
               foreach ( $obj as $key => $value ) {
                 if ( $key == "ID" || $key == "Personen" ) continue;
+                if ( ( $key == "lAnwesenheit" || $key == "Karte" ) && $value == "0000-00-00" ) {
+                  $set[":".$key] = null;
+                  continue;
+                }
                 $set[":".$key] = $value;
               }
               
