@@ -15,41 +15,28 @@ function api_getloginfo($msg) {
   }
 
   try {
-    $conn->beginTransaction();
     $msg['data'] = array();
-    $sqls = array();
-
-    $sql = "CREATE TEMPORARY TABLE logsubset SELECT `Type`, `Val`, splitStr(`Val`, '/', 1) AS `P1`, splitStr(`Val`, '/', 2) AS `P2` FROM `logs`";
+    $where = "";
     if ( !empty( $parts ) )
-      $sql = sprintf( "%s WHERE %s", $sql, implode( " AND ", $parts ) );
-    $sqls[] = $sql;
-
+      $where = sprintf( " WHERE %s", implode( " AND ", $parts ) );
+    
+    $sql = "SELECT SUM(IF(`Type`='money',`Val`,0)) AS `Money`, SUM(IF(`Type`='attendance',1,0)) AS `Families`, SUM(IF(`Type`='attendance',`P1`,0)) AS `Adults`, SUM(IF(`Type`='attendance',`P2`,0)) AS `Children` FROM logsalt $where";
     $stmt = $conn->prepare( $sql );
+    $stmt->setFetchMode( PDO::FETCH_ASSOC );
     $stmt->execute( $data );
-    
-    $sqls[] = $sql = "SELECT SUM(`Val`) AS `Money` FROM logsubset WHERE `Type` = 'money'";
-    $stmt = $conn->query( $sql );
-    $stmt->setFetchMode( PDO::FETCH_ASSOC );
-    $msg['data']['money'] = $stmt->fetch()['Money'];
-    
-    $sqls[] = $sql = "SELECT COUNT(*) AS `Families`, SUM(`P1`) AS `Adults`, SUM(`P2`) AS `Children` FROM logsubset WHERE `Type` = 'attendance'";
-    $stmt = $conn->query( $sql );
-    $stmt->setFetchMode( PDO::FETCH_ASSOC );
     $res = $stmt->fetch();
+    $msg['data']['money'] = $res['Money'];
     $msg['data']['adults'] = $res['Adults'];
     $msg['data']['children'] = $res['Children'];
     $msg['data']['families'] = $res['Families'];
 
-    $sqls[] = $sql = "DROP TEMPORARY TABLE logsubset";
-    $conn->exec( $sql );
-    
-    $conn->commit();
     $msg['status'] = 'success';
   } catch ( PDOException $e ) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
   }
-  if ( DEBUG ) $msg['sql'] = $sqls;
+  if ( DEBUG ) $msg['sql'] = $sql;
+  if ( DEBUG ) $msg['_data'] = $data;
   
   $json = json_encode( $msg );
   if ( $json )

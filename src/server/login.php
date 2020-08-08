@@ -49,7 +49,7 @@ function connect_error($error = false) {
     header("Content-Type: application/json; charset=UTF-8");
     printf( '{"status":"failure", "type":"Connection failed", "message":"%s"}', $error ? $conn->getMessage() : "Not logged in." );
   } else {
-    echo "<html><head>";
+    echo "<!DOCTYPE html><html><head>";
     echo "<title>Tischlein Deck Dich Login</title>";
     echo "<meta charset=\"UTF-8\">";
     echo "</head><body>";

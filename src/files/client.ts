@@ -5,6 +5,7 @@ export const JsBarcode = require('jsbarcode');
 import polyfills from './client/polyfills';
 import ortGenerate from './client/orte';
 import { ausgabeFam, verwaltungFam } from './client/familie';
+import searchGenerate from './client/search';
 import initLogs from './client/log';
 import { delFamDate, resetFam } from './client/actions';
 import settings, { optionsSettingsUpdate } from './client/settings';
@@ -49,14 +50,8 @@ jQuery(($) => {
   // init tabs
   const $tabHs = $('#tab-head li');
   let $current_tab: JQuery<TabElement>;
-  
-  const tabLinks = $tabHs.find('a') as JQuery<TabElement>
-  tabLinks.each((_, element) => {
-    element.onClose = () => { };
-    element.onOpen = () => { };
-  });
 
-  const changeTab = (link: JQuery<TabElement>) => {
+  changeTab = ($link: JQuery<TabElement>) => {
     if ($current_tab) {
       // close tab and hide
       $current_tab.get(0).onClose();
@@ -65,10 +60,10 @@ jQuery(($) => {
     }
 
     // open tab and show
-    $(link.attr('href')).css('display', 'block')
-    link.addClass('selected');
-    link.get(0).onOpen();
-    $current_tab = link;
+    $($link.attr('href')).css('display', 'block')
+    $link.addClass('selected');
+    $link.get(0).onOpen();
+    $current_tab = $link;
 
     // if (c.getAttribute('href') == '#tab2' && typeof (selected_fam) !== "undefined") {
     //   selected_fam.save();
@@ -83,18 +78,26 @@ jQuery(($) => {
     // if (h == '#tab4') { var p = jQuery('#log-pagination').val(); getLogs(p); }
     // if (h == '#tab5') { getOrte(); }
   };
+  
+  const tabLinks = $tabHs.find('a') as JQuery<TabElement>
+  tabLinks.each((_, element) => {
+    element.onClose = () => { };
+    element.onOpen = () => { };
+  });
 
   // Ausgabe + Verwaltung Tabs
 
   // load forms and reset
   ausgabeFam.linkHtml();
   ausgabeFam.clear();
-  ausgabeFam.disable();
   verwaltungFam.linkHtml();
   verwaltungFam.clear();
-  verwaltungFam.disable();
 
   const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select');
+  const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
+  const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms);
+  tabLinks.get(1).onOpen = ausgSearch;
+  tabLinks.get(2).onOpen = verwSearch;
   
   // Logs tab
   const { info: updateLogInfo, logs: updateLogs } = initLogs();
@@ -141,6 +144,7 @@ jQuery(($) => {
     console.log(event, event.which, event.key);
   }
 });
+export let changeTab: ($link: JQuery<TabElement>) => void;
 
 
 /*
@@ -271,74 +275,7 @@ function selectFamV() {
 
 
 //Search for familien and verwaltung tabs
-function search(c) {
-  if (typeof (selected_fam) !== "undefined") {
-    selected_fam.save();
-  }
 
-  jQuery('#ort-select').prop("value", -1);
-  jQuery('#gruppe-select').prop("value", -1);
-
-  var g = document.getElementById('gruppe-select');
-  while (g.lastChild) {
-    g.removeChild(g.lastChild);
-  }
-
-  var f = document.getElementById('familie-list');
-  while (f.lastChild) {
-    f.lastChild.removeEventListener('click', selectFam);
-    f.removeChild(f.lastChild);
-  }
-
-  var f = getFamForm();
-  jQuery('#barcode').attr('src', '');
-  resetForm(f);
-  selected_fam = undefined;
-
-  var s = document.getElementById('familie-search').value;
-  getSearch(s, c);
-}
-
-function searchV(c) {
-  var f = document.getElementById('verwaltung-list');
-  while (f.lastChild) {
-    f.lastChild.removeEventListener('click', selectFamV);
-    f.removeChild(f.lastChild);
-  }
-
-  var f = getVerwForm();
-  jQuery('#barcode').attr('src', '');
-  resetForm(f);
-  verw_fam = undefined;
-
-  var s = document.getElementById('verwaltung-search').value;
-  getSearch(s, c);
-}
-
-//Search-callbacks
-function searchFamA(data) {
-  var f = document.getElementById('familie-list');
-  while (f.lastChild) {
-    f.lastChild.removeEventListener('click', selectFam);
-    f.removeChild(f.lastChild);
-  }
-  searchFam(data, f);
-  famList((data.post.byid == "true"));
-}
-
-function searchFamV(data) {
-  var f = document.getElementById('verwaltung-list');
-  while (f.lastChild) {
-    f.lastChild.removeEventListener('click', selectFam);
-    f.removeChild(f.lastChild);
-  }
-  searchFam(data, f);
-  verwList();
-
-  if (typeof (verw_fam) !== "undefined") {
-    jQuery('#verwaltung-list li[value="' + verw_fam.index + '"]').addClass('selected');
-  }
-}
 
 function searchFam(data, f) {
   if (data.status == "success") {

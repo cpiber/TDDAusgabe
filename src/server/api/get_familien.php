@@ -101,7 +101,7 @@ function api_getfam($msg) {
 
   try {
     $where = implode( " AND ", $parts );
-    $sql = "SELECT * FROM `familien` WHERE $where";
+    $sql = "SELECT * FROM `familien` WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
 
     if ( !$single && $pagesize != -1 ) {
       $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `familien` WHERE $where" );

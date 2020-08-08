@@ -69,24 +69,26 @@
         <div>
           <div class="cols2 search-header" style="margin-bottom: 10px">
             <div class="cols2 cw100p">
-              <select id="ort-select"></select><br />
-              <select id="gruppe-select"></select>
-              <button id="fam-reload">
+              <select></select><br />
+              <select></select>
+              <!--<button>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
                   <path d="M9 13.5c-2.49 0-4.5-2.01-4.5-4.5S6.51 4.5 9 4.5c1.24 0 2.36.52 3.17 1.33L10 8h5V3l-1.76 1.76C12.15 3.68 10.66 3 9 3 5.69 3 3.01 5.69 3.01 9S5.69 15 9 15c2.97 0 5.43-2.16 5.9-5h-1.52c-.46 2-2.24 3.5-4.38 3.5z" />
                 </svg>
-              </button>
+              </button>-->
             </div>
-            <div class="cols2 cw100p" style="vertical-align: bottom">
-              <input id="familie-search" type="text" placeholder="Suche" />
-              <input type="submit" value="Suchen" />
+            <div class="cols2 cw100p">
+              <form class="cw100p">
+                <input type="text" placeholder="Suche" />
+                <input type="submit" value="Suchen" />
+              </form>
             </div>
           </div>
         </div>
 
         <div>
           <div class="cols2 select-list">
-            <ul id="familie-list"></ul>
+            <ul></ul>
           </div>
           <div class="cols2 familie-data">
             <p style="font-weight: bolder;" class="w100pm400px"><span></span></p>
@@ -101,11 +103,11 @@
             </p>
             <p class="w100pm400px">Ort: <span></span> | Gruppe: <span></span> | Nummer: <span></span></p>
             <p class="w100pm400px">Letzte Anwesenheit: <span></span></p>
-            <p class="w100pm400px">Karte gültig bis: <input type="date" /></p>
+            <p class="w100pm400px"><label>Karte gültig bis: <input type="date" /></label></p>
             <p class="w100pm400px">Erwachsene / Kinder: <span></span> / <span></span></p>
             <p class="w100pm400px">zu zahlen: <span></span>€</p>
-            <p class="w100pm400px">Schulden: <input type="number" style="width:60px" step="0.01" />€</p>
-            <p class="w100pm400px">Notizen:<br><textarea class="w100pm400px"></textarea></p>
+            <p class="w100pm400px"><label>Schulden: <input type="number" style="width:60px" step="0.01" />€</label></p>
+            <p class="w100pm400px"><label>Notizen:<br><textarea class="w100pm400px"></textarea></label></p>
             <p class="no-space">Zusatzinfo:
               <button onclick="var s=this.parentElement.nextElementSibling;s.style.display=s.style.display=='none'?'':'none'">Umschalten</button>
             </p>
@@ -138,11 +140,13 @@
         <div>
           <div class="cols2 cw100p">
             <div class="cw100p search-header" style="margin-bottom: 10px">
-              <input id="verwaltung-search" type="text" placeholder="Suche" />
-              <input type="submit" value="Suchen" />
+              <form class="cw100p">
+                <input type="text" placeholder="Suche" />
+                <input type="submit" value="Suchen" />
+              </form>
             </div>
             <div class="select-list">
-              <ul id="verwaltung-list"></ul>
+              <ul></ul>
             </div>
             <div class="cw100p">
               <button class="button-add">+</button>
@@ -152,18 +156,18 @@
             <p class="w100pm400px">
               <span class="link">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span></span>
             </p>
-            <p>Name:<br><input class="w100pm400px" type="text" placeholder="Name" /></p>
-            <p>Ort: <select></select></p>
-            <p>Gruppe: <select></select></p>
-            <p>Nummer: <input type="number" style="width:60px;" /></p>
-            <p>Erwachsene: <input type="number" style="width:60px;" /></p>
-            <p>Kinder: <input type="number" style="width:60px;" /></p>
-            <p>Letzte Anwesenkeit: <input type="date" /></p>
-            <p>Ablaufdatum Karte: <input type="date" /></p>
-            <p>Schulden: <input type="number" style="width:60px;" step="0.01" />€</p>
-            <p>Notizen:<br><textarea class="w100pm400px"></textarea></p>
-            <p>Adresse:<br><textarea class="w100pm400px"></textarea></p>
-            <p>Telefonnummer:<br><input class="w100pm400px" type="text" placeholder="Telefon" /></p>
+            <p><label>Name:<br><input class="w100pm400px" type="text" placeholder="Name" /></label></p>
+            <p><label>Ort: <select></select></label></p>
+            <p><label>Gruppe: <select></select></label></p>
+            <p><label>Nummer: <input type="number" style="width:60px;" /></label></p>
+            <p><label>Erwachsene: <input type="number" style="width:60px;" /></label></p>
+            <p><label>Kinder: <input type="number" style="width:60px;" /></label></p>
+            <p><label>Letzte Anwesenkeit: <input type="date" /></label></p>
+            <p><label>Ablaufdatum Karte: <input type="date" /></label></p>
+            <p><label>Schulden: <input type="number" style="width:60px;" step="0.01" />€</label></p>
+            <p><label>Notizen:<br><textarea class="w100pm400px"></textarea></label></p>
+            <p><label>Adresse:<br><textarea class="w100pm400px"></textarea></label></p>
+            <p><label>Telefonnummer:<br><input class="w100pm400px" type="text" placeholder="Telefon" /></label></p>
             <br>
             <p><button class="w100pm400px" data-save="Speichern" data-create="Anlegen"></button></p>
             <p><button class="w100pm400px">Löschen</button></p>

@@ -101,3 +101,11 @@ export function preis(erwachsene = 0, kinder = 0) {
     alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
   }
 }
+
+
+// promise timeout
+export function timeout(ms: number = 0) {
+  const dfd = $.Deferred();
+  setTimeout(() => { dfd.resolve(); }, ms);
+  return dfd.promise();
+}

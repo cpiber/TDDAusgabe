@@ -1,12 +1,12 @@
 
 import jQuery from 'jquery';
 import { famdata, famdirty, famelems, fam } from './familie_interfaces';
-import { clone, formatDate, preis, numPad, highlightElement } from './helpers';
-import { JsBarcode } from '../client';
+import { clone, formatDate, preis, numPad, highlightElement, timeout } from './helpers';
+import { JsBarcode, changeTab, TabElement } from '../client';
 import { orte } from './settings';
 
 
-class familie {
+export class familie {
   data: famdata = {};
   dirty: famdirty = {};
   barcode: string;
@@ -17,27 +17,12 @@ class familie {
 
   constructor (data: any) {
     Object.assign(this.data, fam, data);
-    JsBarcode(familie.barcode, numPad(this.data.ID, 6), {
-      height: 28,
-      width: 1,
-      textMargin: 0,
-      fontSize: 11,
-      background: 0,
-      marginLeft: 15,
-      marginRight: 15,
-      margin: 0,
-      displayValue: true
-    });
-    this.barcode = familie.barcode.src;
+    this.generateBarcode();
   }
 
   static linkHtml () {
     familie.barcode = $('#barcode').get(0) as HTMLImageElement;
-    ['ID', 'Name', 'Erwachsene', 'Kinder',
-      'Ort', 'Gruppe', 'Schulden', 'Karte',
-      'lAnwesenheit', 'Notizen', 'Num',
-      'Adresse', 'Telefonnummer',
-      'Notizen'].forEach(element => {
+    Object.keys(fam).forEach(element => {
         const el = this.elems[element];
         if (!el) return;
         el.on('change keyup', () => {
@@ -59,6 +44,7 @@ class familie {
       if (typeof (el.val) === "function") el.val('');
       el.prop('checked', false);
     }
+    this.disable();
   }
 
   show(cls: typeof familie) {
@@ -73,6 +59,22 @@ class familie {
         el.text(this.data[prop]);
       }
     }
+  }
+
+  generateBarcode() {
+    if (!this.data.ID) return;
+    JsBarcode(familie.barcode, numPad(this.data.ID, 6), {
+      height: 28,
+      width: 1,
+      textMargin: 0,
+      fontSize: 11,
+      background: 0,
+      marginLeft: 15,
+      marginRight: 15,
+      margin: 0,
+      displayValue: true
+    });
+    this.barcode = familie.barcode.src;
   }
 
   static disable() {
@@ -127,7 +129,7 @@ export class ausgabeFam extends familie {
 
   constructor(data: any) {
     super(data);
-    this.preis = preis(+this.data.Erwachsene, +this.data.Kinder);
+    if (ausgabeFam.current) ausgabeFam.current.save();
     ausgabeFam.current = this;
     ausgabeFam.enable();
     this.show();
@@ -223,6 +225,15 @@ export class ausgabeFam extends familie {
       this.counter++;
     });
 
+    const $verw = $('a[href="#tab3"]') as JQuery<TabElement>;
+    $inputs.eq(24).on('click', () => {
+      if (!this.current) return;
+      new verwaltungFam(this.current.data);
+      this.current = null;
+      changeTab($verw);
+      this.clear();
+    });
+
     super.linkHtml();
   }
 
@@ -238,6 +249,7 @@ export class ausgabeFam extends familie {
   show() {
     super.show(ausgabeFam);
 
+    this.preis = preis(+this.data.Erwachsene, +this.data.Kinder);
     let lAnw = this.data.lAnwesenheit;
     try {
       lAnw = (new Date(this.data.lAnwesenheit)).toLocaleDateString();
@@ -269,6 +281,9 @@ export class ausgabeFam extends familie {
     }
 
     this.errors();
+
+    if (!ausgabeFam.errors.already && !ausgabeFam.errors.money_now && !lToday)
+      ausgabeFam.$anwesend.click();
   }
 
   errors() {
@@ -293,7 +308,7 @@ export class ausgabeFam extends familie {
     }
     
     // Schulden zu hoch
-    if (s >= this.preis * 3) {
+    if (s !== 0 && s >= this.preis * 3) {
       if (days > 1) {
         ausgabeFam.$anwesend.prop('disabled', true);
         this.schuld = true;
@@ -380,12 +395,12 @@ export class verwaltungFam extends familie {
     verwaltungFam.current = this;
     if (data !== undefined && data !== null) {
       this.newFam = false;
-      this.show();
       verwaltungFam.editMode();
     } else {
       this.newFam = true;
       verwaltungFam.createMode();
     }
+    this.show();
     verwaltungFam.enable();
   }
 
@@ -412,6 +427,11 @@ export class verwaltungFam extends familie {
       if (!this.current) return;
       // this.current.delete();
     });
+    const $list = $('#tab3 .select-list ul');
+    $('#tab3 .button-add').on('click', () => {
+      $list.find('.selected').removeClass('selected');
+      new verwaltungFam();
+    });
 
     super.linkHtml();
   }
@@ -426,8 +446,9 @@ export class verwaltungFam extends familie {
 
   show() {
     super.show(verwaltungFam);
-
-    verwaltungFam.elems.Ort.val(orte.findIndex(val => val.Name === this.data.Ort));
+    
+    verwaltungFam.elems.Ort.val(orte.findIndex(val => val.Name === this.data.Ort)).change();
+    timeout().then(() => verwaltungFam.elems.Gruppe.val(this.data.Gruppe));
   }
 
   static disable() {

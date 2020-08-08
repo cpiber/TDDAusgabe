@@ -4,24 +4,22 @@ function api_newort($msg) {
   global $conn;
 
   $name = array_key_exists( 'Name', $_POST ) ? $_POST['Name'] : "";
-  $gruppen = array_key_exists( 'Gruppen', $_POST ) ? intval( $_POST['Gruppen'] ) : null;
-  if ( $gruppen !== null && $gruppen < 0 ) $gruppen = 0;
+  $gruppen = array_key_exists( 'Gruppen', $_POST ) ? intval( $_POST['Gruppen'] ) : 0;
+  if ( $gruppen < 0 ) $gruppen = 0;
   $data = array();
 
   try {
     $sql = "INSERT INTO `orte` (";
     $val = "";
     if ( !empty( $name ) ) {
-      $sql .= "`Name`";
-      $val .= ":name";
+      $sql .= "`Name`, ";
+      $val .= ":name, ";
       $data[":name"] = $name;
     }
-    if ( !empty( $name ) && $gruppen !== null ) { $sql .= ", "; $val .= ", "; }
-    if ( $gruppen !== null ) {
-      $sql .= "`Gruppen`";
-      $val .= ":gruppen";
-      $data[":gruppen"] = $gruppen;
-    }
+    $sql .= "`Gruppen`";
+    $val .= ":gruppen";
+    $data[":gruppen"] = $gruppen;
+    
     $sql =  sprintf( "%s) VALUES (%s)", $sql, $val );
     
     if ( count( $data ) === 2 ) {
@@ -34,7 +32,7 @@ function api_newort($msg) {
       if ( DEBUG ) $msg['_data'] = $data;
     } else {
       $msg['status'] = 'failure';
-      $msg['message'] = 'No/Insufficient data';
+      $msg['message'] = 'Name fehlt';
     }
 
   } catch ( PDOException $e ) {

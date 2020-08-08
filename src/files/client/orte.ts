@@ -64,8 +64,13 @@ export default function generate($selects: JQuery) {
     });
   }
 
-  function ortChange($ort: JQuery<HTMLElement>, $grp: JQuery<HTMLElement>, all) {
-    const n = +$ort.val();
+  function ortChange($ort: JQuery<HTMLElement>, $grp: JQuery<HTMLElement>, all: boolean) {
+    let n = $ort.val();
+    if (n === null) {
+      n = -1;
+    } else {
+      n = +n;
+    }
     $grp.empty();
 
     if (all) {

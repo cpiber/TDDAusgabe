@@ -5,8 +5,7 @@ function setup_error($sql, $error) {
   return sprintf( "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%%;padding:6px;\">%s: <strong>%s</strong><br></span></p>", $sql, $error );
 }
 
-$proc_resetFamNum = "
-  CREATE PROCEDURE resetFamNum()
+$proc_resetFamNum = "CREATE PROCEDURE resetFamNum()
   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE f_id, f_gruppe INT;
@@ -37,18 +36,25 @@ $proc_resetFamNum = "
     CLOSE fam;
   END;
   ";
-$proc_newNum = "
-  CREATE FUNCTION newNum(
+$proc_newNum = "CREATE FUNCTION newNum(
+    q_ID INT,
     q_ort VARCHAR(255),
     q_gruppe INT
   )
   RETURNS int
   BEGIN
-    DECLARE done INT DEFAULT FALSE;
     DECLARE next INT DEFAULT 1;
-    DECLARE f_num INT;
+    DECLARE f_ID INT DEFAULT q_ID;
 
-    SELECT MIN(`f`.`Num`+1) INTO next FROM `tdd`.`familien` AS `f` LEFT JOIN `tdd`.`familien` AS `t` ON (`f`.`Num`+1 = `t`.`Num` AND `f`.`Ort` = `t`.`Ort` AND `f`.`Gruppe` = `t`.`Gruppe`) WHERE `t`.`Num` IS NULL AND `f`.`Ort` = q_ort AND `f`.`Gruppe` = q_gruppe;
+    IF f_ID IS NULL THEN
+      SET f_ID = 0;
+    END IF;
+    
+    SELECT MIN(`left`.`Num`+1) INTO next FROM (
+      SELECT 0 as `Num` UNION SELECT `Num` FROM `tdd`.`familien` AS `f` WHERE `f`.`ID` <> f_ID AND `f`.`Ort` = q_ort AND `f`.`Gruppe` = q_gruppe
+    ) AS `left` LEFT JOIN (
+      SELECT 0 as `Num` UNION SELECT `Num` FROM `tdd`.`familien` AS `f` WHERE `f`.`ID` <> f_ID AND `f`.`Ort` = q_ort AND `f`.`Gruppe` = q_gruppe
+    ) AS `right` ON (`left`.`Num`+1 = `right`.`Num`) WHERE `right`.`Num` IS NULL;
     IF next IS NULL THEN
       SET next = 1;
     END IF;
@@ -56,8 +62,7 @@ $proc_newNum = "
     RETURN next;
   END;
   ";
-$proc_splitStr = "
-  CREATE FUNCTION splitStr (
+$proc_splitStr = "CREATE FUNCTION splitStr (
     x VARCHAR(255),
     delim VARCHAR(12),
     pos INT
@@ -67,11 +72,18 @@ $proc_splitStr = "
          LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
          delim, '');
   "; // https://stackoverflow.com/a/14950556/
+$trigger_familienNumInsert = "CREATE TRIGGER familienNumInsert BEFORE INSERT ON `familien`
+  FOR EACH ROW SET NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL,newNum(NULL, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`);
+  ";
+$trigger_familienNumUpdate = "CREATE TRIGGER familienNumUpdate BEFORE UPDATE ON `familien`
+  FOR EACH ROW SET NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL OR OLD.`Ort`<>NEW.`Ort` OR OLD.`Gruppe`<>NEW.`Gruppe`,newNum(NEW.`ID`, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`);
+  ";
+$view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(`Type`='attendance',splitStr(`Val`, '/', 1),'') AS `P1`, IF(`Type`='attendance',splitStr(`Val`, '/', 2),'') AS `P2` FROM `logs`";
 
 
 // Execute setup if needed
 if ( isset( $_GET['setup'] ) ) {
-  echo "<!DOCTYPE html><html><head><title>Tischlein Deck Dich Setup</title><link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" /></head><body>";
+  echo "<!DOCTYPE html><html><head><title>Tischlein Deck Dich Setup</title><meta charset=\"UTF-8\"><link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" /></head><body>";
   session_start();
 
   if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
@@ -118,6 +130,18 @@ if ( isset( $_GET['setup'] ) ) {
   }
 
   switch ( $step ) {
+    default:
+      ?><h1>Setup</h1>
+      <p style="color:red">Achtung: Bei diesem Prozess werden alle eventuell vorhandenen Daten gelöscht!</p>
+      <br>
+      <ul style="list-style-type:none;padding-left:0;">
+        <li><a href="?setup&step=1">Step 1</a>: Datenbank</li>
+        <li><a href="?setup&step=2">Step 2</a>: Nutzer</li>
+        <li><a href="?setup&step=3">Step 3</a>: Tabellen</li>
+        <li><a href="?setup&step=4">Step 4</a>: Prozeduren</li>
+      </ul><?php
+      break;
+    
     case 1:
       echo "<h1>Step 1: Datenbank</h1><br>";
       try {
@@ -128,7 +152,7 @@ if ( isset( $_GET['setup'] ) ) {
         echo setup_error( $sql, $e->getMessage() );
       }
       try {
-        $sql = "CREATE DATABASE tdd COLLATE utf8mb4_unicode_ci";
+        $sql = "CREATE DATABASE tdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
         $conn->exec( $sql );
         
         echo "<p>Datenbank `tdd` erfolgreich (neu) angelegt.</p>";
@@ -174,7 +198,22 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
         
-        $sql = "CREATE TABLE familien( ID int NOT NULL AUTO_INCREMENT, Name varchar(255), Erwachsene int, Kinder int, Ort varchar(255), Gruppe int, Schulden decimal(3,2), Karte date, lAnwesenheit date, Notizen varchar(255), Num int, Adresse varchar(255), Telefonnummer varchar(255), PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE familien(
+          ID int NOT NULL AUTO_INCREMENT,
+          Name varchar(255) NOT NULL,
+          Erwachsene int NOT NULL DEFAULT '0',
+          Kinder int NOT NULL DEFAULT '0',
+          Ort varchar(255) NOT NULL,
+          Gruppe int NOT NULL,
+          Schulden decimal(5,2) NOT NULL DEFAULT '0.00',
+          Karte date,
+          lAnwesenheit date,
+          Notizen varchar(255),
+          Num int DEFAULT '0',
+          Adresse varchar(255),
+          Telefonnummer varchar(255),
+          PRIMARY KEY (ID)
+        )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Familien` erfolgreich angelegt.</p>";
         
@@ -186,7 +225,12 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "CREATE TABLE orte( ID int NOT NULL AUTO_INCREMENT, Name varchar(255), Gruppen int, PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE orte(
+          ID int NOT NULL AUTO_INCREMENT,
+          Name varchar(255) NOT NULL,
+          Gruppen int NOT NULL DEFAULT '0',
+          PRIMARY KEY (ID)
+        )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Orte` erfolgreich angelegt.</p>";
         
@@ -198,7 +242,12 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "CREATE TABLE einstellungen( ID int NOT NULL AUTO_INCREMENT, Name varchar(255) UNIQUE, Val longtext, PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE einstellungen(
+          ID int NOT NULL AUTO_INCREMENT,
+          Name varchar(255) UNIQUE NOT NULL,
+          Val longtext,
+          PRIMARY KEY (ID)
+        )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Einstellungen` erfolgreich angelegt.</p>";
         
@@ -251,7 +300,13 @@ DESIGNS_NOWDOC____;
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "CREATE TABLE logs( ID int NOT NULL AUTO_INCREMENT, DTime DateTime, Type varchar(255), Val varchar(255), PRIMARY KEY (ID) )";
+        $sql = "CREATE TABLE logs(
+          ID int NOT NULL AUTO_INCREMENT,
+          DTime DateTime NOT NULL,
+          Type varchar(255) NOT NULL,
+          Val varchar(255),
+          PRIMARY KEY (ID)
+        )";
         $conn->exec( $sql );
         echo "<p>Tabelle `Logs` erfolgreich angelegt.</p>";
         
@@ -263,7 +318,7 @@ DESIGNS_NOWDOC____;
       break;
 
     case 4:
-      echo "<h1>Step 4: Prozeduren</h1><br>";
+      echo "<h1>Step 4: Misc</h1><br>";
       try {
         $conn->beginTransaction();
         $conn->exec( "USE tdd" );
@@ -274,8 +329,9 @@ DESIGNS_NOWDOC____;
         echo "<p>Prozedur `resetFamNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
+        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `resetFamNum`.<br>";
-        echo setup_error( $sql, $e->getMessage() );
+        echo setup_error( "", $e->getMessage() );
       }
       try {
         $conn->beginTransaction();
@@ -287,8 +343,9 @@ DESIGNS_NOWDOC____;
         echo "<p>Prozedur `newNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
+        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `newNum`.<br>";
-        echo setup_error( $sql, $e->getMessage() );
+        echo setup_error( "", $e->getMessage() );
       }
       try {
         $conn->beginTransaction();
@@ -300,22 +357,51 @@ DESIGNS_NOWDOC____;
         echo "<p>Prozedur `splitStr` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
+        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `splitStr`.<br>";
-        echo setup_error( $sql, $e->getMessage() );
+        echo setup_error( "", $e->getMessage() );
+      }
+      try {
+        $conn->beginTransaction();
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP TRIGGER IF EXISTS familienNumInsert;" );
+        $conn->exec( $trigger_familienNumInsert );
+        $conn->commit();
+        echo "<p>Trigger `familienNumInsert` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        $conn->rollBack();
+        echo "<p>Fehler beim Anlegen des Triggers `familienNumInsert`.<br>";
+        echo setup_error( "", $e->getMessage() );
+      }
+      try {
+        $conn->beginTransaction();
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP TRIGGER IF EXISTS familienNumUpdate;" );
+        $conn->exec( $trigger_familienNumUpdate );
+        $conn->commit();
+        echo "<p>Trigger `familienNumUpdate` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        $conn->rollBack();
+        echo "<p>Fehler beim Anlegen des Triggers `familienNumUpdate`.<br>";
+        echo setup_error( "", $e->getMessage() );
+      }
+      try {
+        $conn->exec( "USE tdd" );
+
+        $conn->exec( "DROP VIEW IF EXISTS logsalt;" );
+        $conn->exec( $view_logsalt );
+        echo "<p>View `Logsalt` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Anlegen der View `Logsalt`.<br>";
+        echo setup_error( "", $e->getMessage() );
       }
       echo "<p>&nbsp;</p><p><a href=\"?login\">Fertig</a></p>";
       break;
-
-    default:
-      ?><h1>Setup</h1>
-      <p style="color:red">Achtung: Bei diesem Prozess werden alle eventuell vorhandenen Daten gelöscht!</p>
-      <br>
-      <ul style="list-style-type:none;padding-left:0;">
-        <li><a href="?setup&step=1">Step 1</a>: Datenbank</li>
-        <li><a href="?setup&step=2">Step 2</a>: Nutzer</li>
-        <li><a href="?setup&step=3">Step 3</a>: Tabellen</li>
-        <li><a href="?setup&step=4">Step 4</a>: Prozeduren</li>
-      </ul><?php
   }
 
   echo "</div></body></html>";
