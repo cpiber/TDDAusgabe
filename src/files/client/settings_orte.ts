@@ -1,12 +1,6 @@
 import $ from 'jquery';
 import { alert } from './helpers';
-import { orte } from './settings';
-
-export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
-
-export interface OrtList extends Array<any> {
-  loading?: JPromise<void>;
-}
+import { orte, JPromise } from './settings';
 
 export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
   const $opt = $('#orte ul');

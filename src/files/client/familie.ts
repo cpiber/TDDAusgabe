@@ -101,7 +101,7 @@ export class familie {
 
 
 export class ausgabeFam extends familie {
-  timeout: number;
+  timeout;
   preis: number;
   schuld = false;
   retry = false;
@@ -109,6 +109,7 @@ export class ausgabeFam extends familie {
   static elems: famelems = clone(fam);
   static $expired: JQuery<HTMLElement>;
   static $counter: JQuery<HTMLElement>;
+  static $preis: JQuery<HTMLElement>;
   static $anwesend: JQuery<HTMLInputElement>;
   static $geldverg: JQuery<HTMLInputElement>;
   static $schuldbeg: JQuery<HTMLInputElement>;
@@ -145,7 +146,6 @@ export class ausgabeFam extends familie {
     this.elems.Karte = $inputs.eq(11);
     this.elems.Erwachsene = $inputs.eq(12);
     this.elems.Kinder = $inputs.eq(13);
-    this.elems.Preis = $inputs.eq(14);
     this.elems.Schulden = $inputs.eq(15).on('change keyup', function () {
       if (!ausgabeFam.current) return;
       ausgabeFam.$geldverg.prop('disabled', true);
@@ -157,6 +157,7 @@ export class ausgabeFam extends familie {
     this.elems.Telefonnummer = $inputs.eq(19);
     this.$expired = $inputs.eq(0);
     this.$counter = $inputs.eq(1);
+    this.$preis = $inputs.eq(14);
     this.$anwesend = $inputs.eq(20).on('click', function () {
       if (!ausgabeFam.current) return;
       if (ausgabeFam.current.retry) {
@@ -249,6 +250,10 @@ export class ausgabeFam extends familie {
   show() {
     super.show(ausgabeFam);
 
+    const i = orte.findIndex(val => val.ID == this.data.Ort);
+    const ortname = orte[i] ? orte[i].Name : 'Unbekannt';
+    ausgabeFam.elems.Ort.text(ortname);
+
     this.preis = preis(+this.data.Erwachsene, +this.data.Kinder);
     let lAnw = this.data.lAnwesenheit;
     try {
@@ -260,7 +265,7 @@ export class ausgabeFam extends familie {
     ausgabeFam.elems.Adresse.html(addr);
     
     const schuld = this.preis + (+this.data.Schulden);
-    ausgabeFam.elems.Preis.html(`${this.preis.toFixed(2)}€ &nbsp; &nbsp; &nbsp; &rarr; ${schuld.toFixed(2)}`);
+    ausgabeFam.$preis.html(`${this.preis.toFixed(2)}€ &nbsp; &nbsp; &nbsp; &rarr; ${schuld.toFixed(2)}`);
 
     const lToday = this.data.lAnwesenheit === formatDate(new Date());
     ausgabeFam.$anwesend.prop('checked', lToday).prop('disabled', lToday);
@@ -282,8 +287,8 @@ export class ausgabeFam extends familie {
 
     this.errors();
 
-    if (!ausgabeFam.errors.already && !ausgabeFam.errors.money_now && !lToday)
-      ausgabeFam.$anwesend.click();
+    // if (!ausgabeFam.errors.already && !ausgabeFam.errors.money_now && !lToday)
+    //   ausgabeFam.$anwesend.click();
   }
 
   errors() {
@@ -447,7 +452,7 @@ export class verwaltungFam extends familie {
   show() {
     super.show(verwaltungFam);
     
-    verwaltungFam.elems.Ort.val(orte.findIndex(val => val.Name === this.data.Ort)).change();
+    verwaltungFam.elems.Ort.change();
     timeout().then(() => verwaltungFam.elems.Gruppe.val(this.data.Gruppe));
   }
 

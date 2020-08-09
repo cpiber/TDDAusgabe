@@ -203,7 +203,7 @@ if ( isset( $_GET['setup'] ) ) {
           Name varchar(255) NOT NULL,
           Erwachsene int NOT NULL DEFAULT '0',
           Kinder int NOT NULL DEFAULT '0',
-          Ort varchar(255) NOT NULL,
+          Ort int NOT NULL,
           Gruppe int NOT NULL,
           Schulden decimal(5,2) NOT NULL DEFAULT '0.00',
           Karte date,

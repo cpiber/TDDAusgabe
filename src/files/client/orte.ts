@@ -2,14 +2,14 @@ import $ from 'jquery';
 import { alert } from './helpers';
 import { orte } from './settings';
 
-export default function generate($selects: JQuery) {
+export default function generate($selects: JQuery<HTMLSelectElement>) {
   const $A = [ $selects.eq(0), $selects.eq(1) ];
   const $V = [ $selects.eq(2), $selects.eq(3) ];
 
   const ausgabeOrtChange: () => void = ortChange.bind(null, $A[0], $A[1], true);
-  $A[0].on('change', ausgabeOrtChange);
+  ($A[0] as JQuery<HTMLSelectElement>).on('change', ausgabeOrtChange);
   const verwaltungOrtChange: () => void = ortChange.bind(null, $V[0], $V[1], false);
-  $V[0].on('change', verwaltungOrtChange);
+  ($V[0] as JQuery<HTMLSelectElement>).on('change', verwaltungOrtChange);
 
   function loadOrte() {
     if (orte.loading) {
@@ -40,6 +40,7 @@ export default function generate($selects: JQuery) {
   }
 
   function updateOrte(data: any) {
+    orte.maxGruppen = 0;
     [$A, $V].forEach(([$ort, $grp], index) => {
       const val = $ort.val();
       $ort.empty();
@@ -54,42 +55,57 @@ export default function generate($selects: JQuery) {
       // load
       data.data.forEach((element: any, i: number) => {
         const el = $('<option>');
-        el.val(i).text(element.Name);
+        el.val(element.ID).text(element.Name);
         $ort.append(el);
-        if (index === 0)
+        if (index === 0) {
           orte[i] = element;
+          orte.maxGruppen = Math.max(orte.maxGruppen, element.Gruppen);
+        }
       });
       $ort.val(val || -1);
+
+      // create group selectors
+      if ($grp.get(0).length < (index === 0 ? orte.maxGruppen + 1 : orte.maxGruppen)) {
+        const val = $grp.val() || -1;
+        $grp.empty();
+
+        if (index === 0) {
+          // option to not restrict
+          const el = $('<option>');
+          el.val(-1).text("Alle");
+          $grp.append(el);
+        }
+
+        for (let i = 1; i <= orte.maxGruppen; i++) {
+          const el = $('<option>');
+          el.val(i).text(`Gruppe ${i}`);
+          $grp.append(el);
+        }
+        $grp.val(val);
+      }
+
       ortChange($ort, $grp, index === 0);
     });
   }
 
   function ortChange($ort: JQuery<HTMLElement>, $grp: JQuery<HTMLElement>, all: boolean) {
-    let n = $ort.val();
-    if (n === null) {
-      n = -1;
-    } else {
-      n = +n;
-    }
-    $grp.empty();
+    const o = $ort.data('val') || 0;
+    const n = $ort.val();
 
-    if (all) {
-      // option to not restrict
-      const el = $('<option>');
-      el.val(-1).text("Alle");
-      $grp.append(el);
-    }
+    if (o == n) return;
 
-    if (!orte[n]) {
+    const index = orte.findIndex(val => val.ID === n);
+    if (!orte[index]) {
+      $ort.data('val', -1);
+      $grp.children().slice(all ? 1 : 0).prop('disabled', true).prop('hidden', true);
       return;
     }
-
-    for (let i = 1; i <= orte[n].Gruppen; i++) {
-      const el = $('<option>');
-      el.val(i).text(`Gruppe ${i}`);
-      $grp.append(el);
-    }
+    const i = all ? (+orte[index].Gruppen) + 1 : +orte[index].Gruppen;
+    const c = $grp.children();
+    c.slice(0, i).prop('disabled', false).prop('hidden', false);
+    c.slice(i).prop('disabled', true).prop('hidden', true);
     $grp.val(-1);
+    $ort.data('val', n);
   }
 
   return loadOrte;

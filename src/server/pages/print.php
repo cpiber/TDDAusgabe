@@ -8,7 +8,7 @@ function page_print() {
   echo "<!DOCTYPE html><html>\n<head>\n<title>Tischlein Deck Dich</title><meta charset=\"UTF-8\">\n";
   echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
   echo "<link href=\"?file=css\" rel=\"stylesheet\" />";
-  echo "<style>table { width: 100%; } table th { text-align: left; } tbody > tr > * { border: 1px solid grey; padding: 5px; } h3 { margin-top: 1em; margin-bottom: 0; } span.check { width: 14px; height: 14px; border: 1px solid black; display: block; float: right; } p { font-size: 15px; }</style>\n";
+  echo "<style>table { width: 100%; } table th { text-align: left; } tbody > tr > *:not(.clear) { border: 1px solid grey; padding: 5px; } h3 { margin-top: 1em; margin-bottom: 0; } span.check { width: 14px; height: 14px; border: 1px solid black; display: block; float: right; } p { font-size: 15px; }</style>\n";
   echo "</head>\n<body>\n";
   echo "<div id=\"header\" class=\"header\"><div><span><a href=\"\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
   $o = ( isset( $_GET['ort'] ) ? $_GET['ort'] : "Alle" );
@@ -23,20 +23,17 @@ function page_print() {
     $orte = array();
     $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
     foreach ( $stmt->fetchAll() as $r) {
-      $orte[$r['Name']] = $r;
-      $s = ( $r['Name'] == $o ? " selected" : "" );
+      $orte[$r['ID']] = $r;
+      $s = ( $r['ID'] == $o ? " selected" : "" );
       $name = htmlspecialchars($r['Name']);
-      printf( "<option value=\"%s\"%s>%s</option>\n", $name, $s, $name );
+      printf( "<option value=\"%s\"%s>%s</option>\n", $r['ID'], $s, $name );
     }
-    $break = false;
-
   } catch ( PDOException $e ) {
+    echo "</select>\n";
     echo "<i>Fehler bei abrufen der Orte</i><br>" . $e->getMessage();
-    $break = true;
-
+    exit;
   }
   echo "</select>\n";
-  if ( $break ) exit;
   echo "<select id=\"gruppe\" name=\"gruppe\">\n<option value=\"Alle\">Alle</option>\n";
   if ( $o != "Alle" ) {
     $g = ( isset( $_GET['gruppe'] ) ? $_GET['gruppe'] : "Alle" );
@@ -59,7 +56,6 @@ function page_print() {
     $stmt = $conn->prepare( $sql );
     $stmt->execute();
 
-    $orte = array();
     $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
     foreach ( $stmt->fetchAll() as $r) {
       $einst[$r['Name']] = rawurldecode( $r['Val'] );
@@ -68,7 +64,6 @@ function page_print() {
   } catch ( PDOException $e ) {
     echo "<i>Fehler bei abrufen der Einstellungen</i><br>" . $e->getMessage();
     exit;
-
   }
 
   // Get Familien in selected Ort
@@ -80,15 +75,14 @@ function page_print() {
     $stmt = $conn->prepare( $sql );
     $stmt->execute( array( ':ort' => $o, ':gruppe' => $g ) );
 
-    $ort = ""; $gruppe = -1;
+    echo "<table><tbody>\n";
+
+    $ort = -1; $gruppe = -1;
     $result = $stmt->setFetchMode( PDO::FETCH_ASSOC );
     foreach ( $stmt->fetchAll() as $r ) {
       if ( $ort != $r['Ort'] ) {
-        if ( $ort != "" ) {
-          echo "</tbody></table>\n";
-        }
         $ort = $r['Ort']; $gruppe = -1;
-        printf( "<h1>%s</h1>\n<table><tbody>\n", htmlentities($ort) );
+        printf( "<tr><td colspan=\"8\" class=\"clear\"><br /><h1>%s</h1></td></tr>\n", htmlentities($orte[$ort]['Name']) );
       }
       if ( $gruppe != $r['Gruppe'] ) {
         $gruppe = $r['Gruppe'];
@@ -130,6 +124,7 @@ function page_print() {
 
   }
 
+  echo "</tbody></table>\n";
   echo "</div></body>\n</html>";
 }
 

@@ -8,7 +8,7 @@ import { ausgabeFam, verwaltungFam } from './client/familie';
 import searchGenerate from './client/search';
 import initLogs from './client/log';
 import { delFamDate, resetFam } from './client/actions';
-import settings, { optionsSettingsUpdate } from './client/settings';
+import settings, { optionsSettingsUpdate, orte } from './client/settings';
 import { optionsOrteUpdate } from './client/settings_orte';
 import insertHelpHeadings from './client/help';
 import { tabH, alert } from './client/helpers';
@@ -35,6 +35,8 @@ if ( DEBUG ) {
   window.alert = alert;
   // @ts-ignore
   window.settings = settings;
+  // @ts-ignore
+  window.orte = orte;
 }
 
 
@@ -93,7 +95,7 @@ jQuery(($) => {
   verwaltungFam.linkHtml();
   verwaltungFam.clear();
 
-  const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select');
+  const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
   const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms);
   tabLinks.get(1).onOpen = ausgSearch;

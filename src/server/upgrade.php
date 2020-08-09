@@ -89,6 +89,11 @@ if ( $ver < DB_VER ) {
 
       $conn->exec( "ALTER DATABASE tdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
 
+      $conn->exec( "ALTER TABLE `familien` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `orte` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `einstellungen` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `logs` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+
       // function for decoding url-encoded string
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" );
       $conn->exec( "CREATE FUNCTION `url_decode`(str VARCHAR(255) CHARSET utf8) RETURNS VARCHAR(255) DETERMINISTIC
@@ -130,7 +135,7 @@ if ( $ver < DB_VER ) {
         END;
         " ); // https://stackoverflow.com/a/61549664/
 
-      $conn->exec( "UPDATE `familien` SET `Name` = url_decode(`Name`), `Ort` = url_decode(`Ort`), `Notizen` = url_decode(`Notizen`), `Adresse` = url_decode(`Adresse`), `Telefonnummer` = url_decode(`Telefonnummer`)");
+      $conn->exec( "UPDATE `familien` SET `Name` = url_decode(`Name`), `Ort` = COALESCE((SELECT `ID` FROM `orte` WHERE `orte`.`Name`=`Ort`), 0), `Notizen` = url_decode(`Notizen`), `Adresse` = url_decode(`Adresse`), `Telefonnummer` = url_decode(`Telefonnummer`)" );
       $conn->exec( "UPDATE `orte` SET `Name` = url_decode(`Name`)");
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" ); // one-time use
 
@@ -170,25 +175,21 @@ if ( $ver < DB_VER ) {
         ));
       }
 
-      $conn->exec( "ALTER TABLE `familien` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Erwachsene` `Erwachsene` INT NOT NULL DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Kinder` `Kinder` INT NOT NULL DEFAULT '0'" );
-      $conn->exec( "ALTER TABLE `familien` CHANGE `Ort` `Ort` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
+      $conn->exec( "ALTER TABLE `familien` CHANGE `Ort` `Ort` INT NOT NULL" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Gruppe` `Gruppe` INT NOT NULL" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Schulden` `Schulden` DECIMAL(5,2) NOT NULL DEFAULT '0.00'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Notizen` `Notizen` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Num` `Num` INT DEFAULT '0'" );
-
-      $conn->exec( "ALTER TABLE `orte` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      
       $conn->exec( "ALTER TABLE `orte` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `orte` CHANGE `Gruppen` `Gruppen` INT NOT NULL DEFAULT '0'" );
-
-      $conn->exec( "ALTER TABLE `einstellungen` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      
       $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Val` `Val` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
 
-      $conn->exec( "ALTER TABLE `logs` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` DATETIME NOT NULL" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );

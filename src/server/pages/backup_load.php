@@ -76,16 +76,29 @@ function page_backupload() {
             if ( $enabled ) {
               if ( ( $col = array_search( $name, $header ) ) !== false ) {
                 $used_cols[$name] = $col;
-                if ( $name != 'Personen' && $name != 'Straße' ) $names[] = $name;
-                if ( $name == 'Personen' && !in_array( 'Erwachsene', $names ) ) $names[] = 'Erwachsene';
-                if ( $name == 'Personen' && !in_array( 'Kinder', $names ) ) $names[] = 'Kinder';
-                if ( $name == 'Straße' && !in_array( 'Adresse', $names ) ) $names[] = 'Adresse';
+                if ( $table === 'familien' ) {
+                  if ( $name != 'Personen' && $name != 'Straße' ) $names[] = $name;
+                  if ( $name == 'Personen' && !in_array( 'Erwachsene', $names ) ) $names[] = 'Erwachsene';
+                  if ( $name == 'Personen' && !in_array( 'Kinder', $names ) ) $names[] = 'Kinder';
+                  if ( $name == 'Straße' && !in_array( 'Adresse', $names ) ) $names[] = 'Adresse';
+                } else {
+                  $names[] = $name;
+                }
               } else {
                 $msg[] = array(
                   sprintf( "Spalte %s nicht verfügbar", $name ),
                   "warn",
                 );
               }
+            }
+          }
+          // get orte
+          if ( $table === 'familien' ) {
+            $orte = array();
+            $ostmt = $conn->query( "SELECT * FROM `orte`");
+            $ostmt->setFetchMode( PDO::FETCH_ASSOC );
+            foreach ( $ostmt->fetchAll() as $ort ) {
+              $orte[$ort['Name']] = $ort['ID'];
             }
           }
           $keys = array_map( function( $val ) { return sprintf( ":%s", $val ); }, $names );
@@ -98,8 +111,14 @@ function page_backupload() {
             $first = false;
           }
           $updateSql .= " WHERE ID = :ID;";
+          $insertstmt = $conn->prepare( $insertSql );
+          $updatestmt = $conn->prepare( $updateSql );
+          $idfromname = $conn->prepare( sprintf( "SELECT ID FROM %s WHERE `Name` = :Name LIMIT 1", $table ) );
 
+          
           if ( isset( $used_cols['ID'] ) || isset( $used_cols['Name'] ) ) {
+            $conn->beginTransaction();
+
             // parse content
             $objs = array();
             while ( ( $data = fgetcsv( $file ) ) !== false ) {
@@ -136,6 +155,9 @@ function page_backupload() {
                 );
                 continue;
               }
+              if ( isset( $obj['Ort'] ) ) {
+                $obj['Ort'] = array_key_exists( $obj['Ort'], $orte ) ? $orte[$obj['Ort']] : 0;
+              }
               if ( isset( $obj['Personen'] ) ) {
                 $matches = array();
                 if ( preg_match("/(\d+)(?:\/(\d+))?/", $obj['Personen'], $matches ) ) {
@@ -151,16 +173,11 @@ function page_backupload() {
                 }
               }
               $id = isset( $obj['ID'] ) ? $obj['ID'] : 0;
-              $res = null;
-              if ( isset( $obj['ID'] ) ) {
-                $stmt = $conn->prepare( sprintf( "SELECT ID FROM %s WHERE `ID` = :ID LIMIT 1", $table ));
-                $stmt->execute( array( ":ID" => $obj['ID'] ) );
-              } elseif ( isset( $obj['Name'] ) ) {
-                $stmt = $conn->prepare( sprintf( "SELECT ID FROM %s WHERE `Name` = :Name LIMIT 1", $table ));
-                $stmt->execute( array( ":Name" => $obj['Name'] ) );
+              if ( isset( $obj['Name'] ) ) {
+                $idfromname->execute( array( ":Name" => $obj['Name'] ) );
+                $res = $idfromname->fetch( PDO::FETCH_ASSOC );
+                if ( $res && isset( $res['ID'] ) ) $id = $res['ID'];
               }
-              $res = $stmt->fetch( PDO::FETCH_ASSOC );
-              if ( $res && isset( $res['ID'] ) ) $id = $res['ID'];
 
               $set = array();
               if ( $id ) $set[":ID"] = $id;
@@ -174,10 +191,15 @@ function page_backupload() {
                 $set[$name] = $value;
               }
               
-              $sql = $id == 0 ? $insertSql : $updateSql;
-              $stmt = $conn->prepare( $sql );
-              $stmt->execute( $set );
+              if ( $id == 0 ) {
+                $insertstmt->execute( $set );
+              } else {
+                $updatestmt->execute( $set );
+              }
             }
+
+            $conn->commit();
+
             $msg[] = array(
               "Erfolgreich importiert.",
               "ok",
@@ -235,8 +257,9 @@ function page_backupload() {
   }
   echo "<tr><td><i>Alle</i></td><td><input type=\"checkbox\" id=\"toggle_all\" checked /></td></tr>\n";
   echo "</tbody></table>\n";
-  echo "<p><label title=\"Zeichen zwischen Spalten. Für Excel-Export ;\">CSV-Trennzeichen: <input type=\"text\" name=\"delimiter\" placeholder=\",\" size=\"1\" /></label><br /><label>Datei: <input type=\"file\" name=\"file\" /></label></p>\n";
   echo "<p><input type=\"submit\" value=\"Backup laden\" /></p>\n";
+  if ( $table === 'familien' ) echo "<p><b>Achtung:</b> Orte müssen bereits in der Datenbank sein. Unbekannte Orte werden auf 'Unbekannt' gesetzt.</b></p>";
+  echo "<p>Info: Wenn ID angewählt ist, werden existierende Einträge mit der selben ID aktualisiert. Es wird nichts unternommen, sollte die ID nicht existieren.</p>";
   echo "</form>\n";
   echo "<script>window.onload = function(){var boxes = document.getElementsByTagName('input'); document.getElementById('toggle_all').addEventListener('click', function() {for (var i = 0; i < boxes.length; i++) {if (boxes[i].type == 'checkbox') {boxes[i].checked = this.checked;}}});};</script>";
   echo "</div></body>\n</html>";

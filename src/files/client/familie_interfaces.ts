@@ -4,7 +4,7 @@ export interface famdata {
   Name?: string;
   Erwachsene?: number;
   Kinder?: number;
-  Ort?: string;
+  Ort?: number;
   Gruppe?: number;
   Schulden?: number;
   Karte?: string;
@@ -45,7 +45,6 @@ export interface famelems {
   Num?: JQuery<HTMLInputElement>;
   Adresse?: JQuery<HTMLInputElement>;
   Telefonnummer?: JQuery<HTMLInputElement>;
-  Preis?: JQuery<HTMLInputElement>;
 }
 
 const fam: famelems = {
@@ -62,6 +61,5 @@ const fam: famelems = {
   Num: null,
   Adresse: null,
   Telefonnummer: null,
-  Preis: null,
 }
 export { fam };

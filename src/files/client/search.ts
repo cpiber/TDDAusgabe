@@ -8,8 +8,12 @@ export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQu
   const verwList = [];
   const $ausgList = $forms.eq(1);
   const $verwList = $forms.eq(3);
-  const ausgSearch: () => void = search.bind(null, ausgList, $ausgList, $ausg_selects.add('#tab2 .search-header input:first'), ausgabeFam);
-  const verwSearch: () => void = search.bind(null, verwList, $verwList, $('#tab3 .search-header input:first'), verwaltungFam);
+  const ausgSearch: () => void = search.bind(null, ausgList, $ausgList,
+    $ausg_selects.add('#tab2 .search-header input:first'),
+    $('<span>').text('Loading...').hide().insertBefore($ausgList), ausgabeFam);
+  const verwSearch: () => void = search.bind(null, verwList, $verwList,
+    $('#tab3 .search-header input:first'),
+    $('<span>').text('Loading...').hide().insertBefore($verwList), verwaltungFam);
   $ausg_selects.on('change', () => timeout().then(ausgSearch));
   $forms.eq(0).on('submit', ausgSearch);
   $ausgList.on('click', 'li', function () { select.call(this, ausgList, $ausgList, ausgabeFam); });
@@ -19,22 +23,23 @@ export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQu
   return { ausgSearch, verwSearch };
 }
 
-function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLElement>, fam: typeof familie) {
+function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLElement>, $loading: JQuery<HTMLElement>, fam: typeof familie) {
   const data: {
     search: string,
-    ort?: string,
+    ort?: number,
     gruppe?: number,
   } = {
     search: $inputs.last().val().toString()
   };
   if ($inputs.length === 3) {
     const ort = +$inputs.eq(0).val();
-    if (ort !== -1 && !isNaN(ort) && orte[ort])
-      data.ort = orte[ort].Name;
+    if (ort > 0 && !isNaN(ort))
+      data.ort = ort;
     const grp = +$inputs.eq(1).val();
     if (grp > 0 && !isNaN(grp))
       data.gruppe = grp;
   }
+  $loading.show();
   $.post('?api=familie', data).then((data: any) => {
     if (data && data.status === "success") {
       if (data.data.constructor.name !== "Array") {
@@ -42,12 +47,14 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
       }
       list.length = 0;
       $list.empty();
-      let ort = "", grp = -1;
+      let ort = -1, ortname = "", grp = -1;
       data.data.forEach((element: any, index: number) => {
         if (element.Ort !== ort || element.Gruppe !== grp) {
           ort = element.Ort;
           grp = element.Gruppe;
-          $('<li>').addClass('title').val(-1).text(`${ort}, Gruppe ${grp}`).appendTo($list);
+          const i = orte.findIndex(val => val.ID == ort);
+          ortname = orte[i] ? orte[i].Name : 'Unbekannt';
+          $('<li>').addClass('title').val(-1).text(`${ortname}, Gruppe ${grp}`).appendTo($list);
         }
         let name = element.Name;
         if (!name) name = " - ";
@@ -68,7 +75,7 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
           <p>Suche fehlgeschalgen:<br />${xhr.status} ${error}</p>
           <p>${msg}</p>
         `, "Fehler");
-  });
+  }).always(() => $loading.hide());
   return false;
 }
 

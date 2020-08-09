@@ -1,7 +1,14 @@
 import $ from 'jquery';
 import { alert } from './helpers';
-import { OrtList } from './settings_orte';
 import { DEBUG } from '../client';
+
+export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
+
+export interface OrtList extends Array<any> {
+  loading?: JPromise<void>;
+  maxGruppen?: number;
+}
+
 
 export const settings = {
   preis: "",
@@ -11,14 +18,7 @@ export const settings = {
 
 export const orte: OrtList = [];
 orte.loading = null;
-
-
-if (DEBUG) {
-  // @ts-ignore
-  window.settings = settings;
-  // @ts-ignore
-  window.ortList = orte;
-}
+orte.maxGruppen = 0;
 
 
 export function optionsSettingsUpdate() {
@@ -28,7 +28,7 @@ export function optionsSettingsUpdate() {
   $in.eq(2).on('click', update.bind(null, null, $preis, $designs));
 
   [$preis, $designs].forEach(element => {
-    let timeout: number;
+    let timeout;
     element.on('keyup', function () {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {

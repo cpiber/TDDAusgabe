@@ -10,7 +10,8 @@
     "jsbarcode": "^3.11.0",
     "object.values": "^1.1.1",
     "phpinclude": "file:../PHPInclude/phpinclude-1.2.1.tgz",
-    "phpincludebabelts": "file:../PHPIncludeBabelTS/phpincludebabelts-1.0.0.tgz"
+    "phpincludebabelts": "file:../PHPIncludeBabelTS/phpincludebabelts-1.0.0.tgz",
+    "phpincludesass": "file:../PHPIncludeSass/phpincludesass-1.0.0.tgz"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

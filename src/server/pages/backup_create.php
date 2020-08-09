@@ -16,9 +16,20 @@ function page_backupcreate() {
     try {
       if ( !isset( $tables[$table] ) ) throw new Exception( "Tabelle ungültig!", 1 );
       
-      $stmt = $conn->prepare( "SELECT * FROM " . $table );
+      $sql = "SELECT * FROM `$table`";
+      $stmt = $conn->prepare( $sql );
+      $stmt->setFetchMode( PDO::FETCH_ASSOC );
       $stmt->execute();
       $fname = $tables[$table];
+
+      if ( $table == 'familien' ) {
+        $orte = array();
+        $ostmt = $conn->query( "SELECT * FROM `orte`");
+        $ostmt->setFetchMode( PDO::FETCH_ASSOC );
+        foreach ( $ostmt->fetchAll() as $ort ) {
+          $orte[$ort['ID']] = $ort['Name'];
+        }
+      }
 
       header( 'Content-Description: File Transfer' );
       header( 'Content-Type: application/octet-stream' );
@@ -29,14 +40,18 @@ function page_backupcreate() {
       header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
       header( 'Pragma: public' );
 
-      $res = $stmt->fetchAll( PDO::FETCH_ASSOC );
+      $res = $stmt->fetchAll();
       $out = fopen( 'php://output', 'w' );
       foreach ( $res as $i => $obj ) {
         $line = array();
         $header = array();
         foreach ( $obj as $key => $value ) {
           if ( $i == 0 ) $header[] = $key;
-          $line[] = $value;
+          if ( $table === 'familien' && $key === 'Ort' ) {
+            $line[] = array_key_exists( $value, $orte ) ? $orte[$value] : "Unbekannt";
+          } else {
+            $line[] = $value;
+          }
         }
         if ( $i == 0 ) fputcsv( $out, $header );
         fputcsv( $out, $line );

@@ -39,7 +39,7 @@ function parse_searchmatches($matches, &$data, $columns, $prefix=':__search_') {
       if ( !$numeric && !$non_num )
         continue;
 
-      $matchparts[] = sprintf( "`%s` %s %s", $column, $comp, $name );
+      $matchparts[] = sprintf( "%s %s %s", $column, $comp, $name );
     }
     if ( !empty( $matchparts ) )
       $parts[] = sprintf( " ( %s ) ", implode( $not ? " AND " : " OR ", $matchparts ) );
@@ -78,9 +78,10 @@ function api_getfam($msg) {
     if ( array_key_exists( 'search', $_POST ) ) {
       $search = $_POST['search'];
       $cols = array(
-        'ID' => false,
-        'Name' => true,
-        'Ort' => true,
+        'f.ID' => false,
+        'f.Name' => true,
+        'o.Name' => true,
+        'Ort' => false,
         'Gruppe' => false,
         'lAnwesenheit' => true,
         'Notizen' => true,
@@ -101,10 +102,18 @@ function api_getfam($msg) {
 
   try {
     $where = implode( " AND ", $parts );
-    $sql = "SELECT * FROM `familien` WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
+    if ( !isset( $search ) ) {
+      $sql = "SELECT * FROM `familien` WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
+    } else {
+      $sql = "SELECT f.ID AS ID, f.Name AS Name, Erwachsene, Kinder, Ort, Gruppe, Schulden, Karte, lAnwesenheit, Notizen, Num, Adresse, Telefonnummer FROM `familien` AS f LEFT JOIN `orte` AS o ON (f.Ort = o.ID) WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, f.`ID`";
+    }
 
     if ( !$single && $pagesize != -1 ) {
-      $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `familien` WHERE $where" );
+      if ( !isset( $search ) ) {
+        $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `familien` WHERE $where" );
+      } else {
+        $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `familien` AS f LEFT JOIN `orte` AS o ON (f.Ort = o.ID) WHERE $where" );
+      }
       $pagesstmt->setFetchMode( PDO::FETCH_ASSOC );
       $pagesstmt->execute( $data );
       $msg['pages'] = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
