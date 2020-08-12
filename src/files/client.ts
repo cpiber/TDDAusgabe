@@ -2,17 +2,17 @@ import jQuery from 'jquery';
 // @ts-ignore
 export const JsBarcode = require('jsbarcode');
 
-import polyfills from './client/polyfills';
-import ortGenerate from './client/orte';
-import { ausgabeFam, verwaltungFam } from './client/familie';
-import searchGenerate from './client/search';
-import initLogs from './client/log';
-import { delFamDate, resetFam } from './client/actions';
-import settings, { optionsSettingsUpdate, orte } from './client/settings';
-import { optionsOrteUpdate } from './client/settings_orte';
-import insertHelpHeadings from './client/help';
-import { tabH, alert } from './client/helpers';
-import { karte_designs_help, preis_help } from './client/texts';
+import polyfills from './client/js/polyfills';
+import ortGenerate from './client/js/orte';
+import { ausgabeFam, verwaltungFam } from './client/js/familie';
+import searchGenerate from './client/js/search';
+import initLogs from './client/js/log';
+import { delFamDate, resetFam } from './client/js/actions';
+import settings, { optionsSettingsUpdate, orte } from './client/js/settings';
+import { optionsOrteUpdate } from './client/js/settings_orte';
+import insertHelpHeadings from './client/js/help';
+import { tabH, alert } from './client/js/helpers';
+import { karte_designs_help, preis_help } from './client/js/texts';
 
 polyfills();
 
@@ -49,6 +49,10 @@ export interface TabElement extends HTMLAnchorElement {
 
 // load window
 jQuery(($) => {
+  $('button, [type="button"]').on('mouseup', function (e) {
+    $(this).blur(); // remove focus
+  });
+  
   // init tabs
   const $tabHs = $('#tab-head li');
   let $current_tab: JQuery<TabElement>;

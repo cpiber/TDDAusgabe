@@ -82,7 +82,8 @@ function page_print() {
     foreach ( $stmt->fetchAll() as $r ) {
       if ( $ort != $r['Ort'] ) {
         $ort = $r['Ort']; $gruppe = -1;
-        printf( "<tr><td colspan=\"8\" class=\"clear\"><br /><h1>%s</h1></td></tr>\n", htmlentities($orte[$ort]['Name']) );
+        $ortname = array_key_exists( $ort, $orte ) ? $orte[$ort]['Name'] : "Unbekannt";
+        printf( "<tr><td colspan=\"8\" class=\"clear\"><br /><h1>%s</h1></td></tr>\n", htmlentities($ortname) );
       }
       if ( $gruppe != $r['Gruppe'] ) {
         $gruppe = $r['Gruppe'];

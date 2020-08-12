@@ -15,7 +15,7 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
     const $this = $(this);
     const open: boolean = $this.data('open') || false;
 
-    if ($this.hasClass('add')) {
+    if ($this.hasClass('button-add')) {
       $('<li>').val(-1).insertBefore($this).click();
       return;
     }
@@ -84,7 +84,8 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       req.then((success: boolean) => {
         if (!success) return;
         $this.empty().data('name', name).data('gruppen', grp)
-          .text(text(name as string, grp)).data('open', false);
+          .text(text(name as string, grp)).data('open', false)
+          .removeClass('expanded');
       });
       return;
     }
@@ -94,8 +95,9 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       .append($('<input>').val($this.data('name')).addClass('w100pm400px'))
       .append($('<input>').attr('type', 'number').val($this.data('gruppen')).addClass('w100pm400px'))
       .append($('<button>').text('OK'))
+      .append(' &nbsp; ')
       .append($('<a>').text('Löschen').addClass('link-delete').val($this.val()))
-      .data('open', true);
+      .data('open', true).addClass('expanded');
 
   }).on('click', 'a', function (e) {
     const $this = $(this);
@@ -140,5 +142,8 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       $('<li>').addClass('button-add').text('+').appendTo($opt);
     });
   }
+
+  setInterval(update, 30*60*1000); // update every 30min
+
   return update;
 }

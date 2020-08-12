@@ -2,7 +2,7 @@
 import jQuery from 'jquery';
 import { famdata, famdirty, famelems, fam } from './familie_interfaces';
 import { clone, formatDate, preis, numPad, highlightElement, timeout } from './helpers';
-import { JsBarcode, changeTab, TabElement } from '../client';
+import { JsBarcode, changeTab, TabElement } from '../../client';
 import { orte } from './settings';
 
 
@@ -15,25 +15,25 @@ export class familie {
   static current: familie;
   static barcode: HTMLImageElement;
 
-  constructor (data: any) {
+  constructor(data: any) {
     Object.assign(this.data, fam, data);
     this.generateBarcode();
   }
 
-  static linkHtml () {
+  static linkHtml() {
     familie.barcode = $('#barcode').get(0) as HTMLImageElement;
     Object.keys(fam).forEach(element => {
-        const el = this.elems[element];
-        if (!el) return;
-        el.on('change keyup', () => {
-          if (!this.current) return;
-          const newval = el.val();
-          const changed = this.current.data[element] !== newval;
-          this.current.dirty[element] = this.current.dirty[element] || changed;
-          this.current.data[element] = newval;
-          if (changed) this.current.changed(element);
-        });
+      const el = this.elems[element];
+      if (!el) return;
+      el.on('change keyup', () => {
+        if (!this.current) return;
+        const newval = el.val();
+        const changed = this.current.data[element] !== newval;
+        this.current.dirty[element] = this.current.dirty[element] || changed;
+        this.current.data[element] = newval;
+        if (changed) this.current.changed(element);
       });
+    });
   }
 
   static clear() {
@@ -102,6 +102,7 @@ export class familie {
 
 export class ausgabeFam extends familie {
   timeout;
+  priotimeout = false;
   preis: number;
   schuld = false;
   retry = false;
@@ -195,6 +196,17 @@ export class ausgabeFam extends familie {
     });
     this.$error = $inputs.eq(23);
     this.$verw = $inputs.eq(24);
+    this.$anwesend.add(this.$geldverg).add(this.$schuldbeg).on('click', function () {
+      const cur = ausgabeFam.current;
+      if (!cur) return;
+      if (cur.timeout) clearTimeout(cur.timeout);
+      cur.priotimeout = true;
+      cur.timeout = setTimeout(() => {
+        cur.save();
+        cur.priotimeout = false;
+        cur.timeout = null;
+      }, 10000);
+    });
 
     const $buttons = $inputs.slice(2, 5);
     $inputs.eq(1).on('click', function () {
@@ -256,20 +268,22 @@ export class ausgabeFam extends familie {
 
     this.preis = preis(+this.data.Erwachsene, +this.data.Kinder);
     let lAnw = this.data.lAnwesenheit;
-    try {
-      lAnw = (new Date(this.data.lAnwesenheit)).toLocaleDateString();
-    } catch (e) { }
+    if (lAnw !== "" && lAnw !== null) {
+      try {
+        lAnw = (new Date(this.data.lAnwesenheit)).toLocaleDateString();
+      } catch (e) { }
+    }
     const addr = this.data.Adresse.replace(/\n/g, '<br />');
 
     ausgabeFam.elems.lAnwesenheit.text(lAnw);
     ausgabeFam.elems.Adresse.html(addr);
-    
+
     const schuld = this.preis + (+this.data.Schulden);
     ausgabeFam.$preis.html(`${this.preis.toFixed(2)}€ &nbsp; &nbsp; &nbsp; &rarr; ${schuld.toFixed(2)}`);
 
     const lToday = this.data.lAnwesenheit === formatDate(new Date());
     ausgabeFam.$anwesend.prop('checked', lToday).prop('disabled', lToday);
-    
+
     // Karte abgelaufen
     if (!this.data.Karte || this.data.Karte === "0000-00-00") {
       ausgabeFam.$expired.text('Ablaufdatum eingeben!');
@@ -302,7 +316,7 @@ export class ausgabeFam extends familie {
       const today = new Date();
       const diff = (today.getTime() - ab.getTime());
       days = Math.ceil(diff / (1000 * 3600 * 24));
-      
+
       // Bereits abgeholt diese Woche?
       if (days <= 7 && days > 1) {
         ausgabeFam.errors.already = true;
@@ -311,7 +325,7 @@ export class ausgabeFam extends familie {
         ausgabeFam.errors.already = false;
       }
     }
-    
+
     // Schulden zu hoch
     if (s !== 0 && s >= this.preis * 3) {
       if (days > 1) {
@@ -367,6 +381,7 @@ export class ausgabeFam extends familie {
 
   changed(property: string) {
     super.changed(property);
+    if (this.priotimeout) return; // priority running
     if (this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.save();
@@ -451,7 +466,7 @@ export class verwaltungFam extends familie {
 
   show() {
     super.show(verwaltungFam);
-    
+
     verwaltungFam.elems.Ort.change();
     timeout().then(() => verwaltungFam.elems.Gruppe.val(this.data.Gruppe));
   }

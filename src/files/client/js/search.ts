@@ -40,13 +40,14 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
       data.gruppe = grp;
   }
   $loading.show();
+  $list.empty();
   $.post('?api=familie', data).then((data: any) => {
     if (data && data.status === "success") {
       if (data.data.constructor.name !== "Array") {
         data.data = [data.data]; // single fam
       }
-      list.length = 0;
       $list.empty();
+      list.length = 0;
       let ort = -1, ortname = "", grp = -1;
       data.data.forEach((element: any, index: number) => {
         if (element.Ort !== ort || element.Gruppe !== grp) {

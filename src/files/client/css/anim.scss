@@ -1,0 +1,39 @@
+
+@keyframes opac {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes highlight {
+  0% {
+    color: white;
+    background-color: $lightestred;
+  }
+  60% {
+    color: $lightestred_var;
+    background-color: $mediumgray;
+  }
+  100% {
+    color: white;
+    background-color: $lightestred;
+  }
+}
+
+.highlight {
+  animation: highlight 0.4s;
+}

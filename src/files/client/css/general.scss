@@ -1,0 +1,168 @@
+
+html, body {
+  margin: 0;
+}
+h1, h2, h3 {
+  letter-spacing: 0.1em;
+}
+h2 {
+  margin-bottom: 0.6em;
+}
+h3 {
+  margin-bottom: 0.3em;
+  margin-top: 1em;
+}
+h4 {
+  margin-bottom: 0;
+  margin-top: 0.5em;
+}
+h5 {
+  margin-bottom: 0;
+  margin-top: 0.3em;
+}
+h6 {
+  margin-bottom: 0;
+  margin-top: 0.2em;
+}
+p {
+  font-size: 15px;
+  
+  &.heading {
+    font-size: 115%;
+    letter-spacing: 0.7px;
+    margin-bottom: 0;
+  }
+}
+a, a[href], a:visited {
+  color: inherit;
+}
+
+html.main {
+  background-color: $pink;
+  color: $whitish;
+}
+
+.body {
+  padding: 8px;
+}
+
+
+
+.link {
+  text-decoration: underline;
+  color: $lightergray;
+  font-style: italic;
+
+  &:hover, &:focus {
+    cursor: pointer;
+  }
+}
+
+.link-delete {
+  text-decoration: none;
+  color: red;
+
+  &:hover, &:focus {
+    text-decoration: underline;
+  }
+}
+
+.button {
+  border: 1px solid $lightgray;
+  border-radius: 3px;
+
+  background-color: $lightestgray;
+  padding: 6px;
+
+  color: black;
+  text-decoration: none;
+
+  &:disabled {
+    background-color: $mediumgray;
+  }
+
+  &:not(:disabled) {
+    cursor: pointer;
+
+    &:hover {
+      background-color: $lightergray;
+    }
+    &:focus:not(.no-active):not([target]) {
+      background-color: $darkgray;
+    }
+  }
+}
+
+a, a[href], a:visited {
+  &.button {
+    @extend .button;
+  }
+}
+
+button {
+  &:not(.o) {
+    @extend .button;
+
+    padding: 3px 6px;
+
+    border-radius: 2px;
+    border-style: solid;
+
+    & + & {
+      margin-top: 3px;
+    }
+  }
+}
+
+.help {
+  font-size: 70%;
+  margin: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+
+p.code, code.code {
+  @at-root &, span.code {
+    font-family: monospace;
+    background-color: $mediumgray;
+    padding: 0 0.15em;
+  }
+
+  display: block;
+  padding: inherit;
+  padding-left: 18px; padding-right: 18px;
+  margin-bottom: 0;
+
+  & + & {
+    margin-top: 0;
+  }
+}
+
+
+table {
+  max-width: 100%;
+
+  th {
+    font-weight: bold;
+  }
+}
+
+
+.msg {
+  margin: 0 10px;
+  padding: 4px 6px;
+  border: 1px solid gray;
+  border-radius:
+  2px;
+
+  &-ok {
+    background-color: lightgreen;
+  }
+
+  &-error {
+    background-color: red;
+  }
+}

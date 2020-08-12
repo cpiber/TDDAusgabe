@@ -1,0 +1,32 @@
+
+.header {
+  font-size: 32px;
+  color: white;
+  
+  height: 100px;
+  width: 100%;
+  background-color: $lighterred;
+  
+  margin: 8px 0;
+  
+  display: table;
+
+  > div {
+    display: table-cell;
+    vertical-align: middle;
+    
+    padding: 15px 25px;
+  }
+
+  .logo {
+    max-height: 120px;
+    max-width: 100%;
+  }
+
+  &-bar {
+    text-align: right;
+    padding: 0 10px;
+    margin: 2px 0;
+    margin-top: 10px;
+  }
+}

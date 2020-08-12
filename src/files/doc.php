@@ -12,17 +12,19 @@
 <body>
 
   <div id="header" class="header">
-    <div><span><a href=""><img src="?file=logo" style="max-height:120px;max-width:100%" /></a></span></div>
+    <div><span><a href=""><img src="?file=logo" class="logo" /></a></span></div>
   </div>
 
-  <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a class="button" href="?page=print"
-      target="_blank">Druckversion</a> <a class="button" href="?login">Log Out</a></p>
+  <p class="header-bar">
+    <a class="button no-active" href="?page=print"target="_blank">Druckversion</a>
+    <a class="button no-active" href="?login">Log Out</a>
+  </p>
   <img id="barcode" style="display:none" />
 
   &nbsp;
 
 
-  <div id="tabs">
+  <div class="body" id="tabs">
     <div id="tab-head">
       <ul class="tab">
         <li><a href="#tab1">Start</a></li>
@@ -51,7 +53,7 @@
             <p>Familien sind sortiert nach Ort und Gruppe. Jede Familie darf nur an einem Ausgabeort erscheinen
               (Ausnahmen bei Feiertagen), für jeden dieser Orte können mehrere Gruppen angelegt werden.</p>
             <p>Bitte immer die Daten der Familien überprüfen!</p><br>
-            <p>Das Programm speichert automatisch sobald eine neue Familie geöffnet wird. Alternativ wird auch nach 20
+            <p>Das Programm speichert automatisch sobald eine neue Familie geöffnet wird. Alternativ wird auch beim Bearbeiten der Felder und nach 10
               Sekunden automatisch gespeichert.</p>
           </div>
           <div class="cols3">
@@ -68,7 +70,7 @@
         <h1>Lebensmittelausgabe</h1>
         <div>
           <div class="cols2 search-header" style="margin-bottom: 10px">
-            <div class="cols2 cw100p">
+            <div class="cols2 w100p-c">
               <select></select><br />
               <select></select>
               <!--<button>
@@ -77,8 +79,8 @@
                 </svg>
               </button>-->
             </div>
-            <div class="cols2 cw100p">
-              <form class="cw100p">
+            <div class="cols2 w100p-c">
+              <form class="w100p-c">
                 <input type="text" placeholder="Suche" />
                 <input type="submit" value="Suchen" />
               </form>
@@ -90,33 +92,33 @@
           <div class="cols2 select-list">
             <ul></ul>
           </div>
-          <div class="cols2 familie-data">
-            <p style="font-weight: bolder;" class="w100pm400px"><span></span></p>
-            <p class="w100pm400px">
+          <div class="cols2 familie-data w100pm400px-c">
+            <p style="font-weight: bolder;"><span></span></p>
+            <p>
               <b>Familien-Nummer: <span>0</span></b>
               <button class="fam-count o">-</button>
               <button class="fam-count o">0</button>
               <button class="fam-count o">+</button>
             </p>
-            <p class="w100pm400px">
+            <p>
               <span class="link">Karte drucken</span> &nbsp; <span></span>
             </p>
-            <p class="w100pm400px">Ort: <span></span> | Gruppe: <span></span> | Nummer: <span></span></p>
-            <p class="w100pm400px">Letzte Anwesenheit: <span></span></p>
-            <p class="w100pm400px"><label>Karte gültig bis: <input type="date" /></label></p>
-            <p class="w100pm400px">Erwachsene / Kinder: <span></span> / <span></span></p>
-            <p class="w100pm400px">zu zahlen: <span></span>€</p>
-            <p class="w100pm400px"><label>Schulden: <input type="number" style="width:60px" step="0.01" />€</label></p>
-            <p class="w100pm400px"><label>Notizen:<br><textarea class="w100pm400px"></textarea></label></p>
+            <p>Ort: <span></span> | Gruppe: <span></span> | Nummer: <span></span></p>
+            <p>Letzte Anwesenheit: <span></span></p>
+            <p><label>Karte gültig bis: <input type="date" /></label></p>
+            <p>Erwachsene / Kinder: <span></span> / <span></span></p>
+            <p>zu zahlen: <span></span>€</p>
+            <p><label>Schulden: <input type="number" style="width:60px" step="0.01" />€</label></p>
+            <p><label>Notizen:<br><textarea class="w100pm400px"></textarea></label></p>
             <p class="no-space">Zusatzinfo:
               <button onclick="var s=this.parentElement.nextElementSibling;s.style.display=s.style.display=='none'?'':'none'">Umschalten</button>
             </p>
-            <p style="display:none;" class="w100pm400px">
+            <p style="display:none;">
               Adresse:<br /><span ></span><br /><br />
               Telefonnummer:<br /><span></span>
             </p>
             <br />
-            <div class="w100pm400px">
+            <div>
               <div class="cols3">
                 <label><input type="checkbox" /> Anwesend</label>
               </div>
@@ -128,19 +130,19 @@
               </div>
               <div class="clear"></div>
             </div>
-            <p class="w100pm400px">&nbsp;</p>
-            <span class="w100pm400px msg-box"></span>
-            <p class="w100pm400px">&nbsp;</p>
-            <button class="w100pm400px">Familie bearbeiten</button>
+            <p>&nbsp;</p>
+            <span class="msg-box"></span>
+            <p>&nbsp;</p>
+            <button>Familie bearbeiten</button>
           </div>
         </div>
       </div>
       <div id="tab3">
-        <h1>Familienverwaltung</h1>
+        <h1>Familien&shy;verwaltung</h1>
         <div>
-          <div class="cols2 cw100p">
-            <div class="cw100p search-header" style="margin-bottom: 10px">
-              <form class="cw100p">
+          <div class="cols2 w100p-c">
+            <div class="w100p-c search-header" style="margin-bottom: 10px">
+              <form class="w100p-c">
                 <input type="text" placeholder="Suche" />
                 <input type="submit" value="Suchen" />
               </form>
@@ -148,7 +150,7 @@
             <div class="select-list">
               <ul></ul>
             </div>
-            <div class="cw100p">
+            <div class="w100p-c">
               <button class="button-add">+</button>
             </div>
           </div>
@@ -201,8 +203,8 @@
         <div>
           <div class="cols3" id="orte">
             <h2>Orte</h2>
-            <div class="select-list w100pm400px">
-              <ul style="max-height:180px"></ul>
+            <div class="select-list dynamic w100pm400px">
+              <ul></ul>
             </div>
           </div>
           <div class="cols3" id="actions">
@@ -210,7 +212,7 @@
             <p>
               <button class="w100pm400px" title="Löscht alle Familien, die seit 8 Wochen nicht mehr anwesend waren.">
                 8 Wochen nicht anwesend löschen
-              </button><br />
+              </button>
               <button class="w100pm400px" title="Löscht alle Familien, deren Karte seit 8 Wochen abgelaufen ist.">
                 Karte 8 Wochen abgelaufen löschen
               </button>
@@ -228,7 +230,7 @@
             <p>
               <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) herunterladen">
                 Backup herunterladen
-              </button><br />
+              </button>
               <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) laden">
                 Backup laden
               </button>

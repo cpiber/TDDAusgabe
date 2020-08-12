@@ -82,6 +82,7 @@ function page_backupcreate() {
     printf( "<option value=\"%s\"%s>%s</option>", $name, $name === $table ? " selected" : "", $display );
   }
   echo "</select><br /><input type=\"submit\" value=\"Herunterladen\" /></form>";
+  if ( $table === 'familien' ) echo "<p><b>Achtung:</b> Orte müssen in der Datenbank sein. Unbekannte Orte werden auf 'Unbekannt' gesetzt.<br />Nicht vergessen ein Backup der Orte herunterzuladen (fürs einspielen).</p>";
   echo "</div></body>\n</html>";
 }
 

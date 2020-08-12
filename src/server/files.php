@@ -13,7 +13,7 @@ FILE_NOWDOC____;
     case "css":
       header( 'Content-type: text/css' );
       echo <<<'FILE_NOWDOC____'
-require "../files/client.css";
+require "../files/client.scss";
 FILE_NOWDOC____;
       break;
 

@@ -1,0 +1,139 @@
+
+
+#tab1 {
+  font-size: 14px;
+}
+
+#tab6 p {
+  margin: 0.5em 0;
+}
+
+
+ul.tab {
+  list-style-type: none;
+  margin: 0 6px;
+  padding: 0;
+
+  li {
+    display: inline-block;
+    
+    font-size: 18px;
+    margin: 12px 0;
+
+    a {
+      padding: 12px 15px;
+      background-color: $mediumgray;
+      text-decoration: none;
+      
+      border-style: solid solid hidden solid;
+      border-color: $darkgray;
+      border-width: 2px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+
+      &.selected {
+        background-color: $mediumred;
+        border-bottom: 2px solid $mediumred;
+      }
+
+      &:not(.selected) {
+        &:hover, &:focus {
+          background-color: $darkgray;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (min-width: 1160px) {
+  #tabs {
+    overflow: auto;
+  }
+  #tab-head {
+    float: left;
+    max-width: 30%;
+  }
+  ul.tab {
+    margin: 0;
+
+    li {
+      margin: 0;
+      width: 100%;
+
+      a {
+        display: block;
+        
+        border-bottom-left-radius: 10px;
+        border-top-right-radius: 0;
+
+        &.selected {
+          border-right: 2px solid $mediumred;
+          border-bottom: 2px solid $darkgray;
+        }
+      }
+    }
+  }
+}
+
+#tab-body {
+  border: 2px solid $darkgray;
+  
+  margin: 0;
+  padding: 8px;
+  padding-bottom: 16px;
+  margin-top: -1px;
+  
+  overflow: auto;
+  
+  background-color: $darkred;
+
+  > div {
+    animation: opac 0.5s;
+    -webkit-animation: opac 0.5s;
+    -moz-animation: opac 0.5s;
+    -ms-animation: opac 0.5s;
+    -o-animation: opac 0.5s;
+    
+    display: none;
+    overflow: auto;
+
+    > *:first-child {
+      margin-top: 0;
+      padding-top: 8px;
+    }
+  }
+}
+
+
+.button-add {
+  text-align: center;
+}
+
+.familie-count:hover {
+  cursor: text;
+}
+
+.familie-data {
+  font-size: 16px;
+}
+
+.msg-box:not(:empty) {
+  display: block;
+  border: 2px solid $lightgray;
+  background-color: $lightestred;
+  padding: 2px 4px;
+}
+
+table.logs {
+  text-align: left;
+
+  th, td {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+#orte ul {
+  height: auto;
+  max-height: 450px;
+}

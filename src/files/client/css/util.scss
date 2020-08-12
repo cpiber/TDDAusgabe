@@ -1,0 +1,21 @@
+
+.w100pm400px {
+  width: 100%;
+  max-width: 400px;
+
+  &-c > * {
+    @extend .w100pm400px;
+  }
+}
+
+.w100p {
+  width: 100%;
+  
+  &-c > * {
+    @extend .w100p;
+  }
+}
+
+.ml15px {
+  margin-left: 15px;
+}
