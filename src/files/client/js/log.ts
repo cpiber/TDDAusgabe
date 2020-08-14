@@ -59,6 +59,8 @@ function updateInfo($inp: JQuery<HTMLElement>, $info: JQuery<HTMLElement>) {
             <p>${msg}</p>
           `, "Fehler");
   });
+
+  return false;
 }
 
 function loadLogs($div: JQuery<HTMLElement>, $select: JQuery<HTMLSelectElement>) {

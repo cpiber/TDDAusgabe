@@ -27,9 +27,6 @@ function api_newort($msg) {
       $stmt->execute( $data );
       $msg['status'] = 'success';
       $msg['id'] = $conn->lastInsertId();
-      
-      if ( DEBUG ) $msg['sql'] = $sql;
-      if ( DEBUG ) $msg['_data'] = $data;
     } else {
       $msg['status'] = 'failure';
       $msg['message'] = 'Name fehlt';
@@ -39,6 +36,8 @@ function api_newort($msg) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
   }
+  if ( DEBUG ) $msg['sql'] = $sql;
+  if ( DEBUG ) $msg['_data'] = $data;
   
   $json = json_encode( $msg );
   if ( $json )

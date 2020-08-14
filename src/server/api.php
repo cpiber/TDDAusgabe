@@ -1,6 +1,42 @@
 <?php
 
+$fam_data = array(
+  'Name' => false,
+  'Erwachsene' => false,
+  'Kinder' => false,
+  'Ort' => false,
+  'Gruppe' => false,
+  'Schulden' => false,
+  'Karte' => false,
+  'lAnwesenheit' => false,
+  'Notizen' => true,
+  'Num' => false,
+  'Adresse' => true,
+  'Telefonnummer' => true,
+);
+
+function fields($fields, &$data, $insert=true) {
+  $parts = array();
+  foreach ( $fields as $field => $can_empty ) {
+    if ( array_key_exists( $field, $_POST['data'] ) && ( $can_empty || ( !$can_empty && $_POST['data'][$field] !== "" ) ) ) {
+      $parts[] = $insert ? $field : "$field = :$field";
+      $data[":$field"] = $_POST['data'][$field];
+    }
+  }
+  if ( $insert ) {
+    return sprintf( "(%s) VALUES (%s)",
+      implode( ", ", $parts ),
+      array_reduce( $parts, function ($carry, $item) { return sprintf( "%s%s:%s", $carry, empty( $carry ) ? "" : ", ", $item ); } )
+    );
+  } else {
+    return implode( ", ", $parts );
+  }
+}
+
 require "api/get_familien.php";
+require "api/familie_update.php";
+require "api/familie_insert.php";
+require "api/familie_delete.php";
 
 require "api/get_orte.php";
 require "api/ort_update.php";
@@ -24,6 +60,15 @@ if ( array_key_exists( 'api', $_GET ) ) {
   switch ( $_GET['api'] ) {
     case "familie":
       api_getfam($msg);
+      break;
+    case "familie/update":
+      api_updatefam($msg);
+      break;
+    case "familie/insert":
+      api_newfam($msg);
+      break;
+    case "familie/delete":
+      api_deletefam($msg);
       break;
     
     case "ort":

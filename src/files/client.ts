@@ -4,7 +4,6 @@ export const JsBarcode = require('jsbarcode');
 
 import polyfills from './client/js/polyfills';
 import ortGenerate from './client/js/orte';
-import { ausgabeFam, verwaltungFam } from './client/js/familie';
 import searchGenerate from './client/js/search';
 import initLogs from './client/js/log';
 import { delFamDate, resetFam } from './client/js/actions';
@@ -13,6 +12,8 @@ import { optionsOrteUpdate } from './client/js/settings_orte';
 import insertHelpHeadings from './client/js/help';
 import { tabH, alert } from './client/js/helpers';
 import { karte_designs_help, preis_help } from './client/js/texts';
+import { ausgabeFam } from './client/js/familie_ausgabe';
+import { verwaltungFam } from './client/js/familie_verwaltung';
 
 polyfills();
 
@@ -101,7 +102,9 @@ jQuery(($) => {
 
   const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
-  const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms);
+  
+  const loadOrte = ortGenerate($os_select);
+  const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms, loadOrte);
   tabLinks.get(1).onOpen = ausgSearch;
   tabLinks.get(2).onOpen = verwSearch;
   
@@ -110,7 +113,6 @@ jQuery(($) => {
   tabLinks.get(3).onOpen = () => { updateLogInfo(); updateLogs(); };
   
   // Settings tab
-  const loadOrte = ortGenerate($os_select);
   const updateOrte = optionsOrteUpdate(loadOrte);
   const updateSettings = optionsSettingsUpdate();
   tabLinks.get(4).onClose = () => {updateOrte(); updateSettings();};
@@ -228,261 +230,5 @@ window.onkeydown = function (evt) {
   keyboard_timeout_ = setTimeout(function () { keyboard_timeout = true; }, 1500);
 
 }
-
-
-
-function insertFam(data, list = "") {
-  if (data.status == "success") {
-    var f = document.getElementById('familie-list'),
-      q = data.query;
-
-    while (f.lastChild) {
-      f.lastChild.removeEventListener('click', selectFam);
-      f.removeChild(f.lastChild);
-    }
-    tdd_fam_curr = data.query;
-    if (list !== "") { q = list.query; tdd_fam_curr = q; }
-
-    for (var i = 0; i < q.length; i++) {
-      var e = document.createElement('li');
-      e.value = i;
-      var name = unescape(q[i].Name);
-      if (name.trim() == "") { name = " - "; }
-      if (q[i].Num) name = q[i].Num + "/ " + name;
-      var t = document.createTextNode(name);
-      e.appendChild(t);
-      f.appendChild(e);
-    }
-
-    famList();
-
-  } else { console.debug(data); }
-}
-
-function selectFamV() {
-  if (typeof (verw_index) != "undefined") {
-    var cf = verw_index;
-    var ce = jQuery('ul#verwaltung-list li[value=' + cf + ']')[0];
-    if (typeof (ce) !== "undefined") { ce.classList.remove('selected'); }
-  }
-  if (typeof (verw_fam) == "undefined" || (typeof (verw_fam) != "undefined" && verw_fam.saved)) {
-    if (this !== window) {
-      this.classList.add('selected');
-      verw_fam = new familie(tdd_fam_curr[this.value], this.value);
-      verw_index = this.value;
-    }
-    displayFamV(verw_fam);
-    var bs = jQuery('#verw-save');
-    bs.off('click');
-    bs.on('click', function () { verw_fam.save('verwaltung'); });
-  }
-}
-
-
-
-//Search for familien and verwaltung tabs
-
-
-function searchFam(data, f) {
-  if (data.status == "success") {
-    var q = data.query,
-      co = "",
-      cg = 0;
-
-    tdd_fam_curr = q;
-
-    for (var i = 0; i < q.length; i++) {
-      if (co !== q[i].Ort || cg !== q[i].Gruppe) {
-        var e = document.createElement('li');
-        e.classList.add('title');
-        var t = document.createTextNode(unescape(q[i].Ort) + ", Gruppe " + q[i].Gruppe);
-        e.appendChild(t);
-        f.appendChild(e);
-
-        co = q[i].Ort;
-        cg = q[i].Gruppe;
-      }
-      var e = document.createElement('li');
-      e.value = i;
-      var name = unescape(q[i].Name);
-      if (name.trim() == "") { name = " - "; }
-      if (q[i].Num) name = q[i].Num + "/ " + name;
-      var t = document.createTextNode(name);
-      e.appendChild(t);
-      f.appendChild(e);
-    }
-
-  } else { console.debug(data); }
-}
-
-
-function postFamKarte(familie) {
-  if (typeof (familie) !== "undefined" && familie !== {}) {
-    var e = escape(tdd_settings["Kartendesigns"]);
-    var fe = '<input type="hidden" name="designs" value="' + e + '" />';
-    var d = familie.data;
-    d.Preis = preis(+d.Erwachsene, +d.Kinder).toFixed(2);
-    var s = document.getElementById('barcode').src;
-    d.isrc = s;
-    d.img = "<img src=\"" + s + "\" />";
-    e = escape(JSON.stringify(d));
-    fe += '<input type="hidden" name="familie" value="' + e + '" />';
-    var frmName = "frm" + new Date().getTime();
-    var url = "?karte";
-    var form = '<form name="' + frmName + '" method="post" target="karte" action="' + url + '">' + fe + '</form>';
-
-    var wrapper = document.createElement("div");
-    wrapper.innerHTML = form;
-    document.body.appendChild(wrapper);
-    document.forms[frmName].submit();
-    wrapper.parentNode.removeChild(wrapper);
-  }
-
-}
-
-
-
-
-//Familiy-construct
-function familie(data, index) {
-  this.data = data;
-  this.saved = true;
-  this.index = index;
-}
-familie.prototype.save = function (tab = 'familie') {
-  if (this.saved) {
-    tab = tab.split('-');
-    opt = tab.splice(1).join('-');
-    tab = tab[0];
-
-    var f;
-    if (tab == 'familie') { f = getFamForm(); }
-    if (tab == 'verwaltung') { f = getVerwForm(); }
-    var d = this.data || {},
-      nd = {},
-      preist = false;
-
-    //Find new familiy data
-    nd.ID = d.ID;
-    if (tab == 'familie') {
-      nd.Name = d.Name;
-      nd.Erwachsene = d.Erwachsene;
-      nd.Kinder = d.Kinder;
-      nd.Adresse = d.Adresse;
-      nd.Telefonnummer = d.Telefonnummer;
-    } else if (tab == 'verwaltung') {
-      nd.Name = escape(f[9].val());
-      nd.Erwachsene = f[4].val();
-      nd.Kinder = f[5].val();
-      nd.Adresse = escape(f[11].val());
-      nd.Telefonnummer = escape(f[12].val());
-    }
-
-    if (tab == 'familie') {
-      nd.Ort = d.Ort;
-      nd.Gruppe = d.Gruppe;
-      nd.Num = d.Num;
-    } else if (tab == 'verwaltung') {
-      try {
-        nd.Ort = tdd_orte[f[0].val()].Name;
-      } catch (e) { }
-      nd.Gruppe = f[1].val();
-      nd.Num = f[10].val();
-
-      // if not manually changed but moved to different group/location
-      // then let mysql update num
-      if (
-        nd.Num == "" || nd.Num == "0" ||
-        (nd.Num == d.Num && (nd.Ort != d.Ort || nd.Gruppe != d.Gruppe))) {
-        nd.Num = "newNum('" + nd.Ort + "'," + nd.Gruppe + ")";
-      }
-    }
-
-    var s = +f[7].val();
-    if (tab == 'familie') {
-      // schulden beglichen
-      if (f[11].prop("checked")) {
-        s = 0;
-        f[11].prop("checked", false);
-      }
-      // geld vergessen
-      if (f[10].prop("checked")) {
-        s += +this.preis;
-        f[10].prop("checked", false);
-      }
-    }
-    nd.Schulden = s.toFixed(2);
-    var pr = -(+nd.Schulden - +d.Schulden);
-
-    nd.Karte = f[3].val();
-
-    // anwesend
-    if (tab == 'familie' && !f[9].prop("checked")) {
-      var date = d.lAnwesenheit;
-    } else if (tab == 'familie' && f[9].prop("checked")) {
-      var date = formatDate(new Date());
-      if (date != d.lAnwesenheit) { preist = true; }
-    } else if (tab == 'verwaltung') {
-      var date = f[2].val();
-    }
-    nd.lAnwesenheit = date;
-
-    nd.Notizen = escape(f[8].val());
-    if (opt == 'neu') { nd.Notizen = ""; }
-
-    //Save if new/updated
-    if (!(JSON.stringify(nd) == JSON.stringify(d)) && opt !== 'neu') {
-      if (typeof (d.ID) == "undefined") { alert("<p>Konnte nicht speichern, ID wurde nicht gefunden!</p><p>Möglicherweise hilft es, eine andere Person zu speichern, ansonsten bitte neu laden (Familien-Anzahl nicht vergessen).</p>", "Fehler"); console.debug('Error saving', this, '\nCould not find ID'); return; }
-      if (tab == 'familie') {
-        clearTimeout(fam_timeout);
-
-        this.newdata = clone(nd);
-        this.saved = false;
-        console.debug(this, 'saving');
-        var i = tdd_unsaved_queue.push(this) - 1;
-
-        delete nd.ID;
-        var pr0 = +this.preis;
-        if (preist) { pr += pr0; }
-
-        td = { table: "familien", id: d.ID, meta: { key: "ID", value: d.ID }, set: nd, preis: pr, anw: preist };
-        update(td, ["tdd_unsaved_queue", "callback"]);
-        jQuery(f).each(function (i, e) { e.prop('disabled', true); });
-
-      } else if (tab == 'verwaltung') {
-        this.newdata = clone(nd);
-        this.saved = false;
-        console.debug(this, 'saving');
-
-        delete nd.ID;
-
-        jQuery('#verw-save, #verw-del').prop('disabled', true);
-        update({ table: "familien", meta: { key: "ID", value: d.ID }, set: nd, preis: pr, anw: false }, savedVerw);
-        jQuery(f).each(function (i, e) { e.prop('disabled', true); });
-
-        verw_neu = this;
-
-      }
-    } else if (tab == 'verwaltung' && opt == 'neu') {
-      this.newdata = clone(nd);
-      this.saved = false;
-      console.debug(this, 'saving');
-
-      delete nd.ID;
-
-      jQuery('#verw-neu').prop('disabled', true);
-      insert({ table: "familien", set: nd, preis: pr, anw: false }, savedVerwN);
-      jQuery(f).each(function (i, e) { e.prop('disabled', true); });
-
-      verw_neu = this;
-
-    } else {
-      console.debug(this, 'already saved');
-      if (typeof (fam_for_v) != "undefined") { setTimeout(jumpToV, 1); }
-
-    }
-  } else { console.debug(this, 'already saving'); }
-
-};
 
 */

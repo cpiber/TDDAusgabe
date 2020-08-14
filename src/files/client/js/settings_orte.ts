@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { alert } from './helpers';
-import { orte, JPromise } from './settings';
+import { JPromise, orte } from './settings';
 
 export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
   const $opt = $('#orte ul');
@@ -142,8 +142,6 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       $('<li>').addClass('button-add').text('+').appendTo($opt);
     });
   }
-
-  setInterval(update, 30*60*1000); // update every 30min
 
   return update;
 }

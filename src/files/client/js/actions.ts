@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { formatDate, alert } from './helpers';
+import { alert, formatDate } from './helpers';
 
 export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
   if (date === -1) {

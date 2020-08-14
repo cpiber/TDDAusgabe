@@ -20,8 +20,8 @@ if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
   $password = $_SESSION['pw'];
 
   $conn = connectdb($servername, $username, $password);
-  if ( get_class($conn) != "PDO" ) {
-    connect_error(true);
+  if ( is_string($conn) ) {
+    connect_error($conn);
   }
 
 } else {
@@ -39,7 +39,7 @@ function connectdb($servername, $username, $password) {
     
   } catch ( PDOException $e ) {
     $c = null;
-    return $e;
+    return $e->getMessage();
   }
 }
 
@@ -47,14 +47,14 @@ function connect_error($error = false) {
   global $conn;
   if ( isset( $_GET['api'] ) ) {
     header("Content-Type: application/json; charset=UTF-8");
-    printf( '{"status":"failure", "type":"Connection failed", "message":"%s"}', $error ? $conn->getMessage() : "Not logged in." );
+    printf( '{"status":"failure", "type":"Connection failed", "loggedin": false, "message":"%s"}', $error ? $conn->getMessage() : "Not logged in." );
   } else {
     echo "<!DOCTYPE html><html><head>";
     echo "<title>Tischlein Deck Dich Login</title>";
     echo "<meta charset=\"UTF-8\">";
     echo "</head><body>";
     echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
-    loginform( $error ? "<span style=\"color:red\">Login failed.</span>" : "", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
+    loginform( $error ? "<span style=\"color:red\">Login failed. $error</span>" : "", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
     echo "</body></html>";
   }
   exit;
@@ -83,7 +83,7 @@ function loginform( $msg = "", $url = "" ) { ?>
     <input type="password" id="password" name="password" placeholder="Password"><br>
     <input type="submit" value="OK">
     <p>&nbsp;</p>
-    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a href="?login">Zurück</a>  <!--<a href="?setup">Setup</a>--></p>
+    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><?php echo isset( $_GET['url'] ) ? '<a href="?login">Zurück</a>' : ''; ?>  <!--<a href="?setup">Setup</a>--></p>
   </form></div>
 <?php }
 

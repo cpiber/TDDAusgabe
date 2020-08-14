@@ -38,7 +38,7 @@ $proc_resetFamNum = "CREATE PROCEDURE resetFamNum()
   ";
 $proc_newNum = "CREATE FUNCTION newNum(
     q_ID INT,
-    q_ort VARCHAR(255),
+    q_ort INT,
     q_gruppe INT
   )
   RETURNS int
@@ -62,6 +62,44 @@ $proc_newNum = "CREATE FUNCTION newNum(
     RETURN next;
   END;
   ";
+$proc_newGruppe = "CREATE FUNCTION newGruppe(
+    q_ID INT,
+    q_ort INT
+  )
+  RETURNS int
+  BEGIN
+    DECLARE ngrp INT DEFAULT 1;
+    DECLARE nnum INT DEFAULT NULL;
+    DECLARE cgrp INT DEFAULT 0;
+    DECLARE cnum INT DEFAULT 0;
+    DECLARE gmax INT DEFAULT 0;
+    DECLARE f_ID INT DEFAULT q_ID;
+
+    SELECT `Gruppen` INTO gmax FROM `orte` WHERE `ID` = q_ort;
+    IF gmax IS NULL THEN
+      RETURN 0;
+    END IF;
+
+    IF f_ID IS NULL THEN
+      SET f_ID = 0;
+    END IF;
+
+    loop1: LOOP
+      SET cgrp = cgrp + 1;
+      IF cgrp > gmax THEN
+        LEAVE loop1;
+      END IF;
+
+      SELECT COUNT(*) INTO cnum FROM `familien` WHERE `Ort` = q_ort AND `Gruppe` = cgrp AND `ID` <> f_ID;
+      IF nnum IS NULL OR cnum < nnum THEN
+        SET nnum = cnum;
+        SET ngrp = cgrp;
+      END IF;
+    END LOOP;
+
+    RETURN ngrp;
+  END;
+  ";
 $proc_splitStr = "CREATE FUNCTION splitStr (
     x VARCHAR(255),
     delim VARCHAR(12),
@@ -72,11 +110,26 @@ $proc_splitStr = "CREATE FUNCTION splitStr (
          LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
          delim, '');
   "; // https://stackoverflow.com/a/14950556/
-$trigger_familienNumInsert = "CREATE TRIGGER familienNumInsert BEFORE INSERT ON `familien`
-  FOR EACH ROW SET NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL,newNum(NULL, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`);
+$trigger_familienInsert = "CREATE TRIGGER familienInsert BEFORE INSERT ON `familien`
+  FOR EACH ROW SET
+    NEW.`Gruppe` = IF(NEW.`Gruppe`=0 OR NEW.`Gruppe` IS NULL,newGruppe(NULL, NEW.`Ort`),NEW.`Gruppe`);
+    NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL,newNum(NULL, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`),
   ";
-$trigger_familienNumUpdate = "CREATE TRIGGER familienNumUpdate BEFORE UPDATE ON `familien`
-  FOR EACH ROW SET NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL OR OLD.`Ort`<>NEW.`Ort` OR OLD.`Gruppe`<>NEW.`Gruppe`,newNum(NEW.`ID`, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`);
+$trigger_familienUpdate = "CREATE TRIGGER familienUpdate BEFORE UPDATE ON `familien`
+  FOR EACH ROW BEGIN
+    IF NEW.`Gruppe`=0 OR NEW.`Gruppe` IS NULL OR (OLD.`Ort`<>NEW.`ORT` AND OLD.`Gruppe`=NEW.`Gruppe`) THEN
+      SET New.`Gruppe` = newGruppe(NEW.`ID`, NEW.`Ort`);
+    END IF;
+    IF NEW.`Gruppe`<0 THEN
+      SET NEW.`Gruppe` = -NEW.`Gruppe`;
+    END IF;
+    IF NEW.`Num`=0 OR NEW.`Num` IS NULL OR ((OLD.`Ort`<>NEW.`Ort` OR OLD.`Gruppe`<>NEW.`Gruppe`) AND OLD.`Num`=New.`Num`) THEN
+      SET NEW.`Num` = newNum(NEW.`ID`, NEW.`Ort`, NEW.`Gruppe`);
+    END IF;
+    IF NEW.`Num`<0 THEN
+      SET NEW.`Num` = -NEW.`Num`;
+    END IF;
+  END;
   ";
 $view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(`Type`='attendance',splitStr(`Val`, '/', 1),'') AS `P1`, IF(`Type`='attendance',splitStr(`Val`, '/', 2),'') AS `P2` FROM `logs`";
 
@@ -138,7 +191,7 @@ if ( isset( $_GET['setup'] ) ) {
         <li><a href="?setup&step=1">Step 1</a>: Datenbank</li>
         <li><a href="?setup&step=2">Step 2</a>: Nutzer</li>
         <li><a href="?setup&step=3">Step 3</a>: Tabellen</li>
-        <li><a href="?setup&step=4">Step 4</a>: Prozeduren</li>
+        <li><a href="?setup&step=4">Step 4</a>: Misc</li>
       </ul><?php
       break;
     
@@ -204,7 +257,7 @@ if ( isset( $_GET['setup'] ) ) {
           Erwachsene int NOT NULL DEFAULT '0',
           Kinder int NOT NULL DEFAULT '0',
           Ort int NOT NULL,
-          Gruppe int NOT NULL,
+          Gruppe int DEFAULT '0',
           Schulden decimal(5,2) NOT NULL DEFAULT '0.00',
           Karte date,
           lAnwesenheit date,
@@ -290,10 +343,10 @@ DESIGNS_NOWDOC____;
         $ver = DB_VER;
         $sql = "INSERT INTO `einstellungen` ( Name, Val ) VALUES ( 'Version', $ver )";
         $conn->exec( $sql );
-        echo "<p>`Preis` erfolgreich initialisiert.</p>";
+        echo "<p>`Version` erfolgreich initialisiert.</p>";
         
       } catch ( PDOException $e ) {
-        echo "<p>Fehler beim Initialisieren von `Preis`.<br>";
+        echo "<p>Fehler beim Initialisieren von `Version`.<br>";
         echo setup_error( $sql, $e->getMessage() );
       }
 
@@ -302,7 +355,7 @@ DESIGNS_NOWDOC____;
 
         $sql = "CREATE TABLE logs(
           ID int NOT NULL AUTO_INCREMENT,
-          DTime DateTime NOT NULL,
+          DTime DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           Type varchar(255) NOT NULL,
           Val varchar(255),
           PRIMARY KEY (ID)
@@ -351,6 +404,20 @@ DESIGNS_NOWDOC____;
         $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
+        $conn->exec( "DROP FUNCTION IF EXISTS newGruppe;" );
+        $conn->exec( $proc_newGruppe );
+        $conn->commit();
+        echo "<p>Prozedur `newGruppe` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        $conn->rollBack();
+        echo "<p>Fehler beim Anlegen der Prozedur `newGruppe`.<br>";
+        echo setup_error( "", $e->getMessage() );
+      }
+      try {
+        $conn->beginTransaction();
+        $conn->exec( "USE tdd" );
+        
         $conn->exec( "DROP FUNCTION IF EXISTS splitStr;" );
         $conn->exec( $proc_splitStr );
         $conn->commit();
@@ -365,28 +432,28 @@ DESIGNS_NOWDOC____;
         $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
-        $conn->exec( "DROP TRIGGER IF EXISTS familienNumInsert;" );
-        $conn->exec( $trigger_familienNumInsert );
+        $conn->exec( "DROP TRIGGER IF EXISTS familienInsert;" );
+        $conn->exec( $trigger_familienInsert );
         $conn->commit();
-        echo "<p>Trigger `familienNumInsert` erfolgreich angelegt.</p>";
+        echo "<p>Trigger `familienInsert` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
         $conn->rollBack();
-        echo "<p>Fehler beim Anlegen des Triggers `familienNumInsert`.<br>";
+        echo "<p>Fehler beim Anlegen des Triggers `familienInsert`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
         $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
-        $conn->exec( "DROP TRIGGER IF EXISTS familienNumUpdate;" );
-        $conn->exec( $trigger_familienNumUpdate );
+        $conn->exec( "DROP TRIGGER IF EXISTS familienUpdate;" );
+        $conn->exec( $trigger_familienUpdate );
         $conn->commit();
-        echo "<p>Trigger `familienNumUpdate` erfolgreich angelegt.</p>";
+        echo "<p>Trigger `familienUpdate` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
         $conn->rollBack();
-        echo "<p>Fehler beim Anlegen des Triggers `familienNumUpdate`.<br>";
+        echo "<p>Fehler beim Anlegen des Triggers `familienUpdate`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {

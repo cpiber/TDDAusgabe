@@ -79,6 +79,7 @@ html.main {
 
   &:disabled {
     background-color: $mediumgray;
+    color: $dark;
   }
 
   &:not(:disabled) {
@@ -164,5 +165,15 @@ table {
 
   &-error {
     background-color: red;
+  }
+}
+
+input[type="checkbox"] {
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
   }
 }

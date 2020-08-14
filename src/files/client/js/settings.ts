@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import { alert } from './helpers';
-import { DEBUG } from '../../client';
 
 export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
 

@@ -161,7 +161,7 @@
             <p><label>Name:<br><input class="w100pm400px" type="text" placeholder="Name" /></label></p>
             <p><label>Ort: <select></select></label></p>
             <p><label>Gruppe: <select></select></label></p>
-            <p><label>Nummer: <input type="number" style="width:60px;" /></label></p>
+            <p><label title="0 für auto">Nummer: <input type="number" style="width:60px;" /></label></p>
             <p><label>Erwachsene: <input type="number" style="width:60px;" /></label></p>
             <p><label>Kinder: <input type="number" style="width:60px;" /></label></p>
             <p><label>Letzte Anwesenkeit: <input type="date" /></label></p>
@@ -179,12 +179,12 @@
       <div id="tab4">
         <h1>Logs</h1>
         <h2>Einnahmen</h2>
-        <p><form>
+        <form><p>
           <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
           <button type="submit">Go</button>
           &nbsp; &nbsp;
           <button type="button">Monat</button>
-        </form></p>
+        </p></form>
         <p class="log-info">
           Einnahmen im angegebenen Bereich: <span></span>€<br />
           Personen im angegebenen Bereich: <span></span> Erwachsene(r), <span></span> Kind(er) / <span></span> Familie(n)

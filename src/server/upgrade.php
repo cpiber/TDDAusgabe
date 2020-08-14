@@ -179,7 +179,7 @@ if ( $ver < DB_VER ) {
       $conn->exec( "ALTER TABLE `familien` CHANGE `Erwachsene` `Erwachsene` INT NOT NULL DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Kinder` `Kinder` INT NOT NULL DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Ort` `Ort` INT NOT NULL" );
-      $conn->exec( "ALTER TABLE `familien` CHANGE `Gruppe` `Gruppe` INT NOT NULL" );
+      $conn->exec( "ALTER TABLE `familien` CHANGE `Gruppe` `Gruppe` INT DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Schulden` `Schulden` DECIMAL(5,2) NOT NULL DEFAULT '0.00'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Notizen` `Notizen` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Num` `Num` INT DEFAULT '0'" );
@@ -190,7 +190,7 @@ if ( $ver < DB_VER ) {
       $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Val` `Val` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
 
-      $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` DATETIME NOT NULL" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
       $conn->exec( "ALTER TABLE `logs` DROP `aff_table`" );
@@ -201,11 +201,14 @@ if ( $ver < DB_VER ) {
       $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
       $conn->exec( $proc_newNum );
 
-      $conn->exec( "DROP TRIGGER IF EXISTS familienNumInsert;" );
-      $conn->exec( $trigger_familienNumInsert );
+      $conn->exec( "DROP FUNCTION IF EXISTS newGruppe;" );
+      $conn->exec( $proc_newGruppe );
 
-      $conn->exec( "DROP TRIGGER IF EXISTS familienNumUpdate;" );
-      $conn->exec( $trigger_familienNumUpdate );
+      $conn->exec( "DROP TRIGGER IF EXISTS familienInsert;" );
+      $conn->exec( $trigger_familienInsert );
+
+      $conn->exec( "DROP TRIGGER IF EXISTS familienUpdate;" );
+      $conn->exec( $trigger_familienUpdate );
 
       $conn->exec( "DROP VIEW IF EXISTS logsalt;" );
       $conn->exec( $view_logsalt );
