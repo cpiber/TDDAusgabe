@@ -67,7 +67,7 @@
         <p style="text-align: right;">2018 by Constantin, Version <?php echo VERSION; ?></p>
       </div>
       <div id="tab2">
-        <h1>Lebensmittelausgabe</h1>
+        <h1>Lebens&shy;mittel&shy;ausgabe</h1>
         <div>
           <div class="cols2 search-header" style="margin-bottom: 10px">
             <div class="cols2 w100p-c">
@@ -96,9 +96,7 @@
             <p style="font-weight: bolder;"><span></span></p>
             <p>
               <b>Familien-Nummer: <span>0</span></b>
-              <button class="fam-count o">-</button>
-              <button class="fam-count o">0</button>
-              <button class="fam-count o">+</button>
+              <i><button class="fam-count o">-</button><button class="fam-count o">0</button><button class="fam-count o">+</button></i>
             </p>
             <p>
               <span class="link">Karte drucken</span> &nbsp; <span></span>
@@ -199,7 +197,7 @@
         </p>
       </div>
       <div id="tab5">
-        <h1>Einstellungen</h1>
+        <h1>Ein&shy;stel&shy;lungen</h1>
         <div>
           <div class="cols3" id="orte">
             <h2>Orte</h2>
@@ -398,16 +396,33 @@
     </div>
   </div>
 
-  <div class="modal">
+  <div id="card-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <span class="close">&times;</span>
         <h2 class="modal-head">Karte drucken</h2>
       </div>
-      <div class="modal-body"><iframe src="?page=card"></iframe></div>
-      <div class="modal-footer">
-        <h3 class="modal-foot"></h3>
+      <div class="modal-body">
+        <div class="card-frame-wrapper"><iframe src="?page=card" class="card-frame"></iframe></div>
       </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close">&times;</span>
+        <h2 class="modal-head">Login</h2>
+      </div>
+      <div class="modal-body">
+        <form class="login-form">
+          <input name="user" />
+          <input type="password" name="pass" />
+          <input type="submit" value="Anmelden" />
+        </form>
+      </div>
+      <div class="modal-footer"></div>
     </div>
   </div>
 

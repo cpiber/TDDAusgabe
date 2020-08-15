@@ -62,7 +62,7 @@ export function highlightElement(el: JQuery<HTMLElement>) {
 
 
 // alert using modal
-let modal: JQuery<HTMLElement> = null;
+let modal: JQuery<HTMLElement>;
 export function alert(text: string, title = "", footer = "") {
   var m = modal;
   var h = m.find('.modal-head');
@@ -73,18 +73,25 @@ export function alert(text: string, title = "", footer = "") {
   h.html(title);
   f.html(footer);
 
-  modal.show();
-  document.body.style.overflow = "hidden"
+  open_modal(m);
 }
 $(() => {
-  const close = () => {
-    document.body.style.overflow = "";
-    modal.hide();
-  }
-  modal = $('#modal').on('click', (e) => {
-    if (e.target.id === 'modal') close(); // backgroud
-  }).on('click', '.close', () => close());
+  $('.modal').each(function () {
+    let modal = $(this);
+    const close = () => {
+      document.body.style.overflow = "";
+      modal.hide();
+    }
+    modal.on('click', (e) => {
+      if (e.target === this) close(); // backgroud
+    }).on('click', '.close', () => close());
+  });
+  modal = $('#modal');
 });
+export function open_modal(modal: JQuery<HTMLElement>) {
+  modal.show();
+  document.body.style.overflow = "hidden";
+}
 
 
 // calculate price
@@ -94,12 +101,14 @@ export function preis(erwachsene = 0, kinder = 0) {
   s = s.replace(/e/g, ""+erwachsene);
   s = s.replace(/k/g, ""+kinder);
   s = s.replace(/[^0-9\+\-\*\/\(\)\.><=]/g, '');
+
   try {
     return eval(s);
   } catch (e) {
     console.debug(`<code>${settings.preis}</code> invalide Preis-Formel`, e);
     alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
   }
+  return 0;
 }
 
 

@@ -1,8 +1,8 @@
-
 import $ from 'jquery';
+import { cardWindow, familie as cardFam } from '../../card';
 import { JsBarcode } from '../../client';
 import { fam, famdata, famdirty, famelems } from './familie_interfaces';
-import { alert, numPad } from './helpers';
+import { alert, numPad, open_modal, preis } from './helpers';
 
 
 export class familie {
@@ -13,14 +13,18 @@ export class familie {
   static elems: famelems;
   static current: familie;
   static barcode: HTMLImageElement;
+  static frame: HTMLIFrameElement;
+  static $card: JQuery<HTMLElement>;
 
   constructor(data: any) {
     Object.assign(this.data, fam, data);
     this.generateBarcode();
   }
 
-  static linkHtml() {
+  static linkHtml($card: JQuery<HTMLElement>) {
     familie.barcode = $('#barcode').get(0) as HTMLImageElement;
+    familie.frame = $card.find('.card-frame').get(0) as HTMLIFrameElement;
+    familie.$card = $card;
     Object.keys(fam).forEach(element => {
       const el = this.elems[element];
       if (!el) return;
@@ -80,6 +84,19 @@ export class familie {
     this.barcode = familie.barcode.src;
   }
 
+  print() {
+    const fam: cardFam = {
+      ...this.data,
+      Preis: preis(this.data.Erwachsene, this.data.Kinder),
+      img: `<img src="${this.barcode}" />`,
+      isrc: this.barcode,
+    };
+    const w = familie.frame.contentWindow as cardWindow;
+    w.familie = fam;
+    w.updateCanvas();
+    open_modal(familie.$card);
+  }
+
   static disable() {
     for (const prop in this.elems) {
       if (this.elems[prop])
@@ -97,7 +114,7 @@ export class familie {
   changed(property: string) {
   }
 
-  save(cls: typeof familie, additional: {[key: string]: any} = {}) {
+  save(cls: typeof familie, additional: { [key: string]: any } = {}) {
     const data: famdata = {};
     for (let prop in this.dirty) {
       if (this.dirty[prop]) data[prop] = this.data[prop];
@@ -139,5 +156,5 @@ export class familie {
     });
   }
 
-  _save() {}
+  _save() { }
 }

@@ -6,8 +6,27 @@ session_start();
 if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
   $_SESSION['user'] = $_POST['username'];
   $_SESSION['pw'] = $_POST['password'];
-  $url = ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : $_SERVER['SCRIPT_NAME'] );
-  header( "LOCATION: " . $url );
+  login();
+  $url = isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : $_SERVER['SCRIPT_NAME'];
+  header( "LOCATION: $url" );
+  exit;
+
+} else if ( isset( $_GET['api'] ) && $_GET['api'] == 'login' && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+  $_SESSION['user'] = $_POST['username'];
+  $_SESSION['pw'] = $_POST['password'];
+
+  if ( ( $err = login(false) ) !== true ) {
+    echo json_encode( array(
+      'status' => 'failure',
+      'loggedin' => false,
+      'message' => $err,
+    ) );
+  } else {
+    echo json_encode( array(
+      'status' => 'success',
+      'loggedin' => true,
+    ) );
+  }
   exit;
 
 } else if ( isset( $_GET['login'] ) ) {
@@ -15,18 +34,28 @@ if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['pa
   $_SESSION = array();
 }
 
-if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
-  $username = $_SESSION['user'];
-  $password = $_SESSION['pw'];
 
-  $conn = connectdb($servername, $username, $password);
-  if ( is_string($conn) ) {
-    connect_error($conn);
+function login($out = true) {
+  global $conn;
+  global $servername;
+
+  if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
+    $username = $_SESSION['user'];
+    $password = $_SESSION['pw'];
+
+    $conn = connectdb($servername, $username, $password);
+    if ( is_string($conn) ) {
+      if ( $out ) connect_error($conn);
+      return $conn;
+    }
+    return true;
+
+  } else {
+    if ( $out ) connect_error();
+    return false;
   }
-
-} else {
-  connect_error();
 }
+login();
 
 
 function connectdb($servername, $username, $password) {
@@ -74,16 +103,26 @@ function loginform( $msg = "", $url = "" ) { ?>
       width: 100%;
       box-sizing: border-box;
     }
+    @media (max-width: 360px) {
+      .float-middle {
+        padding: 20px 30px;
+      }
+    }
+    @media (max-width: 320px) {
+      .float-middle {
+        padding: 20px 15px;
+      }
+    }
   </style>
   <div class="float-middle"><form action="<?php echo "?login" . ( $url == "" ? "" : "&url=".urlencode($url) ); ?>" method="POST">
     <?php echo $msg; ?>
-    <h1>Login</h1><br>
+    <h1>Login</h1><br />
     <input type="hidden" name="login" value=true>
-    <input type="text" id="username" name="username" placeholder="Username"><br>
-    <input type="password" id="password" name="password" placeholder="Password"><br>
+    <input type="text" id="username" name="username" placeholder="Username">
+    <input type="password" id="password" name="password" placeholder="Password">
     <input type="submit" value="OK">
     <p>&nbsp;</p>
-    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><?php echo isset( $_GET['url'] ) ? '<a href="?login">Zurück</a>' : ''; ?>  <!--<a href="?setup">Setup</a>--></p>
+    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><?php echo isset( $_GET['setup'] ) || isset( $_GET['url'] ) ? '<a href="?login">Zurück</a>' : ''; ?>  <!--<a href="?setup">Setup</a>--></p>
   </form></div>
 <?php }
 

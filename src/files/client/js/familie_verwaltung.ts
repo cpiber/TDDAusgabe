@@ -32,8 +32,12 @@ export class verwaltungFam extends familie {
     verwaltungFam.enable();
   }
 
-  static linkHtml() {
+  static linkHtml($card: JQuery<HTMLElement>) {
     const $inputs = $('#tab3 .familie-data :input, #tab3 .familie-data span') as JQuery<HTMLInputElement>;
+    $inputs.eq(0).on('click', () => {
+      if (!verwaltungFam.current) return;
+      verwaltungFam.current.print();
+    });
     this.elems.ID = $inputs.eq(1);
     this.elems.Name = $inputs.eq(2);
     this.elems.Ort = $inputs.eq(3).on('change', () => {
@@ -78,7 +82,7 @@ export class verwaltungFam extends familie {
       new verwaltungFam();
     });
 
-    super.linkHtml();
+    super.linkHtml($card);
   }
 
   static clear() {

@@ -124,6 +124,10 @@ button {
   }
 }
 
+.smaller {
+  font-size: 80%;
+}
+
 
 p.code, code.code {
   @at-root &, span.code {

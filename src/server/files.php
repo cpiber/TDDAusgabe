@@ -17,6 +17,13 @@ require "../files/client.scss";
 FILE_NOWDOC____;
       break;
 
+    case "cardjs":
+      header( 'Content-type: application/javascript' );
+      echo <<<'FILE_NOWDOC____'
+require "../files/card.ts";
+FILE_NOWDOC____;
+      break;
+
     case "favicon":
       header( 'Content-type: image/vnd.microsoft.icon' );
       $file = <<<'FILE_NOWDOC____'

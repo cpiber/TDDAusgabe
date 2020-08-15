@@ -93,11 +93,12 @@ jQuery(($) => {
   });
 
   // Ausgabe + Verwaltung Tabs
+  const $card = $('#card-modal');
 
   // load forms and reset
-  ausgabeFam.linkHtml();
+  ausgabeFam.linkHtml($card);
   ausgabeFam.clear();
-  verwaltungFam.linkHtml();
+  verwaltungFam.linkHtml($card);
   verwaltungFam.clear();
 
   const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
@@ -114,7 +115,7 @@ jQuery(($) => {
   
   // Settings tab
   const updateOrte = optionsOrteUpdate(loadOrte);
-  const updateSettings = optionsSettingsUpdate();
+  const updateSettings = optionsSettingsUpdate($card.find('.card-frame') as JQuery<HTMLIFrameElement>);
   tabLinks.get(4).onClose = () => {updateOrte(); updateSettings();};
 
   const $sett_help = $('#tab5 .help');

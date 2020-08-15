@@ -51,4 +51,19 @@
       cursor: pointer;
     }
   }
+
+
+  .card-frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: none;
+
+    &-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: calc( max( 65%, 300px ) );
+      margin: 10px 0;
+    }
+  }
 }

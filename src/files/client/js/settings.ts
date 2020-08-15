@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { cardWindow } from '../../card';
 import { alert } from './helpers';
 
 export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
@@ -20,11 +21,19 @@ orte.loading = null;
 orte.maxGruppen = 0;
 
 
-export function optionsSettingsUpdate() {
+export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
   const $in = $('#settings :input');
   const $preis = $in.eq(0).data('name', 'Preis').data('prop', 'preis');
   const $designs = $in.eq(1).data('name', 'Kartendesigns').data('prop', 'designs');
   $in.eq(2).on('click', update.bind(null, null, $preis, $designs));
+
+  const card = $frame.on('load', () => {
+    // set designs on load in case the frame takes longer to load than requesting settings
+    try {
+      (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
+      (card.contentWindow as cardWindow).updateDesigns();
+    } catch (e) {}
+  }).get(0);
 
   [$preis, $designs].forEach(element => {
     let timeout;
@@ -50,6 +59,16 @@ export function optionsSettingsUpdate() {
 
         $preis.val(settings.preis);
         $designs.val(settings.designs);
+
+        try {
+          (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
+          (card.contentWindow as cardWindow).updateDesigns();
+        } catch (e) {
+          console.error(`Failed setting 'designs': ${e}`);
+          alert(`
+          <p>Fehler beim laden der Designs:<br />${e}</p>
+        `, "Fehler");
+        }
       } else {
         console.error(`Failed getting settings: ${data.message}`);
         alert(`

@@ -52,8 +52,12 @@ export class ausgabeFam extends familie {
     ausgabeFam.enable();
   }
 
-  static linkHtml() {
+  static linkHtml($card: JQuery<HTMLElement>) {
     const $inputs = $('#tab2 .familie-data :input, #tab2 .familie-data span') as JQuery<HTMLInputElement>;
+    $inputs.eq(5).on('click', () => {
+      if (!ausgabeFam.current) return;
+      ausgabeFam.current.print();
+    });
     this.elems.Name = $inputs.eq(6);
     this.elems.Ort = $inputs.eq(7);
     this.elems.Gruppe = $inputs.eq(8);
@@ -175,7 +179,7 @@ export class ausgabeFam extends familie {
       this.clear();
     });
 
-    super.linkHtml();
+    super.linkHtml($card);
   }
 
   static clear() {
@@ -189,6 +193,8 @@ export class ausgabeFam extends familie {
 
   show() {
     super.show(ausgabeFam);
+
+    ausgabeFam.elems.Name.html(`${this.data.Name} <i class="smaller">(ID: ${this.data.ID})</i>`);
 
     const i = orte.findIndex(val => val.ID == this.data.Ort);
     const ortname = orte[i] ? orte[i].Name : 'Unbekannt';
