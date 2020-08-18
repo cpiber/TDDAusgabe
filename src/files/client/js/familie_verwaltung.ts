@@ -144,7 +144,10 @@ export class verwaltungFam extends familie {
       });
     } else {
       if (this.data.Num == 0) this.dirty.Num = true;
-      return super.save(verwaltungFam).then(() => this.show());
+      return super.save(verwaltungFam).then((data: apiData) => {
+        this.show();
+        return data;
+      });
     }
   }
 

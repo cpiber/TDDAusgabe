@@ -12,6 +12,7 @@ if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['pa
   exit;
 
 } else if ( isset( $_GET['api'] ) && $_GET['api'] == 'login' && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+  header( "Content-Type: application/json; charset=UTF-8" );
   $_SESSION['user'] = $_POST['username'];
   $_SESSION['pw'] = $_POST['password'];
 
@@ -117,10 +118,10 @@ function loginform( $msg = "", $url = "" ) { ?>
   <div class="float-middle"><form action="<?php echo "?login" . ( $url == "" ? "" : "&url=".urlencode($url) ); ?>" method="POST">
     <?php echo $msg; ?>
     <h1>Login</h1><br />
-    <input type="hidden" name="login" value=true>
-    <input type="text" id="username" name="username" placeholder="Username">
-    <input type="password" id="password" name="password" placeholder="Password">
-    <input type="submit" value="OK">
+    <input type="hidden" name="login" value=true />
+    <input type="text" id="username" name="username" placeholder="Username" autocomplete="username" />
+    <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" />
+    <input type="submit" value="OK" />
     <p>&nbsp;</p>
     <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><?php echo isset( $_GET['setup'] ) || isset( $_GET['url'] ) ? '<a href="?login">Zurück</a>' : ''; ?>  <!--<a href="?setup">Setup</a>--></p>
   </form></div>

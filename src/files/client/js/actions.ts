@@ -18,14 +18,14 @@ export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
     str = formatDate(date);
   }
   if (str) {
-    request('action/delDate', 'Fehler beim löschen', {
+    request('action/delDate', 'Fehler beim Löschen', {
       date: str,
       col: column
     }).then((data: apiData) => {
       console.debug(`Removed ${data.entries}`);
       alert(`
         <p>${data.entries} gelöscht</p>
-      `, "");
+      `);
     });
   } else {
     console.debug(date, "is not a string");
@@ -33,7 +33,7 @@ export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
 }
 
 export function resetFam() {
-  request('action/resetFam', 'Fehler beim reset').then(() => {
+  request('action/resetFam', 'Fehler beim Reset').then(() => {
     console.debug(`Reset`);
     alert(`
       <p>Erfolgreich zurückgesetzt</p>

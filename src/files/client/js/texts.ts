@@ -45,9 +45,9 @@ const karte_designs_help = `
   <code class="code">&nbsp;&nbsp;{ <span style="color:green">// Beginn Design-Objekt</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">name</span>": "<span style="color:red">Design1</span>", <span style="color:green">// Name festlegen (Komma!)</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">elements</span>": [ <span style="color:green">// Beginn der Element-Liste</span></code>
-  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>" }, <span style="color:green">// Ein Element mit HTML-Inhalt (Komma!)</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;/p&gt;</span>" }, <span style="color:green">// Ein Element mit HTML-Inhalt (Komma!)</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:green">// Beginn Element 2</span></code>
-  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;p&gt;</span>", <span style="color:green">// HTML-Eigenschaft (Komma!)</span></code>
+  <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">html</span>": "<span style="color:red">&lt;p&gt;Zeile 1&lt;/p&gt;</span>", <span style="color:green">// HTML-Eigenschaft (Komma!)</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"<span style="color:red">css</span>": "<span style="color:red">color:red</span>" <span style="color:green">// CSS-Eigenschaft</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <span style="color:green">// Ende Element 2</span></code>
   <code class="code">&nbsp;&nbsp;&nbsp;&nbsp;] <span style="color:green">// Ende Element-Liste</span></code>

@@ -60,11 +60,12 @@ export class familie {
       const el: JQuery<HTMLInputElement> = cls.elems[prop];
       if (!el) continue;
       const tag = el.prop('tagName');
+      const val = this.data[prop];
       if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") {
-        el.val(this.data[prop]);
+        el.val(prop !== 'Schulden' ? val : (+val).toFixed(2));
         el.prop('checked', false);
       } else {
-        el.text(this.data[prop]);
+        el.text(val);
       }
     }
   }

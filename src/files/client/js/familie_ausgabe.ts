@@ -4,6 +4,7 @@ import { fam, famelems } from "./familie_interfaces";
 import { verwaltungFam } from "./familie_verwaltung";
 import { clone, formatDate, highlightElement, preis } from "./helpers";
 import { orte } from "./settings";
+import { apiData } from "./api";
 
 export class ausgabeFam extends familie {
   timeout;
@@ -366,12 +367,13 @@ export class ausgabeFam extends familie {
       additional.money = m.toFixed(2);
     }
 
-    return super.save(ausgabeFam, additional).then(() => {
+    return super.save(ausgabeFam, additional).then((data: apiData) => {
       this.orig_schuld = this.data.Schulden;
       if (!ausgabeFam.current || this.data.ID != ausgabeFam.current.data.ID) return;
       ausgabeFam.allow_sb_gv = true;
       this.show();
       ausgabeFam.enable(); // re-enable after setting allow_sb_gv and showing
+      return data;
     });
   }
 

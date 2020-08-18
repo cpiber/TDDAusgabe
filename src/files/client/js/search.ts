@@ -83,7 +83,7 @@ function select(list: any[], $list: JQuery<HTMLElement>, fam: typeof familie) {
   $list.find('.selected').removeClass('selected');
   $(this).addClass('selected');
 
-  if (fam.current && fam.current.data.ID == this.value) {
+  if (fam.current && fam.current instanceof ausgabeFam && fam.current.data.ID == this.value) {
     fam.current._save();
     return;
   }

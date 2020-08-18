@@ -51,7 +51,7 @@ export default function generate($selects: JQuery<HTMLSelectElement>) {
       $ort.val(val || 0);
 
       // create group selectors
-      if ($grp.get(0).length < (index === 0 ? orte.maxGruppen + 1 : orte.maxGruppen)) {
+      if ($grp.get(0).length < orte.maxGruppen + 1) {
         const val = $grp.val() || 0;
         $grp.empty();
 
@@ -73,7 +73,7 @@ export default function generate($selects: JQuery<HTMLSelectElement>) {
   }
 
   function ortChange($ort: JQuery<HTMLElement>, $grp: JQuery<HTMLElement>) {
-    const o = $ort.data('val') || 0;
+    const o = $ort.data('val') || -1;
     const n = $ort.val();
 
     if (o == n) return;

@@ -46,6 +46,11 @@ html.main {
   padding: 8px;
 }
 
+.clear {
+  clear: both;
+  float: none;
+}
+
 
 
 .link {
@@ -92,6 +97,10 @@ html.main {
       background-color: $darkgray;
     }
   }
+
+  &-add {
+    text-align: center;
+  }
 }
 
 a, a[href], a:visited {
@@ -114,6 +123,14 @@ button {
     }
   }
 }
+
+// input:not([type="checkbox"]), button, select {
+//   height: 22px;
+//   min-width: 22px;
+//   padding: 2px 3px;
+//   margin: 0;
+//   box-sizing: border-box;
+// }
 
 .help {
   font-size: 70%;

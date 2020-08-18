@@ -45,35 +45,6 @@ ul.tab {
   }
 }
 
-@media only screen and (min-width: 1160px) {
-  #tabs {
-    overflow: auto;
-  }
-  #tab-head {
-    float: left;
-    max-width: 30%;
-  }
-  ul.tab {
-    margin: 0;
-
-    li {
-      margin: 0;
-      width: 100%;
-
-      a {
-        display: block;
-        
-        border-bottom-left-radius: 10px;
-        border-top-right-radius: 0;
-
-        &.selected {
-          border-right: 2px solid $mediumred;
-          border-bottom: 2px solid $darkgray;
-        }
-      }
-    }
-  }
-}
 
 #tab-body {
   border: 2px solid $darkgray;
@@ -102,38 +73,83 @@ ul.tab {
       padding-top: 8px;
     }
   }
-}
 
 
-.button-add {
-  text-align: center;
-}
+  .familie-count:hover {
+    cursor: text;
+  }
 
-.familie-count:hover {
-  cursor: text;
-}
+  .familie-data {
+    font-size: 16px;
+  }
 
-.familie-data {
-  font-size: 16px;
-}
+  p.no-space + * {
+    margin-top: -1em;
+  }
 
-.msg-box:not(:empty) {
-  display: block;
-  border: 2px solid $lightgray;
-  background-color: $lightestred;
-  padding: 2px 4px;
-}
+  .info {
+    span:empty {
+      display: none;
 
-table.logs {
-  text-align: left;
+      + br, + br + br {
+        display: none;
+      }
+    }
+  }
 
-  th, td {
-    padding-left: 5px;
-    padding-right: 5px;
+  .checkboxes .cols3 {
+    margin-top: 0;
+  }
+
+  .msg-box:not(:empty) {
+    display: block;
+    border: 2px solid $lightgray;
+    background-color: $lightestred;
+    padding: 2px 4px;
+  }
+
+  table.logs {
+    text-align: left;
+
+    th, td {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+
+  #orte ul {
+    height: auto;
+    max-height: 450px;
   }
 }
 
-#orte ul {
-  height: auto;
-  max-height: 450px;
+
+@media only screen and (min-width: 1160px) {
+  #tabs {
+    overflow: auto;
+  }
+  #tab-head {
+    float: left;
+    max-width: 30%;
+  }
+  ul.tab {
+    margin: 0;
+
+    li {
+      margin: 0;
+      width: 100%;
+
+      a {
+        display: block;
+        
+        border-bottom-left-radius: 10px;
+        border-top-right-radius: 0;
+
+        &.selected {
+          border-right: 2px solid $mediumred;
+          border-bottom: 2px solid $darkgray;
+        }
+      }
+    }
+  }
 }

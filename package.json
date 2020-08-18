@@ -13,9 +13,6 @@
     "phpincludebabelts": "file:../PHPIncludeBabelTS/phpincludebabelts-1.0.0.tgz",
     "phpincludesass": "file:../PHPIncludeSass/phpincludesass-1.0.0.tgz"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cpiber/TDDAusgabe.git"

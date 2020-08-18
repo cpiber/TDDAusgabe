@@ -34,7 +34,7 @@ export function numPad(num: number, size: number) {
 
 
 // format date string
-export function formatDate(date: number|Date) {
+export function formatDate(date: number | Date) {
   let d: Date;
   if (date instanceof Date) {
     d = date;
@@ -63,34 +63,50 @@ export function highlightElement(el: JQuery<HTMLElement>) {
 
 // alert using modal
 let modal: JQuery<HTMLElement>;
+const messages: { text: string, title: string, footer: string }[] = [];
 export function alert(text: string, title = "", footer = "") {
-  var m = modal;
-  var h = m.find('.modal-head');
-  var f = m.find('.modal-foot');
-  var b = m.find('.modal-body');
+  const m = modal;
+  messages.push({ text, title, footer });
+  if (m.data('open') == true) return;
 
-  b.html(text);
-  h.html(title);
-  f.html(footer);
-
+  _alert();
   open_modal(m);
+}
+function _alert() {
+  const msg = messages[0];
+  const m = modal;
+  const h = m.find('.modal-head');
+  const f = m.find('.modal-foot');
+  const b = m.find('.modal-body');
+
+  b.html(msg.text);
+  h.html(msg.title);
+  f.html(msg.footer);
 }
 $(() => {
   $('.modal').each(function () {
-    let modal = $(this);
+    let m = $(this);
+    if (m.attr('id') === 'modal') modal = m;
     const close = () => {
-      document.body.style.overflow = "";
-      modal.hide();
-    }
-    modal.on('click', (e) => {
-      if (e.target === this) close(); // backgroud
+      if (m.data('close') === false) return;
+      close_modal(m);
+    };
+    m.on('click', function (e) {
+      if (e.target === this) close(); // background
     }).on('click', '.close', () => close());
   });
-  modal = $('#modal');
 });
 export function open_modal(modal: JQuery<HTMLElement>) {
-  modal.show();
+  modal.show().data('open', true);
   document.body.style.overflow = "hidden";
+}
+export function close_modal(modal: JQuery<HTMLElement>) {
+  if (modal.attr('id') === 'modal') {
+    messages.shift();
+    if (messages.length) return _alert();
+  }
+  document.body.style.overflow = "";
+  modal.hide().data('open', false);
 }
 
 
@@ -98,14 +114,14 @@ export function open_modal(modal: JQuery<HTMLElement>) {
 export function preis(erwachsene = 0, kinder = 0) {
   var s = settings.preis;
   if (typeof (s) == "undefined") { return -1; }
-  s = s.replace(/e/g, ""+erwachsene);
-  s = s.replace(/k/g, ""+kinder);
+  s = s.replace(/e/g, "" + erwachsene);
+  s = s.replace(/k/g, "" + kinder);
   s = s.replace(/[^0-9\+\-\*\/\(\)\.><=]/g, '');
 
   try {
     return eval(s);
   } catch (e) {
-    console.debug(`<code>${settings.preis}</code> invalide Preis-Formel`, e);
+    console.error(`Invalide Preis-Formel (${e}):`, settings.preis);
     alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
   }
   return 0;
