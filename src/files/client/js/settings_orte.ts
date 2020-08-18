@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { alert } from './helpers';
+import request, { apiData } from './api';
 import { JPromise, orte } from './settings';
 
 export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
@@ -28,61 +28,30 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       let grp = +$inp.eq(1).val();
       if (isNaN(grp) || grp < 0) grp = 0;
 
-      let req: JPromise<boolean>;
+      let req: JPromise<void>;
       if (id > 0) {
-        req = $.post('?api=ort/update', {
+        req = request('ort/update', 'Fehler beim Updaten', {
           ID: id,
           Name: name,
           Gruppen: grp
-        }).then((data: any) => {
-          if (data && data.status === "success") {
-            console.debug(`Updated 'Ort' with ID ${id}`);
-            // no name supplied means server ignores it
-            if (!name) name = $this.data('name');
-            return true;
-          } else {
-            console.error(`Failed updating: ${data.message}`);
-            alert(`
-            <p>Fehler beim updaten:<br />${data.message}</p>
-          `, "Fehler");
-          }
-        }).fail((xhr: JQueryXHR, status: string, error: string) => {
-          const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-          console.error(xhr.status, error, msg);
-          alert(`
-            <p>Fehler beim updaten:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+        }).then(() => {
+          console.debug(`Updated 'Ort' with ID ${id}`);
+          // no name supplied means server ignores it
+          if (!name) name = $this.data('name');
         });
       } else {
-        req = $.post('?api=ort/insert', {
+        req = request('ort/insert', 'Fehler beim Erstellen', {
           Name: name,
           Gruppen: grp
-        }).then((data: any) => {
-          if (data && data.status === "success") {
-            const id = data.id;
-            $this.val(id);
-            console.debug(`Inserted 'Ort' with ID ${id}`);
-            return true;
-          } else {
-            console.error(`Failed inserting: ${data.message}`);
-            alert(`
-            <p>Fehler beim erstellen:<br />${data.message}</p>
-          `, "Fehler");
-          }
-        }).fail((xhr: JQueryXHR, status: string, error: string) => {
-          const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-          console.error(xhr.status, error, msg);
-          alert(`
-            <p>Fehler beim erstellen:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+        }).then((data: apiData) => {
+          const id = data.id;
+          $this.val(id);
+          console.debug(`Inserted 'Ort' with ID ${id}`);
         });
       }
 
       // update element
-      req.then((success: boolean) => {
-        if (!success) return;
+      req.then(() => {
         $this.empty().data('name', name).data('gruppen', grp)
           .text(text(name as string, grp)).data('open', false)
           .removeClass('expanded');
@@ -107,25 +76,11 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
       return;
     }
 
-    $.post('?api=ort/delete', {
+    request('ort/delete', 'Fehler beim Löschen', {
       ID: id
-    }).then((data: any) => {
-      if (data && data.status === "success") {
-        console.debug(`Deleted 'Ort' with ID ${id}`);
-        $this.closest('li').remove();
-      } else {
-        console.error(`Failed deleting: ${data.message}`);
-        alert(`
-          <p>Fehler beim löschen:<br />${data.message}</p>
-        `, "Fehler");
-      }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-          <p>Fehler beim löschen:<br />${xhr.status} ${error}</p>
-          <p>${msg}</p>
-        `, "Fehler");
+    }).then(() => {
+      console.debug(`Deleted 'Ort' with ID ${id}`);
+      $this.closest('li').remove();
     });
   });
 

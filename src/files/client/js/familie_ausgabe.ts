@@ -366,8 +366,7 @@ export class ausgabeFam extends familie {
       additional.money = m.toFixed(2);
     }
 
-    const req = super.save(ausgabeFam, additional);
-    if (req) return req.then(() => {
+    return super.save(ausgabeFam, additional).then(() => {
       this.orig_schuld = this.data.Schulden;
       if (!ausgabeFam.current || this.data.ID != ausgabeFam.current.data.ID) return;
       ausgabeFam.allow_sb_gv = true;

@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { alert } from './helpers';
+import request, { apiData } from './api';
 import { orte } from './settings';
 
 export default function generate($selects: JQuery<HTMLSelectElement>) {
@@ -16,23 +16,9 @@ export default function generate($selects: JQuery<HTMLSelectElement>) {
       console.debug("'Orte' already loading");
       return orte.loading;
     }
-    const promise = $.post('?api=ort').then((data: any) => {
-      if (data && data.status === "success") {
-        orte.length = 0;
-        updateOrte(data);
-      } else {
-        console.error(`Failed getting 'Orte': ${data.message}`);
-        alert(`
-          <p>Fehler beim laden der Orte:<br />${data.message}</p>
-        `, "Fehler");
-      }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-        <p>Fehler beim laden der Orte:<br />${xhr.status} ${error}</p>
-        <p>${msg}</p>
-      `, "Fehler");
+    const promise = request('ort', 'Fehler beim Laden der Orte').then((data: apiData) => {
+      orte.length = 0;
+      updateOrte(data);
     }).always(() => {
       orte.loading = null;
     });

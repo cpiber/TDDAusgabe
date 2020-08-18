@@ -111,9 +111,14 @@ $proc_splitStr = "CREATE FUNCTION splitStr (
          delim, '');
   "; // https://stackoverflow.com/a/14950556/
 $trigger_familienInsert = "CREATE TRIGGER familienInsert BEFORE INSERT ON `familien`
-  FOR EACH ROW SET
-    NEW.`Gruppe` = IF(NEW.`Gruppe`=0 OR NEW.`Gruppe` IS NULL,newGruppe(NULL, NEW.`Ort`),NEW.`Gruppe`);
-    NEW.`Num` = IF(NEW.`Num`=0 OR NEW.`Num` IS NULL,newNum(NULL, NEW.`Ort`, NEW.`Gruppe`),NEW.`Num`),
+  FOR EACH ROW BEGIN
+    IF NEW.`Gruppe`=0 OR NEW.`Gruppe` IS NULL THEN
+      SET NEW.`Gruppe` = newGruppe(NULL, NEW.`Ort`);
+    END IF;
+    IF NEW.`Num`=0 OR NEW.`Num` IS NULL THEN
+      SET NEW.`Num` = newNum(NULL, NEW.`Ort`, NEW.`Gruppe`);
+    END IF;
+  END
   ";
 $trigger_familienUpdate = "CREATE TRIGGER familienUpdate BEFORE UPDATE ON `familien`
   FOR EACH ROW BEGIN

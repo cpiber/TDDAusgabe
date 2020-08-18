@@ -1,19 +1,20 @@
 import jQuery from 'jquery';
+import { delFamDate, resetFam } from './client/js/actions';
+import request from './client/js/api';
+import { ausgabeFam } from './client/js/familie_ausgabe';
+import { verwaltungFam } from './client/js/familie_verwaltung';
+import insertHelpHeadings from './client/js/help';
+import { alert, tabH } from './client/js/helpers';
+import initLogs from './client/js/log';
+import ortGenerate from './client/js/orte';
+import polyfills from './client/js/polyfills';
+import searchGenerate from './client/js/search';
+import settings, { optionsSettingsUpdate, orte } from './client/js/settings';
+import { optionsOrteUpdate } from './client/js/settings_orte';
+import { karte_designs_help, preis_help } from './client/js/texts';
 // @ts-ignore
 export const JsBarcode = require('jsbarcode');
 
-import polyfills from './client/js/polyfills';
-import ortGenerate from './client/js/orte';
-import searchGenerate from './client/js/search';
-import initLogs from './client/js/log';
-import { delFamDate, resetFam } from './client/js/actions';
-import settings, { optionsSettingsUpdate, orte } from './client/js/settings';
-import { optionsOrteUpdate } from './client/js/settings_orte';
-import insertHelpHeadings from './client/js/help';
-import { tabH, alert } from './client/js/helpers';
-import { karte_designs_help, preis_help } from './client/js/texts';
-import { ausgabeFam } from './client/js/familie_ausgabe';
-import { verwaltungFam } from './client/js/familie_verwaltung';
 
 polyfills();
 
@@ -23,7 +24,7 @@ export const DEBUG = true;
 
 
 // debug
-if ( DEBUG ) {
+if (DEBUG) {
   // @ts-ignore
   window.$ = jQuery;
   // @ts-ignore
@@ -38,6 +39,8 @@ if ( DEBUG ) {
   window.settings = settings;
   // @ts-ignore
   window.orte = orte;
+  // @ts-ignore
+  window.request = request;
 }
 
 
@@ -53,7 +56,7 @@ jQuery(($) => {
   $('button, [type="button"]').on('mouseup', function (e) {
     $(this).blur(); // remove focus
   });
-  
+
   // init tabs
   const $tabHs = $('#tab-head li');
   let $current_tab: JQuery<TabElement>;
@@ -85,7 +88,7 @@ jQuery(($) => {
     // if (h == '#tab4') { var p = jQuery('#log-pagination').val(); getLogs(p); }
     // if (h == '#tab5') { getOrte(); }
   };
-  
+
   const tabLinks = $tabHs.find('a') as JQuery<TabElement>
   tabLinks.each((_, element) => {
     element.onClose = () => { };
@@ -94,6 +97,7 @@ jQuery(($) => {
 
   // Ausgabe + Verwaltung Tabs
   const $card = $('#card-modal');
+  const $cardframe = $card.find('.card-frame') as JQuery<HTMLIFrameElement>;
 
   // load forms and reset
   ausgabeFam.linkHtml($card);
@@ -103,20 +107,20 @@ jQuery(($) => {
 
   const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
-  
+
   const loadOrte = ortGenerate($os_select);
   const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms, loadOrte);
   tabLinks.get(1).onOpen = ausgSearch;
   tabLinks.get(2).onOpen = verwSearch;
-  
+
   // Logs tab
   const { info: updateLogInfo, logs: updateLogs } = initLogs();
   tabLinks.get(3).onOpen = () => { updateLogInfo(); updateLogs(); };
-  
+
   // Settings tab
   const updateOrte = optionsOrteUpdate(loadOrte);
-  const updateSettings = optionsSettingsUpdate($card.find('.card-frame') as JQuery<HTMLIFrameElement>);
-  tabLinks.get(4).onClose = () => {updateOrte(); updateSettings();};
+  const updateSettings = optionsSettingsUpdate($cardframe);
+  tabLinks.get(4).onClose = () => { updateOrte(); updateSettings(); };
 
   const $sett_help = $('#tab5 .help');
   $sett_help.eq(0).on('click', () => alert(preis_help, "Hilfe zur Preisformel"));
@@ -125,8 +129,8 @@ jQuery(($) => {
   $sett_actions.eq(0).on('click', () => delFamDate());
   $sett_actions.eq(1).on('click', () => delFamDate(-1, 'Karte'));
   $sett_actions.eq(2).on('click', () => resetFam());
-  $sett_actions.eq(3).on('click', () => window.open('?page=backup/create'));
-  $sett_actions.eq(4).on('click', () => window.open('?page=backup/load'));
+  $sett_actions.eq(3).on('click', () => window.open('?page=backup%2Fcreate'));
+  $sett_actions.eq(4).on('click', () => window.open('?page=backup%2Fload'));
 
   updateOrte();
   updateSettings();
@@ -147,6 +151,16 @@ jQuery(($) => {
 
   // register handlers
   $(window).resize(tabH); //.on('keydown', keyboardHandler);
+
+  const $cardwindow = $($cardframe.get(0).contentWindow);
+  const $cardbody = $($cardframe.get(0).contentWindow.document.body);
+  const $cardwrapper = $card.find('.card-frame-wrapper');
+  $cardwindow.on('load resize', () => {
+    const h = $cardbody.innerHeight();
+    if (h) {
+      $cardwrapper.css('padding-bottom', Math.max(300, h));
+    }
+  });
 
   // keyboard navigation
   function keyboardHandler(event: JQuery.KeyDownEvent) {

@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import request, { apiData } from './api';
 import { alert, formatDate } from './helpers';
 
 export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
@@ -18,28 +18,14 @@ export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
     str = formatDate(date);
   }
   if (str) {
-    $.post('?api=action/delDate', {
+    request('action/delDate', 'Fehler beim löschen', {
       date: str,
       col: column
-    }).then((data: any) => {
-      if (data && data.status === "success") {
-        console.debug(`Removed ${data.entries}`);
-        alert(`
-          <p>${data.entries} gelöscht</p>
-          `, "");
-      } else {
-        console.error(`Failed: ${data.message}`);
-        alert(`
-            <p>Fehler beim löschen:<br />${data.message}</p>
-          `, "Fehler");
-      }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
+    }).then((data: apiData) => {
+      console.debug(`Removed ${data.entries}`);
       alert(`
-            <p>Fehler beim löschen:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+        <p>${data.entries} gelöscht</p>
+      `, "");
     });
   } else {
     console.debug(date, "is not a string");
@@ -47,24 +33,10 @@ export function delFamDate(date: number | Date = -1, column = 'lAnwesenheit') {
 }
 
 export function resetFam() {
-  $.post('?api=action/resetFam').then((data: any) => {
-    if (data && data.status === "success") {
-      console.debug(`Reset`);
-      alert(`
-        <p>Erfolgreich zurückgesetzt</p>
-        `, "");
-    } else {
-      console.error(`Failed: ${data.message}`);
-      alert(`
-            <p>Fehler beim reset:<br />${data.message}</p>
-          `, "Fehler");
-    }
-  }).fail((xhr: JQueryXHR, status: string, error: string) => {
-    const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-    console.error(xhr.status, error, msg);
+  request('action/resetFam', 'Fehler beim reset').then(() => {
+    console.debug(`Reset`);
     alert(`
-            <p>Fehler beim reset:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+      <p>Erfolgreich zurückgesetzt</p>
+    `);
   });
 }

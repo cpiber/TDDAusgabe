@@ -101,7 +101,7 @@ function changeDesign(canvas: HTMLCanvasElement) {
     canvas.style.height = "";
     canvas.style.width = "";
     canvas.style.border = "none";
-    if (format !== 'none' && format !== '') console.warn('Defaulting to no format');
+    if (format && format !== 'none' && format !== '') console.warn('Defaulting to no format');
   }
 
   // Add specified elements
@@ -135,5 +135,17 @@ function changeDesign(canvas: HTMLCanvasElement) {
 
       canvas.appendChild(div);
     }
+  }
+
+  if (typeof (Event) === 'function') {
+    // modern browsers
+    window.dispatchEvent(new Event('resize'));
+  } else {
+    // for IE and other old browsers
+    // causes deprecation warning on modern browsers
+    var evt = window.document.createEvent('UIEvents');
+    // @ts-ignore
+    evt.initUIEvent('resize', true, false, window, 0);
+    window.dispatchEvent(evt);
   }
 }

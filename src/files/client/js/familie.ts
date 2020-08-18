@@ -1,8 +1,9 @@
 import $ from 'jquery';
 import { cardWindow, familie as cardFam } from '../../card';
 import { JsBarcode } from '../../client';
+import request, { apiData } from './api';
 import { fam, famdata, famdirty, famelems } from './familie_interfaces';
-import { alert, numPad, open_modal, preis } from './helpers';
+import { numPad, open_modal, preis } from './helpers';
 
 
 export class familie {
@@ -121,38 +122,24 @@ export class familie {
     }
     if (data.Gruppe && data.Gruppe != 0) data.Gruppe = - (+data.Gruppe);
     if (data.Num && data.Num != 0) data.Num = - (+data.Num);
-    if ($.isEmptyObject(data)) return;
+    if ($.isEmptyObject(data))
+      return ($.Deferred() as JQuery.Deferred<apiData, never, never>).resolve().promise();
 
     cls.disable();
-    return $.post('?api=familie/update', {
+    return request('familie/update', 'Fehler beim Speichern', {
       ID: this.data.ID,
       data: data,
       ...additional
-    }).then((data: any) => {
-      if (data && data.status === "success") {
-        if (data.new) {
-          this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
-          this.data.Num = data.new.Num || this.data.Num;
-        }
-        console.debug(`Saved 'familie' with ID ${this.data.ID}`);
-      } else {
-        console.error(`Failed saving: ${data.message}`);
-        alert(`
-          <p>Fehler beim speichern:<br />${data.message}</p>
-        `, "Fehler");
+    }).then((data: apiData) => {
+      if (data.new) {
+        this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
+        this.data.Num = data.new.Num || this.data.Num;
       }
+      console.debug(`Saved 'familie' with ID ${this.data.ID}`);
       return data;
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-        <p>Fehler beim speichern:<br />${xhr.status} ${error}</p>
-        <p>${msg}</p>
-      `, "Fehler");
-    }).always((data) => {
+    }).always(() => {
       for (let prop in this.dirty) this.dirty[prop] = false;
       cls.enable();
-      return data;
     });
   }
 

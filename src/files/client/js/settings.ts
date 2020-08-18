@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { cardWindow } from '../../card';
+import request, { apiData } from './api';
 import { alert } from './helpers';
 
 export type JPromise<T> = JQuery.PromiseBase<T, never, never, never, never, never, never, never, never, never, never, never>;
@@ -32,7 +33,7 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
     try {
       (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
       (card.contentWindow as cardWindow).updateDesigns();
-    } catch (e) {}
+    } catch (e) { }
   }).get(0);
 
   [$preis, $designs].forEach(element => {
@@ -52,36 +53,22 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
       return;
     }
     settings._loading = true;
-    $.post('?api=setting').then((data: any) => {
-      if (data && data.status === "success") {
-        settings.preis = data.data.Preis;
-        settings.designs = data.data.Kartendesigns;
+    request('setting', 'Fehler beim laden der Einstellungen').then((data: apiData) => {
+      settings.preis = data.data.Preis;
+      settings.designs = data.data.Kartendesigns;
 
-        $preis.val(settings.preis);
-        $designs.val(settings.designs);
+      $preis.val(settings.preis);
+      $designs.val(settings.designs);
 
-        try {
-          (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
-          (card.contentWindow as cardWindow).updateDesigns();
-        } catch (e) {
-          console.error(`Failed setting 'designs': ${e}`);
-          alert(`
-          <p>Fehler beim laden der Designs:<br />${e}</p>
-        `, "Fehler");
-        }
-      } else {
-        console.error(`Failed getting settings: ${data.message}`);
+      try {
+        (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
+        (card.contentWindow as cardWindow).updateDesigns();
+      } catch (e) {
+        console.error(`Failed setting 'designs': ${e}`);
         alert(`
-          <p>Fehler beim laden der Einstellungen:<br />${data.message}</p>
+          <p>Fehler beim Laden der Designs:<br />${e}</p>
         `, "Fehler");
       }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-        <p>Fehler beim laden der Einstellungen:<br />${xhr.status} ${error}</p>
-        <p>${msg}</p>
-      `, "Fehler");
     }).always(() => {
       settings._loading = false;
     });
@@ -107,25 +94,10 @@ function update(element: JQuery<HTMLElement> = null, $preis: JQuery<HTMLElement>
     [$preis, $designs].forEach(el);
   }
 
-  $.post('?api=setting/update', {
+  request('setting/update', 'Fehler beim Updaten', {
     settings: sett
-  }).then((data: any) => {
-    if (data && data.status === "success") {
-      console.debug(`Updated setting ${name}`);
-      return true;
-    } else {
-      console.error(`Failed updating: ${data.message}`);
-      alert(`
-            <p>Fehler beim updaten:<br />${data.message}</p>
-          `, "Fehler");
-    }
-  }).fail((xhr: JQueryXHR, status: string, error: string) => {
-    const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-    console.error(xhr.status, error, msg);
-    alert(`
-            <p>Fehler beim updaten:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+  }).then(() => {
+    console.debug(`Updated setting(s)`);
   });
 }
 

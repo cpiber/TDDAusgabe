@@ -7,7 +7,7 @@ function page_card() {
   echo "<!DOCTYPE html><html>\n<head>\n<title>Tischlein Deck Dich</title><meta charset=\"UTF-8\">\n";
   echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
 
-  ?><style>html, body { margin: 0 } #testCanvas { border: 1px solid black }</style>
+  ?><style>html, body { margin: 0 } body { padding: 1px } #testCanvas { border: 1px solid black }</style>
   <script type="text/javascript" src="?file=cardjs"></script>
   <?php
   echo "</head>\n<body>\n";

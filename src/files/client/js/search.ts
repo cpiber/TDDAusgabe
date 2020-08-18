@@ -1,9 +1,11 @@
 import $ from 'jquery';
+import request, { apiData } from './api';
 import { familie } from './familie';
-import { alert, timeout } from './helpers';
-import { JPromise, orte } from './settings';
 import { ausgabeFam } from './familie_ausgabe';
+import { famdata } from './familie_interfaces';
 import { verwaltungFam } from './familie_verwaltung';
+import { timeout } from './helpers';
+import { JPromise, orte } from './settings';
 
 export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQuery<HTMLElement>, loadOrte: () => JPromise<void>) {
   const ausgList = [];
@@ -44,41 +46,27 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
   $loading.show();
   $list.empty();
   const req = () => {
-    $.post('?api=familie', data).then((data: any) => {
-      if (data && data.status === "success") {
-        if (data.data.constructor.name !== "Array") {
-          data.data = [data.data]; // single fam
-        }
-        $list.empty();
-        list.length = 0;
-        let ort = -1, ortname = "", grp = -1;
-        data.data.forEach((element: any, index: number) => {
-          if (element.Ort !== ort || element.Gruppe !== grp) {
-            ort = element.Ort;
-            grp = element.Gruppe;
-            const i = orte.findIndex(val => val.ID == ort);
-            ortname = orte[i] ? orte[i].Name : 'Unbekannt';
-            $('<li>').addClass('title').val(-1).text(`${ortname}, Gruppe ${grp}`).appendTo($list);
-          }
-          let name = element.Name;
-          if (!name) name = " - ";
-          const $li = $('<li>').val(element.ID).text(`${element.Num}/ ${name}`).appendTo($list);
-          if (fam.current && fam.current.data.ID === element.ID) $li.addClass('selected');
-          list[element.ID] = element;
-        });
-      } else {
-        console.error(`Failed search: ${data.message}`);
-        alert(`
-            <p>Suche fehlgeschalgen:<br />${data.message}</p>
-          `, "Fehler");
+    request('familie', 'Suche fehlgeschlagen', data).then((data: apiData | { data: famdata[] }) => {
+      if (data.data.constructor.name !== "Array") {
+        data.data = [data.data]; // single fam
       }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-            <p>Suche fehlgeschalgen:<br />${xhr.status} ${error}</p>
-            <p>${msg}</p>
-          `, "Fehler");
+      $list.empty();
+      list.length = 0;
+      let ort = -1, ortname = "", grp = -1;
+      data.data.forEach((element: famdata) => {
+        if (element.Ort !== ort || element.Gruppe !== grp) {
+          ort = element.Ort;
+          grp = element.Gruppe;
+          const i = orte.findIndex(val => val.ID == ort);
+          ortname = orte[i] ? orte[i].Name : 'Unbekannt';
+          $('<li>').addClass('title').val(-1).text(`${ortname}, Gruppe ${grp}`).appendTo($list);
+        }
+        let name = element.Name;
+        if (!name) name = " - ";
+        const $li = $('<li>').val(element.ID).text(`${element.Num}/ ${name}`).appendTo($list);
+        if (fam.current && fam.current.data.ID === element.ID) $li.addClass('selected');
+        list[element.ID] = element;
+      });
     }).always(() => $loading.hide());
   };
   if (!orte.length) {
@@ -94,7 +82,7 @@ function select(list: any[], $list: JQuery<HTMLElement>, fam: typeof familie) {
   if (!list[this.value]) return false;
   $list.find('.selected').removeClass('selected');
   $(this).addClass('selected');
-  
+
   if (fam.current && fam.current.data.ID == this.value) {
     fam.current._save();
     return;

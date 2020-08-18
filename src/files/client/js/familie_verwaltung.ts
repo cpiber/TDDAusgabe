@@ -1,7 +1,8 @@
+import request, { apiData } from "./api";
 import { familie } from "./familie";
 import { ausgabeFam } from "./familie_ausgabe";
 import { fam, famelems } from "./familie_interfaces";
-import { alert, clone, timeout } from "./helpers";
+import { clone, timeout } from "./helpers";
 import { orte } from "./settings";
 
 export class verwaltungFam extends familie {
@@ -25,10 +26,11 @@ export class verwaltungFam extends familie {
       verwaltungFam.editMode();
     } else {
       this.newFam = true;
-      this.data.Ort = orte[0].ID || 0;
       verwaltungFam.createMode();
     }
     this.show();
+    if (this.newFam)
+      verwaltungFam.elems.Ort.val(orte[0].ID || 0).change();
     verwaltungFam.enable();
   }
 
@@ -43,6 +45,7 @@ export class verwaltungFam extends familie {
     this.elems.Ort = $inputs.eq(3).on('change', () => {
       const cur = this.current;
       if (!cur) return;
+      if (!this.elems.Ort.val()) return;
       if (cur.data.Ort == this.elems.Ort.val()) return;
       cur.data.Gruppe = 0;
       cur.data.Num = 0;
@@ -127,32 +130,21 @@ export class verwaltungFam extends familie {
   save() {
     if (this.newFam) {
       verwaltungFam.disable();
-      return $.post('?api=familie/insert', this.data).then((data: any) => {
-        if (data && data.status === "success") {
-          this.data.ID = data.new.ID;
-          this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
-          this.data.Num = data.new.Num || this.data.Num;
-          this.show();
-          verwaltungFam.editMode();
-        } else {
-          console.error(`Failed creating: ${data.message}`);
-          alert(`
-          <p>Fehler beim erstellen:<br />${data.message}</p>
-        `, "Fehler");
-        }
-      }).fail((xhr: JQueryXHR, status: string, error: string) => {
-        const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-        console.error(xhr.status, error, msg);
-        alert(`
-        <p>Fehler beim erstellen:<br />${xhr.status} ${error}</p>
-        <p>${msg}</p>
-      `, "Fehler");
+      return request('familie/insert', 'Fehler beim Erstellen', {
+        data: this.data
+      }).then((data: apiData) => {
+        this.data.ID = data.new.ID;
+        this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
+        this.data.Num = data.new.Num || this.data.Num;
+        this.show();
+        verwaltungFam.editMode();
+        return data;
       }).always(() => {
         verwaltungFam.enable();
       });
     } else {
-      const req = super.save(verwaltungFam);
-      if (req) return req.then(() => this.show());
+      if (this.data.Num == 0) this.dirty.Num = true;
+      return super.save(verwaltungFam).then(() => this.show());
     }
   }
 
@@ -162,27 +154,13 @@ export class verwaltungFam extends familie {
 
   delete() {
     verwaltungFam.disable();
-    $.post('?api=familie/delete', {
+    request('familie/delete', 'Fehler beim Löschen', {
       ID: this.data.ID
     }).then((data: any) => {
-      if (data && data.status === "success") {
-        verwaltungFam.clear();
-        verwaltungFam.current = null;
-      } else {
-        verwaltungFam.enable();
-        console.error(`Failed deleting: ${data.message}`);
-        alert(`
-          <p>Fehler beim löschen:<br />${data.message}</p>
-        `, "Fehler");
-      }
-    }).fail((xhr: JQueryXHR, status: string, error: string) => {
+      verwaltungFam.clear();
+      verwaltungFam.current = null;
+    }).fail(() => {
       verwaltungFam.enable();
-      const msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText;
-      console.error(xhr.status, error, msg);
-      alert(`
-        <p>Fehler beim löschen:<br />${xhr.status} ${error}</p>
-        <p>${msg}</p>
-      `, "Fehler");
     });
   }
 }
