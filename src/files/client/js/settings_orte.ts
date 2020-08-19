@@ -23,7 +23,7 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
     if (open) {
       // save
       const id = $this.val();
-      const $inp = $this.find('input');
+      const $inp = $this.find('input').prop('disabled', true);
       let name = $inp.eq(0).val();
       let grp = +$inp.eq(1).val();
       if (isNaN(grp) || grp < 0) grp = 0;
@@ -55,6 +55,8 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
         $this.empty().data('name', name).data('gruppen', grp)
           .text(text(name as string, grp)).data('open', false)
           .removeClass('expanded');
+      }).fail(() => {
+        $inp.prop('disabled', false);
       });
       return;
     }

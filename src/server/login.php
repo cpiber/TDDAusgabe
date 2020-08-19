@@ -90,7 +90,7 @@ function connect_error($error = false) {
   exit;
 }
 
-function loginform( $msg = "", $url = "" ) { ?>
+function loginstyles() { ?>
   <style>
     .float-middle {
       max-width: 300px;
@@ -115,6 +115,10 @@ function loginform( $msg = "", $url = "" ) { ?>
       }
     }
   </style>
+<?php }
+
+function loginform( $msg = "", $url = "" ) {
+  loginstyles(); ?>
   <div class="float-middle"><form action="<?php echo "?login" . ( $url == "" ? "" : "&url=".urlencode($url) ); ?>" method="POST">
     <?php echo $msg; ?>
     <h1>Login</h1><br />

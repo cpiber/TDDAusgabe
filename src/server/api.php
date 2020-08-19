@@ -7,8 +7,8 @@ $fam_data = array(
   'Ort' => false,
   'Gruppe' => false,
   'Schulden' => false,
-  'Karte' => false,
-  'lAnwesenheit' => false,
+  'Karte' => true,
+  'lAnwesenheit' => true,
   'Notizen' => true,
   'Num' => false,
   'Adresse' => true,
@@ -20,7 +20,7 @@ function fields($fields, &$data, $insert=true) {
   foreach ( $fields as $field => $can_empty ) {
     if ( array_key_exists( $field, $_POST['data'] ) && ( $can_empty || ( !$can_empty && $_POST['data'][$field] !== "" ) ) ) {
       $parts[] = $insert ? $field : "$field = :$field";
-      $data[":$field"] = $_POST['data'][$field];
+      $data[":$field"] = $_POST['data'][$field] === "" ? null : $_POST['data'][$field];
     }
   }
   if ( $insert ) {

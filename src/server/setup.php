@@ -162,22 +162,8 @@ if ( isset( $_GET['setup'] ) ) {
 
   }
 
-  ?><style>
-    .float-middle {
-      max-width: 300px;
-      border: 1px solid grey;
-      background-color: lightgrey;
-      padding: 20px 50px;
-      margin: auto;
-      margin-top: 40px;
-    }
-    form input {
-      width: 100%;
-    }
-    .pointer {
-      cursor: pointer;
-    }
-  </style>
+  loginstyles();
+  ?>
   <div class="float-middle">
     <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a href="?login&url=<?php echo urlencode( $_SERVER['SCRIPT_NAME'] . '?setup' ); ?>">Log Out</a></p><?php
 
@@ -210,7 +196,7 @@ if ( isset( $_GET['setup'] ) ) {
         echo setup_error( $sql, $e->getMessage() );
       }
       try {
-        $sql = "CREATE DATABASE tdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+        $sql = "CREATE DATABASE tdd CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         $conn->exec( $sql );
         
         echo "<p>Datenbank `tdd` erfolgreich (neu) angelegt.</p>";
@@ -360,7 +346,7 @@ DESIGNS_NOWDOC____;
 
         $sql = "CREATE TABLE logs(
           ID int NOT NULL AUTO_INCREMENT,
-          DTime DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          DTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
           Type varchar(255) NOT NULL,
           Val varchar(255),
           PRIMARY KEY (ID)

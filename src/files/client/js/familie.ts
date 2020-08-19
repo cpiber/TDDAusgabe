@@ -20,6 +20,14 @@ export class familie {
 
   constructor(data: any) {
     Object.assign(this.data, fam, data);
+    if (this.data.Karte === '0000-00-00') {
+      this.data.Karte = null;
+      this.dirty.Karte = true;
+    }
+    if (this.data.lAnwesenheit === '0000-00-00') {
+      this.data.lAnwesenheit = null;
+      this.dirty.lAnwesenheit = true;
+    }
     this.generateBarcode();
   }
 
@@ -141,10 +149,10 @@ export class familie {
         this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
         this.data.Num = data.new.Num || this.data.Num;
       }
+      for (let prop in this.dirty) this.dirty[prop] = false;
       console.debug(`Saved 'familie' with ID ${this.data.ID}`);
       return data;
     }).always(() => {
-      for (let prop in this.dirty) this.dirty[prop] = false;
       cls.enable();
     });
   }

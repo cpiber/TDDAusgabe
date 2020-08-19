@@ -19,7 +19,7 @@ if ( $ver > DB_VER ) {
   <body>
     <h1>FEHLER</h1>
     <p>Datenbank-Version (<?php echo $ver; ?>) ist zu neu - Aus Sicherheitsgründen wurde die Ausführung des Programms gestoppt.</p>
-    <p>Die aktuell laufende Version des Programms erwartet eine ältere Version der Datenbank, eine geänderte Struktur kann unvohersehbare Folgen haben.</p>
+    <p>Die aktuell laufende Version des Programms erwartet eine ältere Version der Datenbank, eine geänderte Struktur kann unvohergesehene Folgen haben.</p>
   </body>
   </html>
   <?php
@@ -28,21 +28,22 @@ if ( $ver > DB_VER ) {
 
 //upgrade
 if ( $ver < DB_VER ) {
+  $error = false;
+
   if ( $ver <= 1 ) {
     // upgrade to version 2
     // add fam num column
     try {
       // update tables
-      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Num int;" );
       $conn->exec( "ALTER TABLE `einstellungen` ADD UNIQUE(`Name`);" );
-      $conn->commit();
 
       $ver = 2;
 
     } catch ( PDOException $e ) {
       $conn->rollBack();
       upgrade_error( 2, $e );
+      $error = true;
     }
   }
 
@@ -51,16 +52,15 @@ if ( $ver < DB_VER ) {
     // add address and telephone column
     try {
       // update tables
-      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Adresse varchar(255);" );
       $conn->exec( "ALTER TABLE `familien` ADD Telefonnummer varchar(255);" );
-      $conn->commit();
 
       $ver = 3;
 
     } catch ( PDOException $e ) {
       $conn->rollBack();
       upgrade_error( 3, $e );
+      $error = true;
     }
   }
 
@@ -69,30 +69,30 @@ if ( $ver < DB_VER ) {
     // originally added in version 2, then 3, now moved here and altered (and reverted) to new requirements
     try {
       // prodecure for resetting nums
-      $conn->beginTransaction();
       $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
       $conn->exec( $proc_resetFamNum );
       if ( !isset( $_GET['norenumber'] ) ) $conn->exec( "CALL resetFamNum();" );
-      $conn->commit();
 
       $ver = 5;
 
     } catch ( PDOException $e ) {
       $conn->rollBack();
       upgrade_error( 5, $e );
+      $error = true;
     }
   }
 
   if ( $ver == 5 || $ver == 6 ) {
     try {
+      $conn->exec( "ALTER DATABASE tdd CHARACTER SET utf8 COLLATE utf8_unicode_ci" );
+      $conn->exec( "SET autocommit = 0" );
+
       $conn->beginTransaction();
 
-      $conn->exec( "ALTER DATABASE tdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
-
-      $conn->exec( "ALTER TABLE `familien` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
-      $conn->exec( "ALTER TABLE `orte` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
-      $conn->exec( "ALTER TABLE `einstellungen` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
-      $conn->exec( "ALTER TABLE `logs` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `familien` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci" );
+      $conn->exec( "ALTER TABLE `orte` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci" );
+      $conn->exec( "ALTER TABLE `einstellungen` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci" );
+      $conn->exec( "ALTER TABLE `logs` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci" );
 
       // function for decoding url-encoded string
       $conn->exec( "DROP FUNCTION IF EXISTS url_decode;" );
@@ -146,7 +146,7 @@ if ( $ver < DB_VER ) {
         $stmt2 = $conn->prepare( "UPDATE `einstellungen` SET `Val` = :Val WHERE `ID` = :ID" );
         $stmt2->execute(array(
           ":ID" => $r['ID'],
-          ":Val" => rawurldecode($r['Val'])
+          ":Val" => str_replace('$Ort','$Ortname',rawurldecode(str_replace('%FC','ü',str_replace('%u20AC','€',$r['Val']))))
         ));
       }
 
@@ -175,24 +175,24 @@ if ( $ver < DB_VER ) {
         ));
       }
 
-      $conn->exec( "ALTER TABLE `familien` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
+      $conn->exec( "ALTER TABLE `familien` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Erwachsene` `Erwachsene` INT NOT NULL DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Kinder` `Kinder` INT NOT NULL DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Ort` `Ort` INT NOT NULL" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Gruppe` `Gruppe` INT DEFAULT '0'" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Schulden` `Schulden` DECIMAL(5,2) NOT NULL DEFAULT '0.00'" );
-      $conn->exec( "ALTER TABLE `familien` CHANGE `Notizen` `Notizen` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `familien` CHANGE `Notizen` `Notizen` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci" );
       $conn->exec( "ALTER TABLE `familien` CHANGE `Num` `Num` INT DEFAULT '0'" );
       
-      $conn->exec( "ALTER TABLE `orte` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
+      $conn->exec( "ALTER TABLE `orte` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL" );
       $conn->exec( "ALTER TABLE `orte` CHANGE `Gruppen` `Gruppen` INT NOT NULL DEFAULT '0'" );
       
-      $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
-      $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Val` `Val` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Name` `Name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL" );
+      $conn->exec( "ALTER TABLE `einstellungen` CHANGE `Val` `Val` LONGTEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci" );
 
-      $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" );
-      $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL" );
-      $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `date_time` `DTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `action` `Type` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL" );
+      $conn->exec( "ALTER TABLE `logs` CHANGE `message` `Val` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci" );
       $conn->exec( "ALTER TABLE `logs` DROP `aff_table`" );
 
       $conn->exec( "DROP FUNCTION IF EXISTS splitStr;" );
@@ -214,12 +214,14 @@ if ( $ver < DB_VER ) {
       $conn->exec( $view_logsalt );
 
       $conn->commit();
+      $conn->exec( "SET autocommit = 1" );
 
       $ver = 7;
 
     } catch ( PDOException $e ) {
       $conn->rollBack();
       upgrade_error( 7, $e );
+      $error = true;
     }
   }
 
@@ -230,6 +232,8 @@ if ( $ver < DB_VER ) {
     echo $e->getMessage();
     exit;
   }
+
+  if ($error) exit;
 }
 
 function upgrade_error( $ver, $e ) {
@@ -244,7 +248,6 @@ function upgrade_error( $ver, $e ) {
   </body>
   </html>
   <?php
-  exit;
 }
 
 
