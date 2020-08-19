@@ -131,6 +131,10 @@ export class familie {
 
   save(cls: typeof familie, additional: { [key: string]: any } = {}) {
     const data: famdata = {};
+    if (!this.data.Num) this.data.Num = 0;
+    if (!this.data.Erwachsene) this.data.Erwachsene = 0;
+    if (!this.data.Kinder) this.data.Kinder = 0;
+    if (!this.data.Schulden) this.data.Schulden = 0;
     for (let prop in this.dirty) {
       if (this.dirty[prop]) data[prop] = this.data[prop];
     }
