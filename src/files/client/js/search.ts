@@ -53,7 +53,7 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
       $list.empty();
       list.length = 0;
       let ort = -1, ortname = "", grp = -1;
-      data.data.forEach((element: famdata) => {
+      data.data.forEach((element: famdata, index: number) => {
         if (element.Ort !== ort || element.Gruppe !== grp) {
           ort = element.Ort;
           grp = element.Gruppe;
@@ -63,7 +63,7 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
         }
         let name = element.Name;
         if (!name) name = " - ";
-        const $li = $('<li>').val(element.ID).text(`${element.Num}/ ${name}`).appendTo($list);
+        const $li = $('<li>').val(element.ID).data('idx', index).text(`${element.Num}/ ${name}`).appendTo($list);
         if (fam.current && fam.current.data.ID === element.ID) $li.addClass('selected');
         list[element.ID] = element;
       });

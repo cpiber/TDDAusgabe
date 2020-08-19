@@ -20,6 +20,18 @@ function api_deldate($msg) {
         ":date" => $date
       ));
       $msg['entries'] = $stmt->rowCount();
+      
+      $sql3 = "INSERT INTO `logs` (`Type`, `Val`) VALUES ";
+      $logdata = array();
+      $sep = "";
+      $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+      $logdata[] = 'delete';
+      $logdata[] = sprintf( '%s familie', $msg['entries'] );
+      if ( !empty( $logdata ) ) {
+        $stmt = $conn->prepare( $sql3 );
+        $stmt->execute( $logdata );
+      }
+      
       $msg['status'] = 'success';
     } catch ( PDOException $e ) {
       $msg['status'] = 'failure';

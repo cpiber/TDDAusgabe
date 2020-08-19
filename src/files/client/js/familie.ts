@@ -4,6 +4,7 @@ import { JsBarcode } from '../../client';
 import request, { apiData } from './api';
 import { fam, famdata, famdirty, famelems } from './familie_interfaces';
 import { numPad, open_modal, preis } from './helpers';
+import { orte } from './settings';
 
 
 export class familie {
@@ -87,8 +88,12 @@ export class familie {
   }
 
   print() {
+    const i = orte.findIndex(val => val.ID == this.data.Ort);
+    const ortname = orte[i] ? orte[i].Name : 'Unbekannt';
+
     const fam: cardFam = {
       ...this.data,
+      Ortname: ortname,
       Preis: preis(this.data.Erwachsene, this.data.Kinder),
       img: `<img src="${this.barcode}" />`,
       isrc: this.barcode,

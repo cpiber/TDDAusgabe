@@ -25,8 +25,20 @@ function api_newort($msg) {
     if ( count( $data ) === 2 ) {
       $stmt = $conn->prepare( $sql );
       $stmt->execute( $data );
+      $id = $msg['id'] = $conn->lastInsertId();
+
+      $sql3 = "INSERT INTO `logs` (`Type`, `Val`) VALUES ";
+      $logdata = array();
+      $sep = "";
+      $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+      $logdata[] = 'insert';
+      $logdata[] = sprintf( 'ort/%s', $id );
+      if ( !empty( $logdata ) ) {
+        $stmt = $conn->prepare( $sql3 );
+        $stmt->execute( $logdata );
+      }
+      
       $msg['status'] = 'success';
-      $msg['id'] = $conn->lastInsertId();
     } else {
       $msg['status'] = 'failure';
       $msg['message'] = 'Name fehlt';

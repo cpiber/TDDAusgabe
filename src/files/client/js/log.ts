@@ -50,7 +50,7 @@ function updateInfo($inp: JQuery<HTMLElement>, $info: JQuery<HTMLElement>) {
 }
 
 function loadLogs($div: JQuery<HTMLElement>, $select: JQuery<HTMLSelectElement>) {
-  const page = +$select.val() || 1;
+  const page = +$select.val() || -1;
   const pages = $select.get(0).length;
 
   const tr = (data: string[], $table: JQuery<HTMLElement>, heading = false) => {
@@ -74,12 +74,13 @@ function loadLogs($div: JQuery<HTMLElement>, $select: JQuery<HTMLSelectElement>)
     });
 
     if (pages != data.pages) {
-      const val = $select.val();
+      let val = $select.val();
       $select.empty();
-      for (let i = 1; i <= data.pages; i++) {
+      for (let i = 1; i < data.pages; i++) {
         $select.append($('<option>').text(i));
       }
-      $select.val(val || 1);
+      $select.append($('<option>').text(data.pages || 1).val(-1));
+      $select.val(val || -1);
     }
   });
 }

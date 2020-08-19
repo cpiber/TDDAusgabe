@@ -13,6 +13,7 @@ interface designelement {
 }
 
 export interface familie extends famdata {
+  Ortname?: string,
   Preis?: number,
   img?: string,
   isrc?: string,

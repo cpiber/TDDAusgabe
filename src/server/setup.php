@@ -136,7 +136,7 @@ $trigger_familienUpdate = "CREATE TRIGGER familienUpdate BEFORE UPDATE ON `famil
     END IF;
   END;
   ";
-$view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(`Type`='attendance',splitStr(`Val`, '/', 1),'') AS `P1`, IF(`Type`='attendance',splitStr(`Val`, '/', 2),'') AS `P2` FROM `logs`";
+$view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(`Type`IN('attendance','insert','update','delete'),splitStr(`Val`, '/', 1),'') AS `P1`, IF(`Type`IN('attendance','insert','update','delete'),splitStr(`Val`, '/', 2),'') AS `P2` FROM `logs`";
 
 
 // Execute setup if needed

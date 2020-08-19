@@ -16,7 +16,7 @@
   </div>
 
   <p class="header-bar">
-    <a class="button no-active" href="?page=print"target="_blank">Druckversion</a>
+    <a class="button no-active" href="?page=print" target="_blank">Druckversion</a>
     <a class="button no-active" href="?login">Log Out</a>
   </p>
   <img id="barcode" style="display:none" />
@@ -53,7 +53,7 @@
             <p>Familien sind sortiert nach Ort und Gruppe. Jede Familie darf nur an einem Ausgabeort erscheinen
               (Ausnahmen bei Feiertagen), für jeden dieser Orte können mehrere Gruppen angelegt werden.</p>
             <p>Bitte immer die Daten der Familien überprüfen!</p><br />
-            <p>Das Programm speichert automatisch sobald eine neue Familie geöffnet wird. Alternativ wird auch beim Bearbeiten der Felder und nach 10
+            <p>Das Programm speichert wenn eine neue Familie geöffnet wird. Alternativ wird auch beim Bearbeiten der Felder und nach 10
               Sekunden automatisch gespeichert.</p>
           </div>
           <div class="cols3">
@@ -66,7 +66,7 @@
         </div>
         <div class="clear"></div>
         <p style="text-align: right;">2018 by Constantin, Version <?php echo VERSION; ?><br />
-          <a href="https://github.com/cpiber/TDDAusgabe">Github</a></p>
+          <a href="https://github.com/cpiber/TDDAusgabe" target="_blank">Github</a></p>
       </div>
       <div id="tab2">
         <h1>Lebens&shy;mittel&shy;ausgabe</h1>
@@ -370,7 +370,7 @@
         <p>Hier finden sich Knöpfe für Massenoperationen oder allgemeine Aktionen.</p>
         <p>Weitere Informationen lassen sich mit Hovering (Maus über den Knopf halten) anzeigen.</p><br />
         <h4>Allgemeines</h4>
-        <p>Diese Spalte beinhalten Einstellungen im wahren Sinne des Wortes; hier lassen sich Eigenschaften über Inputs
+        <p>Diese Spalte beinhält Einstellungen im wahren Sinne des Wortes; hier lassen sich Eigenschaften über Inputs
           festlegen.</p>
         <p>Textfelder mit nur einer Zeile speichern automatisch mit "Enter", mehrzeilige Textareas lassen sich nur mit
           dem Knopf "Alle speichern" unten festsetzen. Dieser Knopf speichert alle Felder in dieser Spalte, es werden

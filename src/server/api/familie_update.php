@@ -58,7 +58,11 @@ function api_updatefam($msg) {
         $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
         $logdata[] = 'attendance';
         $logdata[] = $_POST['attendance'];
+        $sep = ", ";
       }
+      $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+      $logdata[] = 'update';
+      $logdata[] = sprintf( 'familie/%s', $id );
       if ( !empty( $logdata ) ) {
         $stmt = $conn->prepare( $sql3 );
         $stmt->execute( $logdata );

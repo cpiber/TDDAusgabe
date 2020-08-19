@@ -150,7 +150,7 @@ jQuery(($) => {
 
 
   // register handlers
-  $(window).resize(tabH); //.on('keydown', keyboardHandler);
+  $(window).resize(tabH).on('keydown', keyboardHandler);
 
   const $cardwindow = $($cardframe.get(0).contentWindow);
   const $cardbody = $($cardframe.get(0).contentWindow.document.body);
@@ -163,8 +163,42 @@ jQuery(($) => {
   });
 
   // keyboard navigation
+  const $search_field = $('#tab2 .search-header input:first') as JQuery<HTMLInputElement>;
+  const $search_button = $('#tab2 .search-header input:last') as JQuery<HTMLInputElement>;
+  const prev = prevFam.bind(null, $forms.eq(1));
+  const next = nextFam.bind(null, $forms.eq(1));
   function keyboardHandler(event: JQuery.KeyDownEvent) {
-    console.log(event, event.which, event.key);
+    // console.log(event, event.which, event.key);
+    if (!$current_tab) return true;
+    if ($current_tab.attr('href') !== '#tab2') return true;
+    if (!event.altKey) return true;
+    switch (event.key) {
+      case 'n': $os_select.eq(0).focus(); break;
+      case 'm': $os_select.eq(1).focus(); break;
+      case 'j': ausgabeFam.elems.Karte.focus(); break;
+      case 'k': ausgabeFam.elems.Schulden.focus(); break;
+      case 'l': ausgabeFam.elems.Notizen.focus(); break;
+      case 'u': ausgabeFam.$anwesend.click(); break;
+      case 'i': ausgabeFam.$geldverg.click(); break;
+      case 'o': ausgabeFam.$schuldbeg.click(); break;
+      case ',': $search_field.focus().select(); break;
+      case '.': $search_button.click(); break;
+      case 'ArrowUp': prev(); break;
+      case 'ArrowDown': next(); break;
+      default: return true;
+    }
+    return false;
+  }
+  function prevFam($f: JQuery<HTMLElement>) {
+    let i = +$f.find('.selected').data('idx');
+    if (i === 0) return;
+    if (!i) i = 0;
+    $f.children(':not([value="-1"])').eq(i - 1).click();
+  }
+  function nextFam($f: JQuery<HTMLElement>) {
+    let i = +$f.find('.selected').data('idx');
+    if (!i && i !== 0) i = -1;
+    $f.children(':not([value="-1"])').eq(i + 1).click();
   }
 });
 export let changeTab: ($link: JQuery<TabElement>) => void;

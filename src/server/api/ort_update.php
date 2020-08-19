@@ -33,6 +33,17 @@ function api_updateort($msg) {
         $stmt->execute( $data );
       }
 
+      $sql3 = "INSERT INTO `logs` (`Type`, `Val`) VALUES ";
+      $logdata = array();
+      $sep = "";
+      $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+      $logdata[] = 'update';
+      $logdata[] = sprintf( 'ort/%s', $id );
+      if ( !empty( $logdata ) ) {
+        $stmt = $conn->prepare( $sql3 );
+        $stmt->execute( $logdata );
+      }
+
       $msg['status'] = 'success';
     } catch ( PDOException $e ) {
       $msg['status'] = 'failure';

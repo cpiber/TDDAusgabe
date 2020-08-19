@@ -82,6 +82,7 @@ export class ausgabeFam extends familie {
     this.$preis = $inputs.eq(14);
     this.$anwesend = $inputs.eq(20).on('click', function () {
       if (!ausgabeFam.current) return;
+      if (this.disabled) return;
       if (ausgabeFam.current.retry) {
         this.checked = false;
         ausgabeFam.current.retry = false;

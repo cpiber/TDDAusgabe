@@ -7,6 +7,10 @@ function api_updatesetting($msg) {
   
   $sql = "UPDATE `einstellungen` SET `Val` = :val WHERE `Name` = :name";
   $stmt = $conn->prepare( $sql );
+
+  $sql3 = "INSERT INTO `logs` (`Type`, `Val`) VALUES ";
+  $logdata = array();
+  $sep = "";
   foreach ( $vals as $v ) {
     $name = array_key_exists( 'Name', $v ) ? $v['Name'] : "";
     $val = array_key_exists( 'Val', $v ) ? $v['Val'] : "";
@@ -21,12 +25,22 @@ function api_updatesetting($msg) {
           ":val" => $val
         ));
 
+        $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+        $sep = ", ";
+        $logdata[] = 'update';
+        $logdata[] = sprintf( 'setting/%s', $name );
+
         $msg['status'] = 'success';
       } catch ( PDOException $e ) {
         $msg['status'] = 'failure';
         $msg['message'] = $e->getMessage();
+        break;
       }
     }
+  }
+  if ( !empty( $logdata ) ) {
+    $stmt = $conn->prepare( $sql3 );
+    $stmt->execute( $logdata );
   }
   if ( DEBUG ) $msg['sql'] = $sql;
   

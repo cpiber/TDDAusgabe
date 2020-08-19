@@ -17,8 +17,8 @@ function api_getlogs($msg) {
     $data[":type"] = $_POST['type'];
     $parts[] = "`Type` = :type";
   }
-  $page = array_key_exists( 'page', $_POST ) ? intval( $_POST['page'] ) : 1;
-  if ( $page < 1 ) $page = 1;
+  $page = array_key_exists( 'page', $_POST ) ? intval( $_POST['page'] ) : -1;
+  if ( $page == 0 ) $page = 1;
   $pagesize = array_key_exists( 'pagesize', $_POST ) ? intval( $_POST['pagesize'] ) : 20;
   if ( $pagesize < 1 && $pagesize != -1 ) $pagesize = 20;
 
@@ -30,8 +30,9 @@ function api_getlogs($msg) {
       $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `logs` WHERE $where" );
       $pagesstmt->setFetchMode( PDO::FETCH_ASSOC );
       $pagesstmt->execute( $data );
-      $msg['pages'] = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
+      $pages = $msg['pages'] = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
 
+      if ( $page < 0 ) $page = $pages + 1 + $page;
       $offset = ( $page - 1 ) * $pagesize;
       $sql = sprintf( "%s LIMIT %s OFFSET %s", $sql, $pagesize, $offset );
     }

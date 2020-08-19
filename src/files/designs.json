@@ -12,7 +12,7 @@
 			{ "html": "<p style=\"font-style:italic;font-size:16px\">Zulassung zur Ausgabe</p><br>" },
 			{ "html": "<p>$img</p>" },
 			{ "html": "<p><span style=\"font-weight:bold\">Name</span>: $Name (ID: $ID)</p>" },
-			{ "html": "<p><span style=\"font-weight:bold\">Ort</span>: $Ort, <span style=\"font-weight:bold\">Gruppe</span>: $Gruppe</p>" },
+			{ "html": "<p><span style=\"font-weight:bold\">Ort</span>: $Ortname, <span style=\"font-weight:bold\">Gruppe</span>: $Gruppe</p>" },
 			{ "html": "<p><span style=\"font-weight:bold\">Erwachsene/Kinder</span>: $Erwachsene/$Kinder (<span style=\"font-weight:bold\">$Preis€</span>)</p>" },
 			{ "html": "<p><span style=\"font-weight:bold\">Gültig bis</span>: $Karte</p>" },
 			{ "html": "<p><span style=\"font-weight:bold\">Notizen:</span><br>$Notizen</p>" }

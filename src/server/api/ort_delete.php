@@ -14,6 +14,17 @@ function api_deleteort($msg) {
       $stmt = $conn->prepare( $sql );
       $stmt->execute( array( ':ID' => $id ) );
 
+      $sql3 = "INSERT INTO `logs` (`Type`, `Val`) VALUES ";
+      $logdata = array();
+      $sep = "";
+      $sql3 = sprintf( "%s%s(?, ?)", $sql3, $sep );
+      $logdata[] = 'delete';
+      $logdata[] = sprintf( 'ort/%s', $id );
+      if ( !empty( $logdata ) ) {
+        $stmt = $conn->prepare( $sql3 );
+        $stmt->execute( $logdata );
+      }
+
       $msg['status'] = 'success';
     } catch ( PDOException $e ) {
       $msg['status'] = 'failure';
