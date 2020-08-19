@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import request, { apiData } from "./api";
 import { familie } from "./familie";
 import { ausgabeFam } from "./familie_ausgabe";

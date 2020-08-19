@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { changeTab, TabElement } from "../../client";
 import { familie } from "./familie";
 import { fam, famelems } from "./familie_interfaces";
