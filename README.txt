@@ -11,13 +11,15 @@ EINFÜHRUNG
 - Hauptdatei: TDD_Ausgabe.php
 - Programm braucht einen Webserver: WebHosting (online Webseite) oder
 		lokaler Server (XAMPP, Laragon, etc.)
-	- Getestet mit: Laragon (MySQL Datenbank), XAMPP (MariaDB Datenbank)
-			--> sollte mit jedem Standardserver funktionieren
+	- Getestet mit:
+			Laragon (MySQL v5.1 Datenbank, PHP 5.4.9)
+			XAMPP (MariaDB 15.1 Datenbank, PHP 7.2.3)
+			--> sollte mit jedem gewöhnlichen Webserver funktionieren
 	- Datei muss über localhost/Adresse der Webseite aufgerufen werden
 		- Lokaler Server: localhost ist URL zur Webseite
 
 - Hauptdatei kann beliebig umbenennt werden (Aufruf ändern!)
-- Weitere Datein im Verzeichnis:
+- Weitere Datein im Repository:
 	TDD_Setup.sql: SQL-Befehl zum einlesen einer Datei in Familien-Tabelle
 			Liest Datei Familien.txt auf localhost
 	TDD_XmlToTxt.js: Wandelt eine xml-Datei in das richtige Format für
@@ -29,11 +31,11 @@ SETUP
 =====
 
 - Aufruf der Seite: Log-In-Screen
-- Unten Setup anwählen
+- In der Adress-Leiste ?setup anhängen
 - Administrator-Konto der Datenbank eingeben
 	- Lokaler Server: normal UN: root, PW: (leer)
 	- Webserver: auf der Administrationsoberfläche nachsehen
-- Alle 3 Schritte ausführen
+- Alle 4 Schritte ausführen
 - Fertig
 
 
@@ -51,5 +53,5 @@ Nutzung
 
 
 
-Constantin Piber, 2018
+Constantin Piber, 2018-2020
  constantin.piber@gmail.com
