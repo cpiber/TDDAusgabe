@@ -51,6 +51,16 @@ html.main {
   float: none;
 }
 
+.clearfix {
+  overflow: auto;
+
+  &::after {
+    content: '';
+    clear: both;
+    display: table;
+  }
+}
+
 
 
 .link {

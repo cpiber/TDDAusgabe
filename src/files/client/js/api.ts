@@ -69,8 +69,11 @@ $(() => {
   modal = $('#login-modal').data('close', false);
   const $un = modal.find('[name="user"]');
   const $pw = modal.find('[name="pass"]');
+  const $inputs = modal.find(':input');
+  
   modal.find('form').on('submit', () => {
     if (!loginpromise) return false;
+    $inputs.prop('disabled', true);
     $.post('?api=login', {
       username: $un.val(),
       password: $pw.val(),
@@ -88,6 +91,7 @@ $(() => {
       }
       $un.val('');
       $pw.val('');
+      $inputs.prop('disabled', false);
     }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`Login Failed (Network)`, jqXHR.status, error, msg);

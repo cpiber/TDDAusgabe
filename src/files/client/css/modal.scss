@@ -11,6 +11,10 @@
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
 
+  &.slim .modal-content {
+    max-width: 400px;
+  }
+
   &-content {
     position: relative;
     background-color: $whitish;
@@ -24,7 +28,14 @@
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
-    animation-duration: 0.4s
+    animation-duration: 0.4s;
+
+    @media (max-width: 460px) {
+      width: 90%;
+    }
+    @media (max-width: 360px) {
+      width: 95%;
+    }
   }
 
   &-header {

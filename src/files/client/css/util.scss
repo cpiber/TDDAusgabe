@@ -6,6 +6,18 @@
   &-c > * {
     @extend .w100pm400px;
   }
+
+  &-mw800 {
+    @extend .w100pm400px;
+
+    &-c > * {
+      @extend .w100pm400px-mw800;
+    }
+
+    @media only screen and (max-width: 799px) {
+      max-width: unset;
+    }
+  }
 }
 
 .w100p {

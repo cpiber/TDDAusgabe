@@ -26,14 +26,14 @@
 
   <div class="body" id="tabs">
     <div id="tab-head">
-      <ul class="tab">
-        <li><a href="#tab1">Start</a></li>
-        <li><a href="#tab2">Ausgabe</a></li>
-        <li><a href="#tab3">Verwaltung</a></li>
-        <li><a href="#tab4">Logs</a></li>
-        <li><a href="#tab5">Einstellungen</a></li>
-        <li><a href="#tab6">Hilfe</a></li>
-      </ul>
+      <ul class="tab"><!--
+        --><li><a href="#tab1">Start</a></li><!--
+        --><li><a href="#tab2">Ausgabe</a></li><!--
+        --><li><a href="#tab3">Verwaltung</a></li><!--
+        --><li><a href="#tab4">Logs</a></li><!--
+        --><li><a href="#tab5">Einstellungen</a></li><!--
+        --><li><a href="#tab6">Hilfe</a></li><!--
+      --></ul>
     </div>
 
     <div id="tab-body">
@@ -65,7 +65,8 @@
           </div>
         </div>
         <div class="clear"></div>
-        <p style="text-align: right;">2018 by Constantin, Version <?php echo VERSION; ?></p>
+        <p style="text-align: right;">2018 by Constantin, Version <?php echo VERSION; ?><br />
+          <a href="https://github.com/cpiber/TDDAusgabe">Github</a></p>
       </div>
       <div id="tab2">
         <h1>Lebens&shy;mittel&shy;ausgabe</h1>
@@ -95,7 +96,7 @@
           <div class="cols2 select-list">
             <ul></ul>
           </div>
-          <div class="cols2 familie-data w100pm400px-c">
+          <div class="cols2 familie-data w100pm400px-mw800-c">
             <p style="font-weight: bolder;"><span></span></p>
             <p>
               <b>Familien-Nummer: <span>0</span></b>
@@ -110,7 +111,7 @@
             <p>Erwachsene / Kinder: <span></span> / <span></span></p>
             <p>zu zahlen: <span></span>€</p>
             <p><label>Schulden: <input type="number" style="width:60px" step="0.01" />€</label></p>
-            <p><label>Notizen:<br /><textarea class="w100pm400px"></textarea></label></p>
+            <p><label>Notizen:<br /><textarea class="w100p"></textarea></label></p>
             <p class="no-space">Zusatzinfo:
               <button onclick="var s=this.parentElement.nextElementSibling;s.style.display=s.style.display=='none'?'':'none'">Umschalten</button>
             </p>
@@ -134,7 +135,7 @@
             <br />
             <span class="msg-box"></span>
             <p>&nbsp;</p>
-            <button>Familie bearbeiten</button>
+            <button class="w100p">Familie bearbeiten</button>
           </div>
         </div>
       </div>
@@ -155,11 +156,11 @@
               <button class="button-add">+</button>
             </div>
           </div>
-          <div class="cols2 familie-data">
-            <p class="w100pm400px">
+          <div class="cols2 familie-data w100pm400px-mw800-c">
+            <p>
               <span class="link">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span></span>
             </p>
-            <p><label>Name:<br /><input class="w100pm400px" type="text" placeholder="Name" /></label></p>
+            <p><label>Name:<br /><input class="w100p" type="text" placeholder="Name" /></label></p>
             <p><label>Ort: <select></select></label></p>
             <p><label>Gruppe: <select></select></label></p>
             <p><label title="0 für auto">Nummer: <input type="number" style="width:60px;" /></label></p>
@@ -168,12 +169,12 @@
             <p><label>Letzte Anwesenkeit: <input type="date" /></label></p>
             <p><label>Ablaufdatum Karte: <input type="date" /></label></p>
             <p><label>Schulden: <input type="number" style="width:60px;" step="0.01" />€</label></p>
-            <p><label>Notizen:<br /><textarea class="w100pm400px"></textarea></label></p>
-            <p><label>Adresse:<br /><textarea class="w100pm400px"></textarea></label></p>
-            <p><label>Telefonnummer:<br /><input class="w100pm400px" type="text" placeholder="Telefon" /></label></p>
+            <p><label>Notizen:<br /><textarea class="w100p"></textarea></label></p>
+            <p><label>Adresse:<br /><textarea class="w100p"></textarea></label></p>
+            <p><label>Telefonnummer:<br /><input class="w100p" type="text" placeholder="Telefon" /></label></p>
             <br />
-            <p><button class="w100pm400px" data-save="Speichern" data-create="Anlegen"></button></p>
-            <p><button class="w100pm400px">Löschen</button></p>
+            <p><button class="w100p" data-save="Speichern" data-create="Anlegen"></button></p>
+            <p><button class="w100p">Löschen</button></p>
           </div>
         </div>
       </div>
@@ -204,35 +205,35 @@
         <div>
           <div class="cols3" id="orte">
             <h2>Orte</h2>
-            <div class="select-list dynamic w100pm400px">
+            <div class="select-list dynamic w100p">
               <ul></ul>
             </div>
           </div>
           <div class="cols3" id="actions">
             <h2>Aktionen</h2>
             <p>
-              <button class="w100pm400px" title="Löscht alle Familien, die seit 8 Wochen nicht mehr anwesend waren.">
+              <button class="w100p" title="Löscht alle Familien, die seit 8 Wochen nicht mehr anwesend waren.">
                 8 Wochen nicht anwesend löschen
               </button>
-              <button class="w100pm400px" title="Löscht alle Familien, deren Karte seit 8 Wochen abgelaufen ist.">
+              <button class="w100p" title="Löscht alle Familien, deren Karte seit 8 Wochen abgelaufen ist.">
                 Karte 8 Wochen abgelaufen löschen
               </button>
             </p>
             <p>
-              <button class="w100pm400px" title="Setzt alle Nummern der Familien zurück, d.h. alle Familien werden neu durchnummeriert.">
+              <button class="w100p" title="Setzt alle Nummern der Familien zurück, d.h. alle Familien werden neu durchnummeriert.">
                 Nummern zurücksetzen
               </button>
             </p>
             <!--<p>
-              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) als Datenbank erstellen">
+              <button class="w100p" title="Backup aller Daten (Einstellungen, Familien, ...) als Datenbank erstellen">
                 Datenbank Backup
               </button>
             </p>-->
             <p>
-              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) herunterladen">
+              <button class="w100p" title="Backup aller Daten (Einstellungen, Familien, ...) herunterladen">
                 Backup herunterladen
               </button>
-              <button class="w100pm400px" title="Backup aller Daten (Einstellungen, Familien, ...) laden">
+              <button class="w100p" title="Backup aller Daten (Einstellungen, Familien, ...) laden">
                 Backup laden
               </button>
             </p>
@@ -242,17 +243,17 @@
             <p>
               <label class="heading" style="display: inline;">Preis Formel:
                 <span class="help" title="e ... Anzahl Erwachsene, k ... Anzahl Kinder&#xA;&#013;z.B.: e + k * 0.5&#xA;&#013;oder: (e > 0) * 2 + (k > 0)">(?)</span>
-                <input class="w100pm400px" type="text" data-name="Preis" placeholder="Preisformel" />
+                <input class="w100p" type="text" data-name="Preis" placeholder="Preisformel" />
               </label>
             </p>
             <p>
               <label class="heading" style="display: inline;">Karten-Designs:
                 <span class="help">(?)</span>
-                <textarea class="w100pm400px" data-name="Kartendesigns" style="height: 120px;"></textarea>
+                <textarea class="w100p" data-name="Kartendesigns" style="height: 120px;"></textarea>
               </label>
             </p>
             <p>
-              <button class="w100pm400px" title="Felder speichern automatisch">Alle Speichern</button>
+              <button class="w100p" title="Felder speichern automatisch">Alle Speichern</button>
             </p>
           </div>
         </div>
@@ -401,7 +402,7 @@
     </div>
   </div>
 
-  <div id="login-modal" class="modal">
+  <div id="login-modal" class="modal slim">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-head">Login</h2>

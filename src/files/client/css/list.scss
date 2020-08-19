@@ -12,7 +12,8 @@
   
   &:not(.dynamic) {
     height: 630px;
-    @media only screen and (max-width: 800px) {
+    
+    @media only screen and (max-width: 799px) {
       height: 250px;
     }
   }
