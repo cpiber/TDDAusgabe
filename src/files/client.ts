@@ -19,14 +19,14 @@ export const JsBarcode = require('jsbarcode');
 polyfills();
 
 
-export const DEBUG = true;
+export const DEBUG = false;
 
 
 
+// @ts-ignore
+window.$ = jQuery;
 // debug
 if (DEBUG) {
-  // @ts-ignore
-  window.$ = jQuery;
   // @ts-ignore
   window.JsBarcode = JsBarcode;
   // @ts-ignore
@@ -53,7 +53,7 @@ export interface TabElement extends HTMLAnchorElement {
 
 // load window
 jQuery(($) => {
-  $('button, [type="button"]').on('mouseup', function (e) {
+  $('button, [type="button"]').on('mouseup', function () {
     $(this).blur(); // remove focus
   });
 
@@ -145,7 +145,7 @@ jQuery(($) => {
   } else {
     changeTab($tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
   }
-  $tabHs.on('click', 'a', function (e) { changeTab($(this)); });
+  $tabHs.on('click', 'a', function () { changeTab($(this)) });
   tabH();
 
 
@@ -157,18 +157,16 @@ jQuery(($) => {
   const $cardwrapper = $card.find('.card-frame-wrapper');
   $cardwindow.on('load resize', () => {
     const h = $cardbody.innerHeight();
-    if (h) {
-      $cardwrapper.css('padding-bottom', Math.max(300, h));
-    }
+    if (h) $cardwrapper.css('padding-bottom', Math.max(300, h));
   });
 
   // keyboard navigation
   const $search_field = $('#tab2 .search-header input:first') as JQuery<HTMLInputElement>;
   const $search_button = $('#tab2 .search-header input:last') as JQuery<HTMLInputElement>;
   const $list = $('#tab2 .select-list');
+  const $more = $list.find('.more');
   const prev = prevFam.bind(null, $forms.eq(1), $list);
   const next = nextFam.bind(null, $forms.eq(1), $list);
-  let $more = $('#tab2 .select-list .more');
   function keyboardHandler(event: JQuery.KeyDownEvent) {
     // console.log(event, event.which, event.key);
     if (!$current_tab) return true;
@@ -191,7 +189,7 @@ jQuery(($) => {
     }
     return false;
   }
-  function prevFam($f: JQuery<HTMLElement>, $list: JQuery<HTMLElement>) {
+  function prevFam($f: JQuery<HTMLElement>) {
     let i = +$f.find('.selected').data('idx');
     if (i === 0) return;
     if (!i) i = 0;
