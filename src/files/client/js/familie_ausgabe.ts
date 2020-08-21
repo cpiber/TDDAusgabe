@@ -210,7 +210,7 @@ export class ausgabeFam extends familie {
         lAnw = (new Date(this.data.lAnwesenheit)).toLocaleDateString();
       } catch (e) { }
     }
-    const addr = this.data.Adresse.replace(/\n/g, '<br />');
+    const addr = this.data.Adresse ? this.data.Adresse.replace(/\n/g, '<br />') : '';
 
     ausgabeFam.elems.lAnwesenheit.text(lAnw);
     ausgabeFam.elems.Adresse.html(addr);

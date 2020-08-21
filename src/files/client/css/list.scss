@@ -22,6 +22,8 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    position: relative;
+    overflow: auto;
 
     li {
       padding: 2px 12px;
@@ -38,7 +40,7 @@
         border-bottom-style: solid;
       }
 
-      &:not(.title) {
+      &:not(.title):not(.loading) {
         &:hover, &:focus {
           cursor: pointer;
 
@@ -51,6 +53,11 @@
       &.title {
         font-style: italic;
         margin-top: 10px;
+      }
+
+      &.more {
+        margin-top: 15px;
+        font-style: italic;
       }
     }
   }

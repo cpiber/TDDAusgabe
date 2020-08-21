@@ -15,9 +15,9 @@ export default function request(endpoint: string, errorText: string = '', data: 
   const url = `?api=${encodeURIComponent(endpoint)}`;
   return _request(url, errorText, data);
 }
-function _request(url: string, errorText: string, data: { [key: string]: any }): apiRequest {
-  if (loginpromise) return login(url, errorText, data);
-  return $.post(url, data)
+function _request(url: string, errorText: string, data_in: { [key: string]: any }): apiRequest {
+  if (loginpromise) return login(url, errorText, data_in);
+  return $.post(url, data_in)
     .then((data: apiData, status: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
       if (!data) {
         console.error(`${errorText} :: Failed request (NO DATA)`, data);
@@ -38,7 +38,7 @@ function _request(url: string, errorText: string, data: { [key: string]: any }):
       }
       console.debug(`${errorText} :: Failed request (API denied): ${data.message}`, data);
       console.debug(`Opening login dialog to retry...`);
-      return login(url, errorText, data);
+      return login(url, errorText, data_in);
     }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`${errorText} :: Failed request (Network)`, jqXHR.status, error, msg);

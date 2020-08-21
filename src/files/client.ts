@@ -19,7 +19,7 @@ export const JsBarcode = require('jsbarcode');
 polyfills();
 
 
-export const DEBUG = false;
+export const DEBUG = true;
 
 
 
@@ -165,8 +165,10 @@ jQuery(($) => {
   // keyboard navigation
   const $search_field = $('#tab2 .search-header input:first') as JQuery<HTMLInputElement>;
   const $search_button = $('#tab2 .search-header input:last') as JQuery<HTMLInputElement>;
-  const prev = prevFam.bind(null, $forms.eq(1));
-  const next = nextFam.bind(null, $forms.eq(1));
+  const $list = $('#tab2 .select-list');
+  const prev = prevFam.bind(null, $forms.eq(1), $list);
+  const next = nextFam.bind(null, $forms.eq(1), $list);
+  let $more = $('#tab2 .select-list .more');
   function keyboardHandler(event: JQuery.KeyDownEvent) {
     // console.log(event, event.which, event.key);
     if (!$current_tab) return true;
@@ -189,95 +191,30 @@ jQuery(($) => {
     }
     return false;
   }
-  function prevFam($f: JQuery<HTMLElement>) {
+  function prevFam($f: JQuery<HTMLElement>, $list: JQuery<HTMLElement>) {
     let i = +$f.find('.selected').data('idx');
     if (i === 0) return;
     if (!i) i = 0;
-    $f.children(':not([value="-1"])').eq(i - 1).click();
+    const $n = $f.children(':not([value="-1"])').eq(i - 1).click();
+    const h = $list.innerHeight();
+    const cs = $list.scrollTop();
+    const ns = $n.position().top;
+    if (ns < cs || ns > cs + h) $list.scrollTop(ns > 40 ? ns : 0);
   }
   function nextFam($f: JQuery<HTMLElement>) {
     let i = +$f.find('.selected').data('idx');
     if (!i && i !== 0) i = -1;
-    $f.children(':not([value="-1"])').eq(i + 1).click();
+    const $n = $f.children(':not([value="-1"])').eq(i + 1);
+    if ($n.length) {
+      $n.click();
+      const h = $list.innerHeight();
+      const cs = $list.scrollTop();
+      const ns = $n.position().top - h + $n.innerHeight();
+      if (ns > cs || ns < cs + h) $list.scrollTop(ns);
+    } else {
+      $more.click();
+    }
   }
 });
 export let changeTab: ($link: JQuery<TabElement>) => void;
 
-
-/*
-
-
-window.onkeydown = function (evt) {
-  evt = evt || window.event;
-
-  var charCode = evt.keyCode || evt.charCode || evt.which;
-  var charStr = String.fromCharCode(charCode);
-
-  if (currentTab.getAttribute('href') == "#tab2" && evt.altKey == true && evt.key !== "Alt") {
-    switch (charStr) {
-      case "N":
-        document.getElementById('ort-select').focus();
-        break;
-      case "M":
-        document.getElementById('gruppe-select').focus();
-        break;
-      case "J":
-        document.getElementById('fam-karte').focus();
-        break;
-      case "K":
-        document.getElementById('fam-schuld').focus();
-        break;
-      case "L":
-        document.getElementById('fam-notiz').focus();
-        break;
-      case "U":
-        document.getElementById('fam-anw').click();
-        break;
-      case "I":
-        document.getElementById('fam-gv').click();
-        break;
-      case "O":
-        document.getElementById('fam-sb').click();
-        break;
-      case "¼": //Komma
-        var e = document.getElementById('familie-search');
-        e.focus();
-        e.select();
-        e.setSelectionRange(0, e.value.length);
-        break;
-      case "¾": //Punkt
-        document.getElementById('fam-reload').click();
-        break;
-      case "&": //Pfeil auf
-        document.getElementById('familie-list').focus();
-        var i = tdd_fam_curr.length - 1;
-        if (typeof (selected_fam) != "undefined") { i = selected_fam.index - 1; }
-        var e = jQuery('#familie-list li[value="' + i + '"]').get(0);
-        if (typeof (e) != "undefined") {
-          selectFam.call(e);
-          jQuery('#familie-list').scrollTo(e);
-        }
-        break;
-      case "(": //Pfeil ab
-        document.getElementById('familie-list').focus();
-        var i = 0;
-        if (typeof (selected_fam) != "undefined") { i = selected_fam.index + 1; }
-        var e = jQuery('#familie-list li[value="' + i + '"]').get(0);
-        if (typeof (e) != "undefined") {
-          selectFam.call(e);
-          jQuery('#familie-list').scrollTo(e);
-        }
-        break;
-      default:
-        //console.debug( evt, charCode, charStr );
-        break;
-    }
-  }
-
-  keyboard_timeout = false;
-  if (typeof (keyboard_timeout_) != "undefined") { clearTimeout(keyboard_timeout_); }
-  keyboard_timeout_ = setTimeout(function () { keyboard_timeout = true; }, 1500);
-
-}
-
-*/

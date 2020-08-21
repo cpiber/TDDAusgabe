@@ -95,7 +95,7 @@ function api_getfam($msg) {
         $parts[] = parse_searchmatches( $m, $data, $cols );
     }
     $page = array_key_exists( 'page', $_POST ) ? intval( $_POST['page'] ) : 1;
-    if ( $page < 1 ) $page = 1;
+    if ( $page == 0 ) $page = 1;
     $pagesize = array_key_exists( 'pagesize', $_POST ) ? intval( $_POST['pagesize'] ) : 50;
     if ( $pagesize < 1 && $pagesize != -1 ) $pagesize = 50;
   }
@@ -118,6 +118,7 @@ function api_getfam($msg) {
       $pagesstmt->execute( $data );
       $msg['pages'] = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
 
+      if ( $page < 0 ) $page = $pages + 1 + $page;
       $offset = ( $page - 1 ) * $pagesize;
       $sql = sprintf( "%s LIMIT %s OFFSET %s", $sql, $pagesize, $offset );
     }
