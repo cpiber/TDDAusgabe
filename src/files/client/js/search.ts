@@ -7,6 +7,10 @@ import { verwaltungFam } from './familie_verwaltung';
 import { timeout } from './helpers';
 import { JPromise, orte } from './settings';
 
+interface famlist extends Array<any> {
+  page?: number,
+}
+
 export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQuery<HTMLElement>, loadOrte: () => JPromise<void>) {
   const ausgList = [];
   const verwList = [];
@@ -14,10 +18,10 @@ export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQu
   const $verwList = $forms.eq(3);
   const ausgSearch: () => void = search.bind(null, ausgList, $ausgList,
     $ausg_selects.add('#tab2 .search-header input:first'),
-    $('<span>').text('Loading...').hide().insertBefore($ausgList), ausgabeFam, loadOrte);
+    $('<span>').text('Loading...').hide().insertAfter($ausgList), ausgabeFam, loadOrte);
   const verwSearch: () => void = search.bind(null, verwList, $verwList,
     $('#tab3 .search-header input:first'),
-    $('<span>').text('Loading...').hide().insertBefore($verwList), verwaltungFam, loadOrte);
+    $('<span>').text('Loading...').hide().insertAfter($verwList), verwaltungFam, loadOrte);
   $ausg_selects.on('change', () => timeout().then(ausgSearch));
   $forms.eq(0).on('submit', ausgSearch);
   $ausgList.on('click', 'li', function () { select.call(this, ausgList, $ausgList, ausgabeFam); });
@@ -32,8 +36,10 @@ function search(list: any[], $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLEle
     search: string,
     ort?: number,
     gruppe?: number,
+    pagesize: number,
   } = {
-    search: $inputs.last().val().toString()
+    search: $inputs.last().val().toString(),
+    pagesize: -1
   };
   if ($inputs.length === 3) {
     const ort = +$inputs.eq(0).val();
