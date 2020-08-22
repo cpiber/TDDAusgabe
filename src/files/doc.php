@@ -43,8 +43,8 @@
           <div class="cols3">
             <h2>Das neue TDD-Programm</h2>
             <p>Willkommen zum neuen "Tischlein Deck Dich"-Lebensmittel&shy;ausgabe&shy;programm.</p>
-            <p>Über die Tabs können Sie die verschiedenen Sektionen des Programms erreichen, links bzw. unten finden Sie
-              weitere Informationen zu selbigen.
+            <p>Über die Tabs können Sie die verschiedenen Sektionen des Programms erreichen, rechts bzw. unten finden Sie
+              weitere Informationen.</p>
           </div>
           <div class="cols3">
             <h2>Ausgabe</h2>
@@ -73,7 +73,7 @@
         <div>
           <div class="cols2 search-header" style="margin-bottom: 10px">
             <div class="cols2 w100p-c">
-              <select></select><br />
+              <select></select>
               <select></select>
               <!--<button>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
@@ -120,7 +120,7 @@
               Telefonnummer:<br /><span></span>
             </p>
             <br />
-            <div class="checkboxes">
+            <div class="checkboxes clearfix">
               <div class="cols3">
                 <label><input type="checkbox" /> Anwesend</label>
               </div>
@@ -130,7 +130,6 @@
               <div class="cols3">
                 <label><input type="checkbox" title="Setzt Schulden auf Null&#xA;&#013;Nur wenn ALLE Schulden bezahlt wurden" /> Schulden beglichen</label>
               </div>
-              <div class="clear"></div>
             </div>
             <br />
             <span class="msg-box"></span>
