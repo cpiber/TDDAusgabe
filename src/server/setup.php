@@ -152,12 +152,12 @@ if ( isset( $_GET['setup'] ) ) {
       $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
       
     } catch ( PDOException $e ) {
-      loginform( '<span style=\"color:red\">Login failed. ' . $e->getMessage() . '</span>', $_SERVER['SCRIPT_NAME'] . '?setup' );
+      loginform( '<span style=\"color:red\">Login failed. ' . $e->getMessage() . '</span>', '?setup' );
       exit;
 
     }
   } else {
-    loginform( "<p>Admin-Login für Datenbank eingeben</p>", $_SERVER['SCRIPT_NAME'] . '?setup' );
+    loginform( "<p>Admin-Login für Datenbank eingeben</p>", '?setup' );
     exit;
 
   }
@@ -165,7 +165,7 @@ if ( isset( $_GET['setup'] ) ) {
   loginstyles();
   ?>
   <div class="float-middle">
-    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a href="?login&url=<?php echo urlencode( $_SERVER['SCRIPT_NAME'] . '?setup' ); ?>">Log Out</a></p><?php
+    <p style="text-align: right; padding: 0 10px; margin: 2px 0;"><a href="?login&url=<?php echo urlencode( '?setup' ); ?>">Log Out</a></p><?php
 
   if ( isset( $_GET['step'] ) ) {
     $step = $_GET['step'];

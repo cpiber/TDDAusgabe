@@ -84,7 +84,7 @@ function connect_error($error = false) {
     echo "<meta charset=\"UTF-8\">";
     echo "</head><body>";
     echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
-    loginform( $error ? "<span style=\"color:red\">Login failed. $error</span>" : "", ( isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : '' ) );
+    loginform( $error ? "<span style=\"color:red\">Login failed. $error</span>" : "" );
     echo "</body></html>";
   }
   exit;
@@ -118,11 +118,19 @@ function loginstyles() { ?>
 <?php }
 
 function loginform( $msg = "", $url = "" ) {
+  if ( $url == "" ) {
+    if ( isset( $_GET['url'] ) ) {
+      $url = $_GET['url'];
+    } else if ( !isset( $_GET['login' ] ) ) {
+      $url = sprintf( "?%s", $_SERVER['QUERY_STRING'] );
+    }
+  }
   loginstyles(); ?>
   <div class="float-middle"><form action="<?php echo "?login" . ( $url == "" ? "" : "&url=".urlencode($url) ); ?>" method="POST">
     <?php echo $msg; ?>
     <h1>Login</h1><br />
     <input type="hidden" name="login" value=true />
+    <input type="hidden" name="url" value="<?php echo $url ?>" />
     <input type="text" id="username" name="username" placeholder="Username" autocomplete="username" />
     <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" />
     <input type="submit" value="OK" />
