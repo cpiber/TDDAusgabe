@@ -12,7 +12,7 @@ if ( DEBUG ) {
 $servername = "localhost";
 
 define( 'VERSION', '2.0.1' );
-define( 'DB_VER', 7 );
+define( 'DB_VER', 8 );
 
 
 

@@ -106,6 +106,9 @@ if ( $ver < DB_VER ) {
             SET str = REPLACE(str, CONCAT('%C3%', HEX(X)), UNHEX(CONCAT('C3', HEX(X))));
             SET  X = X + 1;
           END WHILE;
+          SET str = REPLACE(str, '%09', '\t');
+          SET str = REPLACE(str, '%0A', '\n');
+          SET str = REPLACE(str, '%0D', '\r');
           SET X = 32;
           WHILE X  < 127 DO
             SET str = REPLACE(str, CONCAT('%', HEX(X)), UNHEX(HEX(X)));
@@ -216,11 +219,25 @@ if ( $ver < DB_VER ) {
       $conn->commit();
       $conn->exec( "SET autocommit = 1" );
 
-      $ver = 7;
+      $ver = 8;
 
     } catch ( PDOException $e ) {
       $conn->rollBack();
-      upgrade_error( 7, $e );
+      upgrade_error( 8, $e );
+      $error = true;
+    }
+  }
+
+  if ( $ver == 7 ) {
+    try {
+      $conn->exec( "UPDATE `familien` SET `Adresse` = REPLACE(REPLACE(REPLACE(`Adresse`, '%0A', '\n'), '%0D', '\r'), '%09', '\t')" );
+      $conn->exec( "UPDATE `einstellungen` SET `Val` = REPLACE(REPLACE(REPLACE(`Val`, '%0A', '\n'), '%0D', '\r'), '%09', '\t')" );
+
+      $ver = 8;
+
+    } catch ( PDOException $e ) {
+      $conn->rollBack();
+      upgrade_error( 8, $e );
       $error = true;
     }
   }

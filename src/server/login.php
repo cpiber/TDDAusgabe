@@ -57,6 +57,7 @@ function login($out = true) {
   }
 }
 login();
+session_write_close();
 
 
 function connectdb($servername, $username, $password) {

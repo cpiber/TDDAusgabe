@@ -21,6 +21,8 @@ export const orte: OrtList = [];
 orte.loading = null;
 orte.maxGruppen = 0;
 
+let frameloaded = false;
+
 
 export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
   const $in = $('#settings :input');
@@ -29,12 +31,20 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
   $in.eq(2).on('click', update.bind(null, null, $preis, $designs));
 
   const card = $frame.on('load', () => {
+    frameloaded = true;
+    if (!settings.designs || settings._loading) return;
+
     // set designs on load in case the frame takes longer to load than requesting settings
     try {
       (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
       (card.contentWindow as cardWindow).updateDesigns();
-    } catch (e) { }
-  }).get(0);
+    } catch (e) {
+      console.error(`Failed setting 'designs': ${e}`);
+      alert(`
+          <p>Fehler beim Laden der Designs:<br />${e}</p>
+        `, "Fehler");
+    }
+  }).attr('src', '?page=card').get(0);
 
   [$preis, $designs].forEach(element => {
     let timeout;
@@ -59,7 +69,8 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
 
       $preis.val(settings.preis);
       $designs.val(settings.designs);
-
+      
+      if (!frameloaded) return;
       try {
         (card.contentWindow as cardWindow).designs = JSON.parse(settings.designs);
         (card.contentWindow as cardWindow).updateDesigns();

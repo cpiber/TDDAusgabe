@@ -395,7 +395,7 @@
         <h2 class="modal-head">Karte drucken</h2>
       </div>
       <div class="modal-body">
-        <div class="card-frame-wrapper"><iframe src="?page=card" class="card-frame"></iframe></div>
+        <div class="card-frame-wrapper"><iframe class="card-frame"></iframe></div>
       </div>
       <div class="modal-footer"></div>
     </div>
