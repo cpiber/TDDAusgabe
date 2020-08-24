@@ -1,6 +1,6 @@
 {
   "name": "tddausgabe",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Ausgabeprogramm für Tischlein Deck Dich",
   "main": "index.js",
   "dependencies": {},
