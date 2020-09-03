@@ -9,6 +9,9 @@ import { JPromise, orte } from './settings';
 
 interface famlist extends Array<any> {
   page?: number,
+  ort?: number,
+  ortname?: string,
+  gruppe?: number,
 }
 
 export default function generate($ausg_selects: JQuery<HTMLElement>, $forms: JQuery<HTMLElement>, loadOrte: () => JPromise<void>) {
@@ -47,7 +50,7 @@ function search(list: famlist, $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLE
   } = {
     search: $inputs.last().val().toString(),
     page: 1,
-    pagesize: 30,
+    pagesize: 100,
   };
   if ($inputs.length === 3) {
     const ort = +$inputs.eq(0).val();
@@ -69,14 +72,18 @@ function search(list: famlist, $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLE
       if (data.data.constructor.name !== "Array") {
         data.data = [data.data]; // single fam
       }
+
+      let ort = -1, ortname = "", grp = -1;
       if (!next_page) {
         $list.empty();
         list.length = 0;
         list.page = 1;
       } else {
         list.page += 1;
+        ort = list.ort;
+        ortname = list.ortname;
+        grp = list.gruppe;
       }
-      let ort = -1, ortname = "", grp = -1;
       data.data.forEach((element: famdata, index: number) => {
         index = index + (list.page - 1) * 30; // pagesize
         if (element.Ort !== ort || element.Gruppe !== grp) {
@@ -92,6 +99,9 @@ function search(list: famlist, $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLE
         if (fam.current && fam.current.data.ID === element.ID) $li.addClass('selected');
         list[element.ID] = element;
       });
+      list.ort = ort;
+      list.ortname = ortname;
+      list.gruppe = grp;
       if (list.page < (+data.pages)) $more.show();
     }).always(() => $loading.hide());
   };
