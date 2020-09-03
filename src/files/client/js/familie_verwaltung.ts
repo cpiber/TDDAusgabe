@@ -13,6 +13,7 @@ export class verwaltungFam extends familie {
   static $button_save: JQuery<HTMLInputElement>;
   static $button_delete: JQuery<HTMLInputElement>;
   static current: verwaltungFam = null;
+  static search: () => void = null;
 
   constructor(data: any = null) {
     super(data);
@@ -89,6 +90,10 @@ export class verwaltungFam extends familie {
     super.linkHtml($card);
   }
 
+  static setSearch(s: () => void) {
+    this.search = s;
+  }
+
   static clear() {
     super.clear();
     [this.$button_save, this.$button_delete].forEach((el) => {
@@ -137,8 +142,10 @@ export class verwaltungFam extends familie {
         this.data.ID = data.new.ID;
         this.data.Gruppe = data.new.Gruppe || this.data.Gruppe;
         this.data.Num = data.new.Num || this.data.Num;
+        this.newFam = false;
         this.show();
         verwaltungFam.editMode();
+        verwaltungFam.search();
         return data;
       }).always(() => {
         verwaltungFam.enable();
@@ -147,6 +154,7 @@ export class verwaltungFam extends familie {
       if (this.data.Num == 0) this.dirty.Num = true;
       return super.save(verwaltungFam).then((data: apiData) => {
         this.show();
+        verwaltungFam.search();
         return data;
       });
     }
@@ -163,6 +171,7 @@ export class verwaltungFam extends familie {
     }).then((data: any) => {
       verwaltungFam.clear();
       verwaltungFam.current = null;
+      verwaltungFam.search();
     }).fail(() => {
       verwaltungFam.enable();
     });

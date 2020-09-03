@@ -99,12 +99,6 @@ jQuery(($) => {
   const $card = $('#card-modal');
   const $cardframe = $card.find('.card-frame') as JQuery<HTMLIFrameElement>;
 
-  // load forms and reset
-  ausgabeFam.linkHtml($card);
-  ausgabeFam.clear();
-  verwaltungFam.linkHtml($card);
-  verwaltungFam.clear();
-
   const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
 
@@ -112,6 +106,13 @@ jQuery(($) => {
   const { ausgSearch, verwSearch } = searchGenerate($os_select.slice(0, 2), $forms, loadOrte);
   tabLinks.get(1).onOpen = ausgSearch;
   tabLinks.get(2).onOpen = verwSearch;
+
+  // load forms and reset
+  ausgabeFam.linkHtml($card);
+  ausgabeFam.clear();
+  verwaltungFam.linkHtml($card);
+  verwaltungFam.setSearch(verwSearch);
+  verwaltungFam.clear();
 
   // Logs tab
   const { info: updateLogInfo, logs: updateLogs } = initLogs();
