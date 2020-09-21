@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import { changeTab, TabElement } from "../../client";
+import { apiData } from "./api";
 import { familie } from "./familie";
 import { fam, famelems } from "./familie_interfaces";
 import { verwaltungFam } from "./familie_verwaltung";
 import { clone, formatDate, highlightElement, preis } from "./helpers";
 import { orte } from "./settings";
-import { apiData } from "./api";
 
 export class ausgabeFam extends familie {
   timeout;
@@ -329,9 +329,10 @@ export class ausgabeFam extends familie {
     if (this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       if (!this) return;
-      this.save();
       this.timeout = null;
-    }, 400);
+      const elem = $(':focus');
+      this.save().then(() => elem.focus()); // refocus after saving
+    }, 800);
   }
 
   save() {
@@ -355,7 +356,6 @@ export class ausgabeFam extends familie {
       m += this.preis;
     }
     if (ausgabeFam.$geldverg.prop('checked')) {
-      console.log('verg');
       this.data.Schulden += this.preis;
       this.dirty.Schulden = true;
     }
@@ -371,7 +371,7 @@ export class ausgabeFam extends familie {
 
     return super.save(ausgabeFam, additional).then((data: apiData) => {
       this.orig_schuld = this.data.Schulden;
-      if (!ausgabeFam.current || this.data.ID != ausgabeFam.current.data.ID) return;
+      if (!ausgabeFam.current || this.data.ID != ausgabeFam.current.data.ID) return data;
       ausgabeFam.allow_sb_gv = true;
       this.show();
       ausgabeFam.enable(); // re-enable after setting allow_sb_gv and showing
