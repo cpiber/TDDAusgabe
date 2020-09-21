@@ -98,8 +98,10 @@ function search(list: famlist, $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLE
         const $li = $('<li>').val(element.ID).data('idx', index).text(`${element.Num}/ ${name}`).appendTo($list);
         if (fam.current && fam.current.data.ID === element.ID) {
           $li.addClass('selected');
-          Object.assign(fam.current.data, element); // update data
-          fam.current.show(fam);
+          if (fam.name === "ausgabeFam" && !(fam as typeof ausgabeFam).current.timeout) {
+            Object.assign(fam.current.data, element); // update data
+            fam.current.show(fam);
+          }
         }
         list[element.ID] = element;
       });
