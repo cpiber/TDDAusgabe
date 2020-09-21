@@ -19,7 +19,7 @@ export const JsBarcode = require('jsbarcode');
 polyfills();
 
 
-export const DEBUG = true;
+export const DEBUG = false;
 
 
 
