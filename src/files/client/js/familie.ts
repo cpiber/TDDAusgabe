@@ -86,7 +86,8 @@ export class familie {
       width: 1,
       textMargin: 0,
       fontSize: 11,
-      background: 0,
+      // @ts-ignore
+      background: 0, // transparent
       marginLeft: 15,
       marginRight: 15,
       margin: 0,

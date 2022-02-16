@@ -1,4 +1,5 @@
 import jQuery from 'jquery';
+import JsBarcode from 'jsbarcode';
 import { delFamDate, resetFam } from './client/js/actions';
 import request from './client/js/api';
 import { ausgabeFam } from './client/js/familie_ausgabe';
@@ -12,8 +13,7 @@ import searchGenerate from './client/js/search';
 import settings, { optionsSettingsUpdate, orte } from './client/js/settings';
 import { optionsOrteUpdate } from './client/js/settings_orte';
 import { karte_designs_help, preis_help } from './client/js/texts';
-// @ts-ignore
-export const JsBarcode = require('jsbarcode');
+export { JsBarcode };
 
 
 polyfills();

@@ -1,6 +1,5 @@
 
-// @ts-ignore
-const values = require('object.values');
+import values from 'object.values';
 
 export default function polyfills() {
   if (!Object.values) {

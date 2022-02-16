@@ -1,7 +1,7 @@
 <?php
 
 // debugging
-define ( 'DEBUG', false );
+define ( 'DEBUG', true );
 if ( DEBUG ) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
@@ -11,7 +11,7 @@ if ( DEBUG ) {
 
 $servername = "localhost";
 
-define( 'VERSION', '2.0.4' );
+define( 'VERSION', '2.0.5' );
 define( 'DB_VER', 8 );
 
 

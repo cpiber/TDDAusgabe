@@ -1,5 +1,6 @@
 <?php
 
+global $conn;
 
 function setup_error($sql, $error) {
   return sprintf( "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%%;padding:6px;\">%s: <strong>%s</strong><br></span></p>", $sql, $error );
@@ -315,9 +316,7 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
 
-        $designs = <<<'DESIGNS_NOWDOC____'
-require "../files/designs.json";
-DESIGNS_NOWDOC____;
+        $designs = require("../files/designs.json");
         $sql = "INSERT INTO `einstellungen` ( Name, Val ) VALUES ( 'Kartendesigns', :designs )";
         $stmt = $conn->prepare( $sql );
         $stmt->execute( array(":designs" => $designs) );

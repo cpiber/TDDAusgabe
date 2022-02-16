@@ -3,39 +3,6 @@
 
 session_start();
 
-if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
-  $_SESSION['user'] = $_POST['username'];
-  $_SESSION['pw'] = $_POST['password'];
-  login();
-  $url = isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : $_SERVER['SCRIPT_NAME'];
-  header( "LOCATION: $url" );
-  exit;
-
-} else if ( isset( $_GET['api'] ) && $_GET['api'] == 'login' && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
-  header( "Content-Type: application/json; charset=UTF-8" );
-  $_SESSION['user'] = $_POST['username'];
-  $_SESSION['pw'] = $_POST['password'];
-
-  if ( ( $err = login(false) ) !== true ) {
-    echo json_encode( array(
-      'status' => 'failure',
-      'loggedin' => false,
-      'message' => $err,
-    ) );
-  } else {
-    echo json_encode( array(
-      'status' => 'success',
-      'loggedin' => true,
-    ) );
-  }
-  exit;
-
-} else if ( isset( $_GET['login'] ) ) {
-  session_destroy();
-  $_SESSION = array();
-}
-
-
 function login($out = true) {
   global $conn;
   global $servername;
@@ -56,8 +23,6 @@ function login($out = true) {
     return false;
   }
 }
-login();
-session_write_close();
 
 
 function connectdb($servername, $username, $password) {
@@ -140,5 +105,41 @@ function loginform( $msg = "", $url = "" ) {
   </form></div>
 <?php }
 
+
+if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+  $_SESSION['user'] = $_POST['username'];
+  $_SESSION['pw'] = $_POST['password'];
+  login();
+  $url = isset( $_GET['url'] ) ? urldecode( $_GET['url'] ) : $_SERVER['SCRIPT_NAME'];
+  header( "LOCATION: $url" );
+  exit;
+
+} else if ( isset( $_GET['api'] ) && $_GET['api'] == 'login' && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+  header( "Content-Type: application/json; charset=UTF-8" );
+  $_SESSION['user'] = $_POST['username'];
+  $_SESSION['pw'] = $_POST['password'];
+
+  if ( ( $err = login(false) ) !== true ) {
+    echo json_encode( array(
+      'status' => 'failure',
+      'loggedin' => false,
+      'message' => $err,
+    ) );
+  } else {
+    echo json_encode( array(
+      'status' => 'success',
+      'loggedin' => true,
+    ) );
+  }
+  exit;
+
+} else if ( isset( $_GET['login'] ) ) {
+  session_destroy();
+  $_SESSION = array();
+}
+
+
+login();
+session_write_close();
 
 ?>

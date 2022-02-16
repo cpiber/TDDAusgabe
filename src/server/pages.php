@@ -1,5 +1,7 @@
 <?php
 
+global $conn;
+
 require "pages/print.php";
 require "pages/card.php";
 require "pages/backup_create.php";

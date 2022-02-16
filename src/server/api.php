@@ -1,5 +1,7 @@
 <?php
 
+global $conn;
+
 $fam_data = array(
   'Name' => false,
   'Erwachsene' => false,

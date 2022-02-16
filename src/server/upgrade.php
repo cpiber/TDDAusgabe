@@ -1,5 +1,6 @@
 <?php
 
+global $conn;
 
 //Check version and upgrade database
 $stmt = $conn->query( "SELECT Val FROM `einstellungen` WHERE `Name` = 'Version'" );
@@ -241,6 +242,8 @@ if ( $ver < DB_VER ) {
       $error = true;
     }
   }
+  
+  if ($error) exit;
 
   // write new dbver
   try {
@@ -249,8 +252,6 @@ if ( $ver < DB_VER ) {
     echo $e->getMessage();
     exit;
   }
-
-  if ($error) exit;
 }
 
 function upgrade_error( $ver, $e ) {

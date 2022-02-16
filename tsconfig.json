@@ -2,12 +2,15 @@
   "exclude": [
     "node_modules"
   ],
+  "include": [
+    "src/files"
+  ],
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./build/tmp",
     "sourceMap": true,
     "module": "es6",
-    "target": "es6",
-    "jsx": "react",
+    "moduleResolution": "node",
+    "target": "es5",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
