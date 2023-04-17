@@ -17,8 +17,8 @@ define( 'DB_VER', 8 );
 
 
 require "server/files.php";
-require "server/setup.php";
 require "server/login.php";
+require "server/setup.php";
 require "server/upgrade.php";
 
 require "server/api.php";

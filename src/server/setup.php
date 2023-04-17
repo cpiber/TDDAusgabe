@@ -1,6 +1,6 @@
 <?php
 
-global $conn;
+global $conn, $servername;
 
 function setup_error($sql, $error) {
   return sprintf( "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%%;padding:6px;\">%s: <strong>%s</strong><br></span></p>", $sql, $error );
@@ -143,11 +143,10 @@ $view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(
 // Execute setup if needed
 if ( isset( $_GET['setup'] ) ) {
   echo "<!DOCTYPE html><html><head><title>Tischlein Deck Dich Setup</title><meta charset=\"UTF-8\"><link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" /></head><body>";
-  session_start();
 
   if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
     try {
-      $conn = new PDO( "mysql:host=$servername", $_SESSION['user'], $_SESSION['pw'] );
+      $conn = new PDO( "mysql:host=$servername;charset=utf8", $_SESSION['user'], $_SESSION['pw'] );
       
       // set the PDO error mode to exception
       $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );

@@ -139,6 +139,8 @@ if ( isset( $_GET['login'] ) && isset( $_POST['username'] ) && isset( $_POST['pa
 }
 
 
+if ( isset( $_GET['setup'] ) ) return;
+
 login();
 session_write_close();
 
