@@ -16,13 +16,13 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
     const open: boolean = $this.data('open') || false;
 
     if ($this.hasClass('button-add')) {
-      $('<li>').val(-1).insertBefore($this).click();
+      $('<li>').val(-1).insertBefore($this).trigger('click');
       return;
     }
 
     if (open) {
       // save
-      const id = $this.val();
+      const id = +$this.val();
       const $inp = $this.find('input').prop('disabled', true);
       let name = $inp.eq(0).val();
       let grp = +$inp.eq(1).val();

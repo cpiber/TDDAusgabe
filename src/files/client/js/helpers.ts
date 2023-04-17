@@ -111,18 +111,25 @@ export function close_modal(modal: JQuery<HTMLElement>) {
 
 
 // calculate price
+export function sandboxFn(fn: string, closure?: Parameters<typeof Object.defineProperties>[1]) {
+  const code = `with (sandbox) {${fn}}`;
+  console.log(code);
+  const func = new Function('sandbox', code);
+  const ctx = Object.create(null);
+  Object.defineProperties(ctx, closure);
+  return func(ctx);
+};
+
+
 export function preis(erwachsene = 0, kinder = 0) {
   var s = settings.preis;
   if (typeof (s) == "undefined") { return -1; }
-  s = s.replace(/e/g, "" + erwachsene);
-  s = s.replace(/k/g, "" + kinder);
-  s = s.replace(/[^0-9\+\-\*\/\(\)\.><=]/g, '');
 
   try {
-    return eval(s);
+    return sandboxFn(`return ${s};`, { k: { value: +kinder, writable: false }, e: { value: +erwachsene, writable: false } });
   } catch (e) {
     console.error(`Invalide Preis-Formel (${e}):`, settings.preis);
-    alert(`<p>Fehler in der Preis-Formel!<br>${e}</p>`, "Fehler");
+    alert(`<p>Fehler in der Preis-Formel!<br>${e} (${s})</p>`, "Fehler");
   }
   return 0;
 }

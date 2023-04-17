@@ -10,7 +10,7 @@
     "sourceMap": true,
     "module": "es6",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "esnext",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [

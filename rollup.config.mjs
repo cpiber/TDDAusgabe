@@ -8,6 +8,7 @@ const plugins = [
   typescript({ sourceMap: !build }),
   nodeResolve({
     preferBuiltins: false,
+    browser: true,
   }),
   commonjs(),
 ];
