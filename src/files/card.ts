@@ -61,13 +61,17 @@ window.onload = function () {
         designs.appendChild(opt);
       }
     }
-    designs.value = "0";
+    designs.value = window.localStorage.getItem('last-design') || "0";
+    if (+designs.value < 0 || +designs.value >= window.designs.length) designs.value = "0";
     desChange();
   };
   window.updateDesigns = updateDesigns;
   updateDesigns();
 
-  designs.addEventListener('change', desChange);
+  designs.addEventListener('change', function () {
+    window.localStorage.setItem('last-design', designs.value);
+    desChange();
+  });
 
   const print = document.getElementById('drucken');
   print.addEventListener('click', function () {
