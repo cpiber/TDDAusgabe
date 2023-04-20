@@ -27,6 +27,11 @@ if ( array_key_exists( "file", $_GET ) ) {
       header( 'Content-type: image/png' );
       echo require('../files/logo.png');
       break;
+
+    case "placeholder":
+      header( 'Content-type: image/png' );
+      echo require('../files/placeholder.png');
+      break;
     
     default:
       http_response_code( 404 );

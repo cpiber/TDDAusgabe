@@ -11,8 +11,8 @@ if ( DEBUG ) {
 
 $servername = "localhost";
 
-define( 'VERSION', '2.0.5' );
-define( 'DB_VER', 8 );
+define( 'VERSION', '2.0.6' );
+define( 'DB_VER', 9 );
 
 
 

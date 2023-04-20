@@ -27,6 +27,20 @@ if ( $ver > DB_VER ) {
   exit;
 }
 
+function upgrade_error( $ver, $e ) {
+  ?><!DOCTYPE html><html>
+  <head>
+    <title>Tischlein Deck Dich - ERROR</title>
+  </head>
+  <body>
+    <h1>FEHLER</h1>
+    <p>Datenbank konnte nicht auf Version <?php echo $ver; ?> aktualisiert werden.</p>
+    <p><?php echo $e->getMessage(); ?></p>
+  </body>
+  </html>
+  <?php
+}
+
 //upgrade
 if ( $ver < DB_VER ) {
   $error = false;
@@ -242,6 +256,37 @@ if ( $ver < DB_VER ) {
       $error = true;
     }
   }
+
+
+  if ( $ver == 8 ) {
+    try {
+      $conn->beginTransaction();
+
+      $stmt = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'Kartendesigns'" );
+      $designs = $stmt->fetchColumn();
+      $designs = json_decode( $designs, true );
+      $designs[] = array(
+        "name" => "Visitenkarte 2 - Vollständig",
+		    "format" => "54x86",
+		    "elements" => array(
+          array( "html" => "<p style=\"font-weight:500; text-align: right; width: 150px; font-size: 1.8em; line-height: 1; margin: 0\">\$Name</p>", "position" => array( 2.1, 41.1 ) ),
+          array( "html" => "<p style=\"font-weight:bold; text-align: right; width: 150px; font-size: 3em; margin: 0\">\$Erwachsene/\$Kinder</p>", "position" => array( 23.9, 41.1 ) ),
+          array( "html" => "<p style=\"text-align: right; width: 100px; font-size: 1.5em; margin: 0\">\$Num</p>", "position" => array( 41,30.9 ) ),
+          array( "html" => "\$img", "position" => array( 41,58.4 ) ),
+          array( "html" => "<img src=\"?file=placeholder\" style=\"object-fit: cover; width: 100%; height: 100%;\" />", "position" => array( 0,0 ), "size" => array( 40, 54 ) ),
+        ),
+      );
+      $stmt = $conn->prepare( "UPDATE `einstellungen` SET `Val` = :designs WHERE `Name` = 'Kartendesigns'" );
+      $stmt->execute(array(":designs" => json_encode( $designs, JSON_PRETTY_PRINT )));
+
+      $conn->commit();
+      $ver = 9;
+    } catch ( PDOException $e ) {
+      $conn->rollBack();
+      upgrade_error( 9, $e );
+      $error = true;
+    }
+  }
   
   if ($error) exit;
 
@@ -253,20 +298,5 @@ if ( $ver < DB_VER ) {
     exit;
   }
 }
-
-function upgrade_error( $ver, $e ) {
-  ?><!DOCTYPE html><html>
-  <head>
-    <title>Tischlein Deck Dich - ERROR</title>
-  </head>
-  <body>
-    <h1>FEHLER</h1>
-    <p>Datenbank konnte nicht auf Version <?php echo $ver; ?> aktualisiert werden.</p>
-    <p><?php echo $e->getMessage(); ?></p>
-  </body>
-  </html>
-  <?php
-}
-
 
 ?>
