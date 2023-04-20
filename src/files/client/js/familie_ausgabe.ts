@@ -24,6 +24,7 @@ export class ausgabeFam extends familie {
   static $error: JQuery<HTMLElement>;
   static $warn: JQuery<HTMLElement>;
   static $verw: JQuery<HTMLElement>;
+  static $light: JQuery<HTMLElement>;
   static _counter = 0;
   static current: ausgabeFam = null;
   static errors = {
@@ -132,6 +133,7 @@ export class ausgabeFam extends familie {
     });
     this.$error = $inputs.filter('.err-box');
     this.$warn = $inputs.filter('.warn-box');
+    this.$light = $inputs.filter('.light');
     this.$verw = $inputs.filter('.verw');
     this.$anwesend.add(this.$geldverg).add(this.$schuldbeg).on('click', function () {
       const cur = ausgabeFam.current;
@@ -192,6 +194,7 @@ export class ausgabeFam extends familie {
     super.clear();
     this.$error.text('');
     this.$warn.text('');
+    this.$light.removeClass('light-red light-orange light-green');
     [this.$anwesend, this.$geldverg, this.$schuldbeg].forEach((el) => {
       el.prop('checked', false);
     });
@@ -313,6 +316,11 @@ export class ausgabeFam extends familie {
         w.push(this.warnMsg[prop]);
     }
     this.$warn.empty().html(w.join('<br />'));
+
+    this.$light.removeClass('light-red light-orange light-green');
+    if (err.length) this.$light.addClass('light-red');
+    else if (w.length) this.$light.addClass('light-orange');
+    else this.$light.addClass('light-green');
   }
 
   static disable() {

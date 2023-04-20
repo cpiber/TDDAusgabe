@@ -139,6 +139,34 @@ ul.tab {
     padding: 2px 4px;
   }
 
+  .count-manage {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .light {
+    $size: 1.5em;
+    display: inline-block;
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+
+    &-red, &-orange, &-green {
+      border: 1px solid $lightgray;
+    }
+
+    &-red {
+      background-color: $lightestred;
+    }
+    &-orange {
+      background-color: $darkerorange;
+    }
+    &-green {
+      background-color: $green;
+    }
+  }
+
   table.logs {
     text-align: left;
 

@@ -92,9 +92,10 @@
             <ul></ul>
           </div>
           <div class="cols2 familie-data w100pm400px-mw800-c">
-            <p>
+            <p class="count-manage">
               <b>Familien-Nummer: <span class="counter">0</span></b>
               <i><button class="fam-count o">-</button><button class="fam-count o">0</button><button class="fam-count o">+</button></i>
+              <span class="light"></span>
             </p>
             <p>
               <span class="link print">Karte drucken</span> &nbsp; <span class="Name"></span>
