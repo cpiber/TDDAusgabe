@@ -15,8 +15,7 @@ export class ausgabeFam extends familie {
   schuld = false;
   retry = false;
 
-  static elems: famelems = clone(fam);
-  static $expired: JQuery<HTMLElement>;
+  static elems: Required<Omit<famelems, 'ID'>> = clone(fam);
   static $counter: JQuery<HTMLElement>;
   static $preis: JQuery<HTMLElement>;
   static $anwesend: JQuery<HTMLInputElement>;
@@ -67,32 +66,24 @@ export class ausgabeFam extends familie {
 
   static linkHtml($card: JQuery<HTMLElement>) {
     const $inputs = $('#tab2 .familie-data :input, #tab2 .familie-data span') as JQuery<HTMLInputElement>;
-    $inputs.eq(5).on('click', () => {
+    $inputs.filter('.print').on('click', () => {
       if (!ausgabeFam.current) return;
       ausgabeFam.current.print();
     });
-    this.elems.Name = $inputs.eq(6);
-    this.elems.Ort = $inputs.eq(7);
-    this.elems.Gruppe = $inputs.eq(8);
-    this.elems.Num = $inputs.eq(9);
-    this.elems.lAnwesenheit = $inputs.eq(10);
-    this.elems.Karte = $inputs.eq(11);
-    this.elems.Erwachsene = $inputs.eq(12);
-    this.elems.Kinder = $inputs.eq(13);
-    this.elems.Schulden = $inputs.eq(15).on('change keyup', function () {
+    for (const prop in this.elems) {
+      this.elems[prop] = $inputs.filter(`.${prop}`);
+    }
+
+    this.elems.Schulden.on('change keyup', function () {
       if (!ausgabeFam.current) return;
       ausgabeFam.$geldverg.prop('disabled', true);
       ausgabeFam.$schuldbeg.prop('disabled', true);
       ausgabeFam.allow_sb_gv = false;
       ausgabeFam.current.errors();
     });
-    this.elems.Notizen = $inputs.eq(16);
-    this.elems.Adresse = $inputs.eq(18);
-    this.elems.Telefonnummer = $inputs.eq(19);
-    this.$expired = $inputs.eq(0);
-    this.$counter = $inputs.eq(1);
-    this.$preis = $inputs.eq(14);
-    this.$anwesend = $inputs.eq(20).on('click', function () {
+    this.$counter = $inputs.filter('.counter');
+    this.$preis = $inputs.filter('.preis');
+    this.$anwesend = $inputs.filter('.anwesend').on('click', function () {
       if (!ausgabeFam.current) return;
       if (this.disabled) return;
       if (ausgabeFam.current.retry) {
@@ -113,7 +104,7 @@ export class ausgabeFam extends familie {
         ausgabeFam.$schuldbeg.prop('disabled', true);
       }
     });
-    this.$geldverg = $inputs.eq(21).on('click', function () {
+    this.$geldverg = $inputs.filter('.geldverg').on('click', function () {
       if (!ausgabeFam.current) return;
       if (this.checked) {
         ausgabeFam.elems.Schulden.prop('disabled', true);
@@ -124,7 +115,7 @@ export class ausgabeFam extends familie {
         if (!ausgabeFam.$schuldbeg.prop('checked')) ausgabeFam.elems.Schulden.prop('disabled', false);
       }
     });
-    this.$schuldbeg = $inputs.eq(22).on('click', function () {
+    this.$schuldbeg = $inputs.filter('.schuldbeg').on('click', function () {
       if (!ausgabeFam.current) return;
       if (this.checked) {
         ausgabeFam.elems.Schulden.prop('disabled', true);
@@ -139,9 +130,9 @@ export class ausgabeFam extends familie {
         }
       }
     });
-    this.$error = $inputs.eq(23);
-    this.$warn = $inputs.eq(24);
-    this.$verw = $inputs.eq(25);
+    this.$error = $inputs.filter('.err-box');
+    this.$warn = $inputs.filter('.warn-box');
+    this.$verw = $inputs.filter('.verw');
     this.$anwesend.add(this.$geldverg).add(this.$schuldbeg).on('click', function () {
       const cur = ausgabeFam.current;
       if (!cur) return;
@@ -155,8 +146,8 @@ export class ausgabeFam extends familie {
       }, 10000);
     });
 
-    const $buttons = $inputs.slice(2, 5);
-    $inputs.eq(1).on('click', function () {
+    const $buttons = $inputs.filter('button.o');
+    $inputs.filter('.counter').on('click', function () {
       const $this = $(this);
       const open = $this.data('open') || false;
       if (!open) {
@@ -175,18 +166,18 @@ export class ausgabeFam extends familie {
         $input.trigger('focus').trigger('select');
       }
     });
-    $inputs.eq(2).on('click', () => {
+    $buttons.eq(0).on('click', () => {
       this.counter--;
     });
-    $inputs.eq(3).on('click', () => {
+    $buttons.eq(1).on('click', () => {
       this.counter = 0;
     });
-    $inputs.eq(4).on('click', () => {
+    $buttons.eq(2).on('click', () => {
       this.counter++;
     });
 
     const $verw = $('a[href="#tab3"]') as JQuery<TabElement>;
-    $inputs.eq(25).on('click', () => {
+    $inputs.filter('.verw').on('click', () => {
       if (!this.current) return;
       new verwaltungFam(this.current.data);
       this.current = null;
@@ -199,8 +190,8 @@ export class ausgabeFam extends familie {
 
   static clear() {
     super.clear();
-    this.$expired.text('');
     this.$error.text('');
+    this.$warn.text('');
     [this.$anwesend, this.$geldverg, this.$schuldbeg].forEach((el) => {
       el.prop('checked', false);
     });

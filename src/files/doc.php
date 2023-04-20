@@ -92,45 +92,44 @@
             <ul></ul>
           </div>
           <div class="cols2 familie-data w100pm400px-mw800-c">
-            <p style="font-weight: bolder;"><span></span></p>
             <p>
-              <b>Familien-Nummer: <span>0</span></b>
+              <b>Familien-Nummer: <span class="counter">0</span></b>
               <i><button class="fam-count o">-</button><button class="fam-count o">0</button><button class="fam-count o">+</button></i>
             </p>
             <p>
-              <span class="link">Karte drucken</span> &nbsp; <span></span>
+              <span class="link print">Karte drucken</span> &nbsp; <span class="Name"></span>
             </p>
-            <p>Ort: <span></span> | Gruppe: <span></span> | Nummer: <span></span></p>
-            <p>Letzte Anwesenheit: <span></span></p>
-            <p><label>Karte gültig bis: <input type="date" /></label></p>
-            <p>Erwachsene / Kinder: <span></span> / <span></span></p>
-            <p>zu zahlen: <span></span>€</p>
-            <p><label>Schulden: <input type="number" style="width:60px" step="0.01" />€</label></p>
-            <p><label>Notizen:<br /><textarea class="w100p"></textarea></label></p>
+            <p>Ort: <span class="Ort"></span> | Gruppe: <span class="Gruppe"></span> | Nummer: <span class="Num"></span></p>
+            <p>Letzte Anwesenheit: <span class="lAnwesenheit"></span></p>
+            <p><label>Karte gültig bis: <input type="date" class="Karte" /></label></p>
+            <p>Erwachsene / Kinder: <span class="Erwachsene"></span> / <span class="Kinder"></span></p>
+            <p>zu zahlen: <span class="preis"></span>€</p>
+            <p><label>Schulden: <input type="number" style="width:60px" step="0.01" class="Schulden" />€</label></p>
+            <p><label>Notizen:<br /><textarea class="w100p Notizen"></textarea></label></p>
             <p class="no-space">Zusatzinfo:
               <button onclick="var s=this.parentElement.nextElementSibling;s.style.display=s.style.display=='none'?'':'none'">Umschalten</button>
             </p>
             <p style="display:none;" class="info">
-              Adresse:<br /><span ></span><br /><br />
-              Telefonnummer:<br /><span></span>
+              Adresse:<br /><span class="Adresse"></span><br /><br />
+              Telefonnummer:<br /><span class="Telefonnummer"></span>
             </p>
             <br />
             <div class="checkboxes clearfix">
               <div class="cols3">
-                <label><input type="checkbox" /> Anwesend</label>
+                <label><input type="checkbox" class="anwesend" /> Anwesend</label>
               </div>
               <div class="cols3">
-                <label><input type="checkbox" title="Fügt gesamten Preis zu den Schulden hinzu" /> Geld vergessen</label>
+                <label><input type="checkbox" class="geldverg" title="Fügt gesamten Preis zu den Schulden hinzu" /> Geld vergessen</label>
               </div>
               <div class="cols3">
-                <label><input type="checkbox" title="Setzt Schulden auf Null&#xA;&#013;Nur wenn ALLE Schulden bezahlt wurden" /> Schulden beglichen</label>
+                <label><input type="checkbox" class="schuldbeg" title="Setzt Schulden auf Null&#xA;&#013;Nur wenn ALLE Schulden bezahlt wurden" /> Schulden beglichen</label>
               </div>
             </div>
             <br />
             <span class="err-box"></span>
             <span class="warn-box"></span>
             <p>&nbsp;</p>
-            <button class="w100p">Familie bearbeiten</button>
+            <button class="w100p verw">Familie bearbeiten</button>
           </div>
         </div>
       </div>
