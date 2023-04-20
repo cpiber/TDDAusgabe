@@ -125,10 +125,17 @@ ul.tab {
     margin-top: 0;
   }
 
-  .msg-box:not(:empty) {
+  .err-box:not(:empty) {
     display: block;
     border: 2px solid $lightgray;
     background-color: $lightestred;
+    padding: 2px 4px;
+  }
+
+  .warn-box:not(:empty) {
+    display: block;
+    border: 2px solid $lightgray;
+    background-color: $darkerorange;
     padding: 2px 4px;
   }
 

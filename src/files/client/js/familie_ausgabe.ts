@@ -8,7 +8,7 @@ import { clone, formatDate, highlightElement, preis } from "./helpers";
 import { orte } from "./settings";
 
 export class ausgabeFam extends familie {
-  timeout;
+  timeout: number | null = null;
   priotimeout = false;
   preis: number;
   orig_schuld: number;
@@ -23,18 +23,29 @@ export class ausgabeFam extends familie {
   static $geldverg: JQuery<HTMLInputElement>;
   static $schuldbeg: JQuery<HTMLInputElement>;
   static $error: JQuery<HTMLElement>;
+  static $warn: JQuery<HTMLElement>;
   static $verw: JQuery<HTMLElement>;
   static _counter = 0;
   static current: ausgabeFam = null;
   static errors = {
-    money_next: false,
     money_now: false,
     already: false,
+    expired: false,
   };
-  static errorMsg = {
-    money_next: 'Darf nächstes Mal nur noch nach Begleichen der Schulden hinein.',
+  static warnings = {
+    money_next: false,
+    expiration_date_missing: false,
+    expires_soon: false,
+  };
+  static errorMsg: Record<keyof typeof ausgabeFam['errors'], string> = {
     money_now: 'Schulden zu hoch! Muss erst Schulden begleichen!',
     already: 'Hat diese Woche bereits abgeholt!',
+    expired: 'Karte abgelaufen!',
+  };
+  static warnMsg: Record<keyof typeof ausgabeFam['warnings'], string> = {
+    money_next: 'Darf nächstes Mal nur noch nach Begleichen der Schulden hinein.',
+    expiration_date_missing: 'Ablaufdatum eintragen!',
+    expires_soon: 'Karte läuft bald ab!',
   };
   static allow_sb_gv = true;
   static allow_an = true;
@@ -107,7 +118,7 @@ export class ausgabeFam extends familie {
       if (this.checked) {
         ausgabeFam.elems.Schulden.prop('disabled', true);
         if (ausgabeFam.current.preis + (+ausgabeFam.current.data.Schulden) >= ausgabeFam.current.preis * 3) {
-          ausgabeFam.errors.money_next = true;
+          ausgabeFam.warnings.money_next = true;
         }
       } else {
         if (!ausgabeFam.$schuldbeg.prop('checked')) ausgabeFam.elems.Schulden.prop('disabled', false);
@@ -129,7 +140,8 @@ export class ausgabeFam extends familie {
       }
     });
     this.$error = $inputs.eq(23);
-    this.$verw = $inputs.eq(24);
+    this.$warn = $inputs.eq(24);
+    this.$verw = $inputs.eq(25);
     this.$anwesend.add(this.$geldverg).add(this.$schuldbeg).on('click', function () {
       const cur = ausgabeFam.current;
       if (!cur) return;
@@ -160,7 +172,7 @@ export class ausgabeFam extends familie {
         }).css('display', 'inline')
           .appendTo($this)
           .append($input);
-        $input.focus().select();
+        $input.trigger('focus').trigger('select');
       }
     });
     $inputs.eq(2).on('click', () => {
@@ -174,7 +186,7 @@ export class ausgabeFam extends familie {
     });
 
     const $verw = $('a[href="#tab3"]') as JQuery<TabElement>;
-    $inputs.eq(24).on('click', () => {
+    $inputs.eq(25).on('click', () => {
       if (!this.current) return;
       new verwaltungFam(this.current.data);
       this.current = null;
@@ -225,21 +237,6 @@ export class ausgabeFam extends familie {
     ausgabeFam.$geldverg.prop('checked', false);
     ausgabeFam.$schuldbeg.prop('checked', false);
 
-    // Karte abgelaufen
-    if (!this.data.Karte || this.data.Karte === "0000-00-00") {
-      ausgabeFam.$expired.text('Ablaufdatum eingeben!');
-    } else {
-      const expires = new Date(this.data.Karte);
-      const today = new Date();
-      const diff = (today.getTime() - expires.getTime());
-      const days = Math.ceil(diff / (1000 * 3600 * 24));
-      if (days > 0) {
-        ausgabeFam.$expired.text('Karte abgelaufen!');
-      } else {
-        ausgabeFam.$expired.text('');
-      }
-    }
-
     this.errors();
 
     // if (!ausgabeFam.errors.already && !ausgabeFam.errors.money_now && !lToday)
@@ -247,6 +244,20 @@ export class ausgabeFam extends familie {
   }
 
   errors() {
+    // Karte abgelaufen
+    if (!this.data.Karte || this.data.Karte === "0000-00-00") {
+      ausgabeFam.warnings.expiration_date_missing = true;
+      ausgabeFam.errors.expired = ausgabeFam.warnings.expires_soon = false;
+    } else {
+      ausgabeFam.warnings.expiration_date_missing = false;
+      const expires = new Date(this.data.Karte);
+      const today = new Date();
+      const diff = (today.getTime() - expires.getTime());
+      const days = Math.ceil(diff / (1000 * 3600 * 24));
+      ausgabeFam.errors.expired = days > 0;
+      ausgabeFam.warnings.expires_soon = days > -7 && days <= 0;
+    }
+
     const s = +this.data.Schulden;
     const hasS = this.schuld || false;
     let days = 0;
@@ -273,16 +284,16 @@ export class ausgabeFam extends familie {
         ausgabeFam.$anwesend.prop('disabled', true);
         this.schuld = true;
         ausgabeFam.errors.money_now = true;
-        ausgabeFam.errors.money_next = false;
+        ausgabeFam.warnings.money_next = false;
       } else {
         this.schuld = false;
         ausgabeFam.errors.money_now = false;
-        ausgabeFam.errors.money_next = true;
+        ausgabeFam.warnings.money_next = true;
       }
     } else {
       this.schuld = false;
       ausgabeFam.errors.money_now = false;
-      ausgabeFam.errors.money_next = false;
+      ausgabeFam.warnings.money_next = false;
     }
     if (hasS) {
       if (s === 0) {
@@ -304,6 +315,13 @@ export class ausgabeFam extends familie {
         err.push(this.errorMsg[prop]);
     }
     this.$error.empty().html(err.join('<br />'));
+
+    const w = [];
+    for (const prop in this.warnings) {
+      if (this.warnings[prop])
+        w.push(this.warnMsg[prop]);
+    }
+    this.$warn.empty().html(w.join('<br />'));
   }
 
   static disable() {
@@ -331,7 +349,7 @@ export class ausgabeFam extends familie {
       if (!this) return;
       this.timeout = null;
       const elem = $(':focus');
-      this.save().then(() => elem.focus()); // refocus after saving
+      this.save().then(() => elem.trigger('select')); // refocus after saving
     }, 800);
   }
 
