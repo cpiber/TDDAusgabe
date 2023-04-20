@@ -6,7 +6,7 @@ export default function insert() {
   const $hs = $('#tab6 h2, #tab6 h3, #tab6 h4, #tab6 h5, #tab6 h6');
   const $ul = $('<ul>').css('marginTop', 0).css('marginBottom', '2.5em');
 
-  $hs.each(function (i, e) {
+  $hs.each(function (_, e) {
     const $e = $(e);
     let m: string|number = 0, f = '0.85em';
     switch (e.tagName) {
@@ -31,7 +31,7 @@ export default function insert() {
         break;
     }
     const $li = $('<li>').css('marginLeft', m).css('marginRight', m).appendTo($ul);
-    const $a = $('<a>').attr('href', '#').addClass('link').text($e.text())
+    $('<a>').attr('href', '#').addClass('link').text($e.text())
       .css('fontSize', f).data('to', $e).appendTo($li);
   });
 

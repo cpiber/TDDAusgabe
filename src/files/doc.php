@@ -179,19 +179,19 @@
           <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
           <button type="submit">Go</button>
           &nbsp; &nbsp;
-          <button type="button">Monat</button>
+          <button type="button" class="month">Monat</button>
         </p></form>
         <p class="log-info">
-          Einnahmen im angegebenen Bereich: <span></span>€<br />
-          Personen im angegebenen Bereich: <span></span> Erwachsene(r), <span></span> Kind(er) / <span></span> Familie(n)
+          Einnahmen im angegebenen Bereich: <span class="money"></span>€<br />
+          Personen im angegebenen Bereich: <span class="adults"></span> Erwachsene(r), <span class="children"></span> Kind(er) / <span class="families"></span> Familie(n)
         </p>
         <p>&nbsp;</p>
         <h2>Kompletter Log</h2>
         <div class="log"></div>
         <p>
-          Seite <select></select>
+          Seite <select class="page"></select>
           &nbsp; &nbsp;
-          <button type="button">Aktualisieren</button>
+          <button type="button" class="refresh">Aktualisieren</button>
         </p>
       </div>
       <div id="tab5">

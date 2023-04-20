@@ -9,8 +9,8 @@ export default function init() {
 
   const write = (date: Date, index: number) => {
     const str = date.toISOString().replace(/\.[0-9]{3}Z/, "");
-    $inp.eq(index).val(str.substr(0, 10));
-    $inp.eq(index + 1).val(str.substr(11, 5));
+    $inp.eq(index).val(str.substring(0, 10));
+    $inp.eq(index + 1).val(str.substring(11, 11+5));
   }
   const writeDefault = () => {
     let d = new Date();
@@ -24,9 +24,9 @@ export default function init() {
 
   writeDefault();
   $inp.eq(0).on('submit', info);
-  $inp.eq(6).on('click', () => { writeDefault(); info(); });
-  $inp.eq(7).on('change', logs);
-  $inp.eq(8).on('click', logs);
+  $inp.filter('.month').on('click', () => { writeDefault(); info(); });
+  $inp.filter('.page').on('change', logs);
+  $inp.filter('.refresh').on('click', logs);
 
   return { info, logs };
 }
@@ -40,10 +40,10 @@ function updateInfo($inp: JQuery<HTMLElement>, $info: JQuery<HTMLElement>) {
     end: end
   }).then((data: apiData) => {
     const m = +(data.data.money);
-    $info.eq(0).text((isNaN(m) ? 0 : m).toFixed(2));
-    $info.eq(1).text(+data.data.adults);
-    $info.eq(2).text(+data.data.children);
-    $info.eq(3).text(+data.data.families);
+    $info.filter('.money').text((isNaN(m) ? 0 : m).toFixed(2));
+    $info.filter('.adults').text(+data.data.adults);
+    $info.filter('.children').text(+data.data.children);
+    $info.filter('.families').text(+data.data.families);
   });
 
   return false;
