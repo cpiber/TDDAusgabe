@@ -232,7 +232,6 @@ function page_backupload() {
   echo "<!DOCTYPE html><html>\n<head>\n<title>Tischlein Deck Dich</title><meta charset=\"UTF-8\">\n";
   echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
   echo "<link href=\"?file=css\" rel=\"stylesheet\" />";
-  // echo "<style>table { max-width: 100%; } table th { font-weight: bold; } html, body { margin: 0; } p { font-size: 15px; } .header { font-size: 32px; color: #ffffff; height: 100px; width: 100%; background-color: #f85e3d; margin: 8px 0; display: table; } .header > div { display: table-cell; vertical-align: middle; padding: 15px 25px; } div.body { margin: 4px; } .msg { margin: 0 10px; padding: 4px 6px; border: 1px solid gray; border-radius: 2px; } .msg.msg-ok { background-color: lightgreen; } .msg.msg-error { background-color: red; }</style>\n";
   echo "</head>\n<body>\n";
   echo "<div id=\"header\" class=\"header\"><div><span><a href=\"\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
   echo "<div class=\"body\">";
@@ -260,7 +259,7 @@ function page_backupload() {
   echo "<p><label title=\"Zeichen zwischen Spalten. Für Excel-Export ;\">CSV-Trennzeichen: <input type=\"text\" name=\"delimiter\" placeholder=\",\" size=\"1\" /></label><br /><label>Datei: <input type=\"file\" name=\"file\" /></label></p>\n";
   echo "<p><input type=\"submit\" value=\"Backup laden\" /></p>\n";
   if ( $table === 'familien' ) echo "<p><b>Achtung:</b> Orte müssen bereits in der Datenbank sein. Unbekannte Orte werden auf 'Unbekannt' gesetzt.</p>";
-  echo "<p>Info: Wenn ID angewählt ist, werden existierende Einträge mit der selben ID aktualisiert. Es wird nichts unternommen, sollte die ID nicht existieren.</p>";
+  echo "<p>Info: Wenn ID angewählt ist, werden existierende Einträge mit der selben ID aktualisiert. In dem Fall wird nichts unternommen, sollte die ID nicht existieren.</p>";
   echo "</form>\n";
   echo "<script>window.onload = function(){var boxes = document.getElementsByTagName('input'); document.getElementById('toggle_all').addEventListener('click', function() {for (var i = 0; i < boxes.length; i++) {if (boxes[i].type == 'checkbox') {boxes[i].checked = this.checked;}}});};</script>";
   echo "</div></body>\n</html>";
