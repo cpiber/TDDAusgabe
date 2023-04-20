@@ -113,7 +113,6 @@ export function close_modal(modal: JQuery<HTMLElement>) {
 // calculate price
 export function sandboxFn(fn: string, closure?: Parameters<typeof Object.defineProperties>[1]) {
   const code = `with (sandbox) {${fn}}`;
-  console.log(code);
   const func = new Function('sandbox', code);
   const ctx = Object.create(null);
   Object.defineProperties(ctx, closure);

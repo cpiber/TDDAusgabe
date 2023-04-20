@@ -9,7 +9,7 @@ import { orte } from "./settings";
 export class verwaltungFam extends familie {
   newFam = false;
 
-  static elems: famelems = clone(fam);
+  static elems: Required<famelems> = clone(fam);
   static $button_save: JQuery<HTMLInputElement>;
   static $button_delete: JQuery<HTMLInputElement>;
   static current: verwaltungFam = null;
@@ -32,19 +32,20 @@ export class verwaltungFam extends familie {
     }
     this.show();
     if (this.newFam)
-      verwaltungFam.elems.Ort.val(orte[0].ID || 0).change();
+      verwaltungFam.elems.Ort.val(orte[0].ID || 0).trigger('change');
     verwaltungFam.enable();
   }
 
   static linkHtml($card: JQuery<HTMLElement>) {
     const $inputs = $('#tab3 .familie-data :input, #tab3 .familie-data span') as JQuery<HTMLInputElement>;
-    $inputs.eq(0).on('click', () => {
+    $inputs.filter('.print').on('click', () => {
       if (!verwaltungFam.current) return;
       verwaltungFam.current.print();
     });
-    this.elems.ID = $inputs.eq(1);
-    this.elems.Name = $inputs.eq(2);
-    this.elems.Ort = $inputs.eq(3).on('change', () => {
+    for (const prop in this.elems) {
+      this.elems[prop] = $inputs.filter(`.${prop}`);
+    }
+    this.elems.Ort.on('change', () => {
       const cur = this.current;
       if (!cur) return;
       if (!this.elems.Ort.val()) return;
@@ -56,7 +57,7 @@ export class verwaltungFam extends familie {
       this.elems.Gruppe.val(0);
       this.elems.Num.val(0);
     });
-    this.elems.Gruppe = $inputs.eq(4).on('change', () => {
+    this.elems.Gruppe.on('change', () => {
       const cur = this.current;
       if (!cur) return;
       if (cur.data.Gruppe == this.elems.Gruppe.val()) return;
@@ -64,20 +65,11 @@ export class verwaltungFam extends familie {
       cur.dirty.Num = true;
       this.elems.Num.val(0);
     });
-    this.elems.Num = $inputs.eq(5);
-    this.elems.Erwachsene = $inputs.eq(6);
-    this.elems.Kinder = $inputs.eq(7);
-    this.elems.lAnwesenheit = $inputs.eq(8);
-    this.elems.Karte = $inputs.eq(9);
-    this.elems.Schulden = $inputs.eq(10);
-    this.elems.Notizen = $inputs.eq(11);
-    this.elems.Adresse = $inputs.eq(12);
-    this.elems.Telefonnummer = $inputs.eq(13);
-    this.$button_save = $inputs.eq(14).on('click', () => {
+    this.$button_save = $inputs.filter('.save').on('click', () => {
       if (!this.current) return;
       this.current.save();
     });
-    this.$button_delete = $inputs.eq(15).on('click', () => {
+    this.$button_delete = $inputs.filter('.delete').on('click', () => {
       if (!this.current) return;
       this.current.delete();
     });
@@ -105,7 +97,7 @@ export class verwaltungFam extends familie {
   show() {
     super.show(verwaltungFam);
 
-    verwaltungFam.elems.Ort.change();
+    verwaltungFam.elems.Ort.trigger('change');
     timeout().then(() => verwaltungFam.elems.Gruppe.val(this.data.Gruppe));
   }
 
@@ -168,7 +160,7 @@ export class verwaltungFam extends familie {
     verwaltungFam.disable();
     request('familie/delete', 'Fehler beim Löschen', {
       ID: this.data.ID
-    }).then((data: any) => {
+    }).then(() => {
       verwaltungFam.clear();
       verwaltungFam.current = null;
       verwaltungFam.search();

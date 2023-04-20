@@ -152,23 +152,23 @@
           </div>
           <div class="cols2 familie-data w100pm400px-mw800-c">
             <p>
-              <span class="link">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span></span>
+              <span class="link print">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span class="ID"></span>
             </p>
-            <p><label>Name:<br /><input class="w100p" type="text" placeholder="Name" /></label></p>
-            <p><label>Ort: <select></select></label></p>
-            <p><label>Gruppe: <select></select></label></p>
-            <p><label title="0 für auto">Nummer: <input type="number" style="width:60px;" /></label></p>
-            <p><label>Erwachsene: <input type="number" style="width:60px;" /></label></p>
-            <p><label>Kinder: <input type="number" style="width:60px;" /></label></p>
-            <p><label>Letzte Anwesenkeit: <input type="date" /></label></p>
-            <p><label>Ablaufdatum Karte: <input type="date" /></label></p>
-            <p><label>Schulden: <input type="number" style="width:60px;" step="0.01" />€</label></p>
-            <p><label>Notizen:<br /><textarea class="w100p"></textarea></label></p>
-            <p><label>Adresse:<br /><textarea class="w100p"></textarea></label></p>
-            <p><label>Telefonnummer:<br /><input class="w100p" type="text" placeholder="Telefon" /></label></p>
+            <p><label>Name:<br /><input class="w100p Name" type="text" placeholder="Name" /></label></p>
+            <p><label>Ort: <select class="Ort"></select></label></p>
+            <p><label>Gruppe: <select class="Gruppe"></select></label></p>
+            <p><label title="0 für auto">Nummer: <input type="number" style="width:60px;" class="Num" /></label></p>
+            <p><label>Erwachsene: <input type="number" style="width:60px;" class="Erwachsene" /></label></p>
+            <p><label>Kinder: <input type="number" style="width:60px;" class="Kinder" /></label></p>
+            <p><label>Letzte Anwesenkeit: <input type="date" class="lAnwesenheit" /></label></p>
+            <p><label>Ablaufdatum Karte: <input type="date" class="Karte" /></label></p>
+            <p><label>Schulden: <input type="number" style="width:60px;" step="0.01" class="Schulden" />€</label></p>
+            <p><label>Notizen:<br /><textarea class="w100p Notizen"></textarea></label></p>
+            <p><label>Adresse:<br /><textarea class="w100p Adresse"></textarea></label></p>
+            <p><label>Telefonnummer:<br /><input class="w100p Telefonnummer" type="text" placeholder="Telefon" /></label></p>
             <br />
-            <p><button class="w100p" data-save="Speichern" data-create="Anlegen"></button></p>
-            <p><button class="w100p">Löschen</button></p>
+            <p><button class="w100p save" data-save="Speichern" data-create="Anlegen"></button></p>
+            <p><button class="w100p delete">Löschen</button></p>
           </div>
         </div>
       </div>
