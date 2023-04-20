@@ -8,8 +8,9 @@ interface design {
 
 interface designelement {
   html: string,
-  position?: string,
+  position?: number[],
   css?: string,
+  size?: number[],
 }
 
 export interface familie extends famdata {
@@ -117,6 +118,9 @@ function changeDesign(canvas: HTMLCanvasElement) {
       }
       if (element.position && element.position.length === 2) {
         style += `;position:absolute;top:${+element.position[0] * pxConst}px;left:${+element.position[1] * pxConst}px`;
+      }
+      if (element.size && element.size.length === 2) {
+        style += `;width:${+element.size[0] * pxConst}px;height:${+element.size[1] * pxConst}px`;
       }
       div.setAttribute('style', style);
       
