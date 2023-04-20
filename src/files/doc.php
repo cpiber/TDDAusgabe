@@ -17,7 +17,7 @@
 
   <p class="header-bar">
     <a class="button no-active" href="?page=print" target="_blank">Druckversion</a>
-    <a class="button no-active" href="?login">Log Out</a>
+    <a class="button no-active" href="?login">Abmelden</a>
   </p>
   <img id="barcode" style="display:none" />
 
@@ -65,7 +65,7 @@
           </div>
         </div>
         <div class="clear"></div>
-        <p style="text-align: right;">2018-2020 by Constantin, Version <?php echo VERSION; ?><br />
+        <p style="text-align: right;">2018-2023 by Constantin, Version <?php echo VERSION; ?><br />
           <a href="https://github.com/cpiber/TDDAusgabe" target="_blank">Github</a></p>
       </div>
       <div id="tab2">
