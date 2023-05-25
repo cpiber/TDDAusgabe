@@ -50,8 +50,10 @@ if ( $ver < DB_VER ) {
     // add fam num column
     try {
       // update tables
+      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Num int;" );
       $conn->exec( "ALTER TABLE `einstellungen` ADD UNIQUE(`Name`);" );
+      $conn->commit();
 
       $ver = 2;
 
@@ -67,8 +69,10 @@ if ( $ver < DB_VER ) {
     // add address and telephone column
     try {
       // update tables
+      $conn->beginTransaction();
       $conn->exec( "ALTER TABLE `familien` ADD Adresse varchar(255);" );
       $conn->exec( "ALTER TABLE `familien` ADD Telefonnummer varchar(255);" );
+      $conn->commit();
 
       $ver = 3;
 
@@ -84,9 +88,11 @@ if ( $ver < DB_VER ) {
     // originally added in version 2, then 3, now moved here and altered (and reverted) to new requirements
     try {
       // prodecure for resetting nums
+      $conn->beginTransaction();
       $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
       $conn->exec( $proc_resetFamNum );
       if ( !isset( $_GET['norenumber'] ) ) $conn->exec( "CALL resetFamNum();" );
+      $conn->commit();
 
       $ver = 5;
 
@@ -245,8 +251,10 @@ if ( $ver < DB_VER ) {
 
   if ( $ver == 7 ) {
     try {
+      $conn->beginTransaction();
       $conn->exec( "UPDATE `familien` SET `Adresse` = REPLACE(REPLACE(REPLACE(`Adresse`, '%0A', '\n'), '%0D', '\r'), '%09', '\t')" );
       $conn->exec( "UPDATE `einstellungen` SET `Val` = REPLACE(REPLACE(REPLACE(`Val`, '%0A', '\n'), '%0D', '\r'), '%09', '\t')" );
+      $conn->commit();
 
       $ver = 8;
 
