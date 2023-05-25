@@ -16,6 +16,10 @@ interface designelement {
 export interface familie extends famdata {
   Ortname?: string,
   Preis?: number,
+  ProfilBild1?: string,
+  ProfilBild2?: string,
+  ProfilBildSrc1?: string,
+  ProfilBildSrc2?: string,
   img?: string,
   isrc?: string,
 }

@@ -108,6 +108,10 @@ export class familie {
       ...this.data,
       Ortname: ortname,
       Preis: preis(this.data.Erwachsene, this.data.Kinder),
+      ProfilBildSrc1: getImageUrl(this.data.ProfilePic),
+      ProfilBildSrc2: getImageUrl(this.data.ProfilePic2),
+      ProfilBild1: `<img src="${getImageUrl(this.data.ProfilePic)}" />`,
+      ProfilBild2: `<img src="${getImageUrl(this.data.ProfilePic2)}" />`,
       img: `<img src="${this.barcode}" />`,
       isrc: this.barcode,
     };

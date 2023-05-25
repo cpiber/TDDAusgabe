@@ -298,8 +298,28 @@ if ( $ver < DB_VER ) {
 
   if ( $ver == 9 ) {
     try {
-      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `ProfilePic` varchar(255) NOT NULL DEFAULT '', ADD COLUMN `ProfilePic2` varchar(255) NOT NULL DEFAULT ''" );
+      $conn->beginTransaction();
 
+      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `ProfilePic` varchar(255) NOT NULL DEFAULT '', ADD COLUMN `ProfilePic2` varchar(255) NOT NULL DEFAULT ''" );
+      $stmt = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'Kartendesigns'" );
+      $designs = $stmt->fetchColumn();
+      $designs = json_decode( $designs, true );
+      array_pop($designs);
+      $designs[] = array(
+        "name" => "Visitenkarte 2 - Vollständig",
+		    "format" => "54x86",
+		    "elements" => array(
+          array( "html" => "<p style=\"font-weight:500; text-align: right; width: 150px; font-size: 1.8em; line-height: 1; margin: 0\">\$Name</p>", "position" => array( 2.1, 41.1 ) ),
+          array( "html" => "<p style=\"font-weight:bold; text-align: right; width: 150px; font-size: 3em; margin: 0\">\$Erwachsene/\$Kinder</p>", "position" => array( 23.9, 41.1 ) ),
+          array( "html" => "<p style=\"text-align: right; width: 100px; font-size: 1.5em; margin: 0\">\$Num</p>", "position" => array( 41,30.9 ) ),
+          array( "html" => "\$img", "position" => array( 41,58.4 ) ),
+          array( "html" => "<img src=\"\$ProfilBildSrc1\" style=\"object-fit: cover; width: 100%; height: 100%;\" />", "position" => array( 0,0 ), "size" => array( 40, 54 ) ),
+        ),
+      );
+      $stmt = $conn->prepare( "UPDATE `einstellungen` SET `Val` = :designs WHERE `Name` = 'Kartendesigns'" );
+      $stmt->execute(array(":designs" => json_encode( $designs, JSON_PRETTY_PRINT )));
+      
+      $conn->commit();
       $ver = 10;
 
     } catch ( PDOException $e ) {
