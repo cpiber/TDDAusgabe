@@ -93,6 +93,9 @@ export class verwaltungFam extends familie {
           this.current.dirty[prop] = true;
           this.elems[prop].attr('src', getImageUrl(this.current.data[prop]));
           this.enable();
+        })
+        .catch(() => {
+          this.enable();
         });
     };
     this.$button_updateProf1 = $inputs.filter('.update[data-ref="ProfilePic"]').on('click', () => {
@@ -221,6 +224,8 @@ class ProfilePictureHelper {
     const dfd = $.Deferred();
 
     open_modal(this.$modal);
+    const close = () => dfd.reject('close');
+    this.$modal.one('close', close);
     
     this.setStream().catch(err => dfd.reject(err));
     navigator.mediaDevices.removeEventListener('devicechange', this.setStream);
@@ -236,6 +241,7 @@ class ProfilePictureHelper {
     };
     this.$video.one('canplay', handleStartStream);
     dfd.then(() => {
+      this.$modal.off('close', close);
       close_modal(this.$modal);
       this.stopBothVideoAndAudio(this.$video.get(0).srcObject as MediaStream);
       this.$video.get(0).srcObject = null;

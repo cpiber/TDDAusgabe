@@ -298,7 +298,7 @@ if ( $ver < DB_VER ) {
 
   if ( $ver == 9 ) {
     try {
-      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `ProfilePic` varchar(255) NULL DEFAULT NULL, ADD COLUMN `ProfilePic2` varchar(255) NULL DEFAULT NULL" );
+      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `ProfilePic` varchar(255) NOT NULL DEFAULT '', ADD COLUMN `ProfilePic2` varchar(255) NOT NULL DEFAULT ''" );
 
       $ver = 10;
 

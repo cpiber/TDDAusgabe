@@ -107,6 +107,7 @@ export function close_modal(modal: JQuery<HTMLElement>) {
   }
   document.body.style.overflow = "";
   modal.hide().data('open', false);
+  modal.trigger('close');
 }
 
 
