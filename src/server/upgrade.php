@@ -295,6 +295,18 @@ if ( $ver < DB_VER ) {
       $error = true;
     }
   }
+
+  if ( $ver == 9 ) {
+    try {
+      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `ProfilePic` varchar(255) NULL DEFAULT NULL, ADD COLUMN `ProfilePic2` varchar(255) NULL DEFAULT NULL" );
+
+      $ver = 10;
+
+    } catch ( PDOException $e ) {
+      upgrade_error( 10, $e );
+      $error = true;
+    }
+  }
   
   if ($error) exit;
 

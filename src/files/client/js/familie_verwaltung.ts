@@ -12,6 +12,8 @@ export class verwaltungFam extends familie {
   static elems: Required<famelems> = clone(fam);
   static $button_save: JQuery<HTMLInputElement>;
   static $button_delete: JQuery<HTMLInputElement>;
+  static $button_updateProf1: JQuery<HTMLInputElement>;
+  static $button_updateProf2: JQuery<HTMLInputElement>;
   static current: verwaltungFam = null;
   static search: () => void = null;
 
@@ -37,7 +39,7 @@ export class verwaltungFam extends familie {
   }
 
   static linkHtml($card: JQuery<HTMLElement>) {
-    const $inputs = $('#tab3 .familie-data :input, #tab3 .familie-data span') as JQuery<HTMLInputElement>;
+    const $inputs = $('#tab3 .familie-data :input, #tab3 .familie-data span, #tab3 .profile-pics img') as JQuery<HTMLInputElement>;
     $inputs.filter('.print').on('click', () => {
       if (!verwaltungFam.current) return;
       verwaltungFam.current.print();
@@ -79,6 +81,9 @@ export class verwaltungFam extends familie {
       new verwaltungFam();
     });
 
+    this.$button_updateProf1 = $inputs.filter('.update[data-ref="ProfilePic"]');
+    this.$button_updateProf2 = $inputs.filter('.update[data-ref="ProfilePic2"]');
+
     super.linkHtml($card);
   }
 
@@ -103,14 +108,14 @@ export class verwaltungFam extends familie {
 
   static disable() {
     super.disable();
-    [this.$button_save, this.$button_delete].forEach((el) => {
+    [this.$button_save, this.$button_delete, this.$button_updateProf1, this.$button_updateProf2].forEach((el) => {
       el.prop('disabled', true);
     });
   }
 
   static enable() {
     super.enable();
-    [this.$button_save, this.$button_delete].forEach((el) => {
+    [this.$button_save, this.$button_delete, this.$button_updateProf1, this.$button_updateProf2].forEach((el) => {
       el.prop('disabled', false);
     });
   }

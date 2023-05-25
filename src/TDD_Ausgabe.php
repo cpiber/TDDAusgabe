@@ -11,8 +11,9 @@ if ( DEBUG ) {
 
 $servername = "localhost";
 
-define( 'VERSION', '2.0.6' );
-define( 'DB_VER', 9 );
+define( 'VERSION', '2.0.6-preview' );
+define( 'DB_VER', 10 );
+define( 'STATIC_DIR', __DIR__ . '/static' );
 
 
 

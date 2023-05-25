@@ -66,7 +66,7 @@ export class ausgabeFam extends familie {
   }
 
   static linkHtml($card: JQuery<HTMLElement>) {
-    const $inputs = $('#tab2 .familie-data :input, #tab2 .familie-data span') as JQuery<HTMLInputElement>;
+    const $inputs = $('#tab2 .familie-data :input, #tab2 .familie-data span, #tab2 .profile-pics img') as JQuery<HTMLInputElement>;
     $inputs.filter('.print').on('click', () => {
       if (!ausgabeFam.current) return;
       ausgabeFam.current.print();

@@ -13,6 +13,8 @@ export interface famdata {
   Num?: number;
   Adresse?: string;
   Telefonnummer?: string;
+  ProfilePic?: string;
+  ProfilePic2?: string;
 }
 
 export interface famdirty {
@@ -29,6 +31,8 @@ export interface famdirty {
   Num?: boolean;
   Adresse?: boolean;
   Telefonnummer?: boolean;
+  ProfilePic?: boolean;
+  ProfilePic2?: boolean;
 }
 
 export interface famelems {
@@ -45,6 +49,8 @@ export interface famelems {
   Num?: JQuery<HTMLInputElement>;
   Adresse?: JQuery<HTMLInputElement>;
   Telefonnummer?: JQuery<HTMLInputElement>;
+  ProfilePic?: JQuery<HTMLImageElement>;
+  ProfilePic2?: JQuery<HTMLImageElement>;
 }
 
 const fam: famelems = {
@@ -61,5 +67,7 @@ const fam: famelems = {
   Num: null,
   Adresse: null,
   Telefonnummer: null,
+  ProfilePic: null,
+  ProfilePic2: null,
 }
 export { fam };

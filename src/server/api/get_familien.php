@@ -3,7 +3,7 @@
 function parse_searchstring($string) {
   $string = trim( $string );
   
-  $matches;
+  $matches = null;
   // https://stackoverflow.com/a/366239/
   if ( !preg_match_all( "/(!?=?)(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\2|([^\\s]+))/", $string, $matches, PREG_SET_ORDER ) )
     return false;
@@ -89,7 +89,6 @@ function api_getfam($msg) {
         'Adresse' => true,
         'Telefonnummer' => true,
       );
-      $searchparts = array();
       $m = parse_searchstring( $search );
       if ( $m !== false )
         $parts[] = parse_searchmatches( $m, $data, $cols );
@@ -105,7 +104,7 @@ function api_getfam($msg) {
     if ( !isset( $search ) ) {
       $sql = "SELECT * FROM `familien` WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
     } else {
-      $sql = "SELECT f.ID AS ID, f.Name AS Name, Erwachsene, Kinder, Ort, Gruppe, Schulden, Karte, lAnwesenheit, Notizen, Num, Adresse, Telefonnummer FROM `familien` AS f LEFT JOIN `orte` AS o ON (f.Ort = o.ID) WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, f.`ID`";
+      $sql = "SELECT f.ID AS ID, f.Name AS Name, Erwachsene, Kinder, Ort, Gruppe, Schulden, Karte, lAnwesenheit, Notizen, Num, Adresse, Telefonnummer, ProfilePic, ProfilePic2 FROM `familien` AS f LEFT JOIN `orte` AS o ON (f.Ort = o.ID) WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, f.`ID`";
     }
 
     if ( !$single && $pagesize != -1 ) {
@@ -116,7 +115,7 @@ function api_getfam($msg) {
       }
       $pagesstmt->setFetchMode( PDO::FETCH_ASSOC );
       $pagesstmt->execute( $data );
-      $msg['pages'] = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
+      $msg['pages'] = $pages = ceil( intval( $pagesstmt->fetch()['cnt'] ) / $pagesize );
 
       if ( $page < 0 ) $page = $pages + 1 + $page;
       $offset = ( $page - 1 ) * $pagesize;

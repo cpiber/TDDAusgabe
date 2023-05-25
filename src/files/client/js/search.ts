@@ -69,7 +69,7 @@ function search(list: famlist, $list: JQuery<HTMLElement>, $inputs: JQuery<HTMLE
   }
   const req = () => {
     request('familie', 'Suche fehlgeschlagen', data).then((data: apiData | { data: famdata[], pages: number }) => {
-      if (data.data.constructor.name !== "Array") {
+      if (!Array.isArray(data.data)) {
         data.data = [data.data]; // single fam
       }
 

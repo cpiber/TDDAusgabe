@@ -1,9 +1,14 @@
 
 import values from 'object.values';
+import isArray from 'core-js-pure/actual/array/is-array'
 
 export default function polyfills() {
   if (!Object.values) {
     values.shim();
+  }
+
+  if (!Array.isArray) {
+    Array.isArray = isArray;
   }
   
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign

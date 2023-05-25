@@ -91,7 +91,7 @@
           <div class="cols2 select-list">
             <ul></ul>
           </div>
-          <div class="cols2 familie-data w100pm400px-mw800-c">
+          <div class="cols4 familie-data w100pm400px-mw800-c">
             <p class="count-manage">
               <b>Familien-Nummer: <span class="counter">0</span></b>
               <i><button class="fam-count o">-</button><button class="fam-count o">0</button><button class="fam-count o">+</button></i>
@@ -132,6 +132,10 @@
             <p>&nbsp;</p>
             <button class="w100p verw">Familie bearbeiten</button>
           </div>
+          <div class="cols4 profile-pics">
+            <img class="profile-pic w100pm400px-mw800 ProfilePic" />
+            <img class="profile-pic w100pm400px-mw800 ProfilePic2" />
+          </div>
         </div>
       </div>
       <div id="tab3">
@@ -151,7 +155,7 @@
               <button class="button-add">+</button>
             </div>
           </div>
-          <div class="cols2 familie-data w100pm400px-mw800-c">
+          <div class="cols4 familie-data w100pm400px-mw800-c">
             <p>
               <span class="link print">Karte drucken</span> &nbsp;&nbsp;&nbsp; ID: <span class="ID"></span>
             </p>
@@ -170,6 +174,12 @@
             <br />
             <p><button class="w100p save" data-save="Speichern" data-create="Anlegen"></button></p>
             <p><button class="w100p delete">Löschen</button></p>
+          </div>
+          <div class="cols4 profile-pics">
+            <img class="profile-pic w100pm400px-mw800 ProfilePic" />
+            <button class="w100pm400px-mw800 update" data-ref="ProfilePic">Photo aktualisieren</button>
+            <img class="profile-pic w100pm400px-mw800 ProfilePic2" />
+            <button class="w100pm400px-mw800 update" data-ref="ProfilePic2">Photo 2 aktualisieren</button>
           </div>
         </div>
       </div>

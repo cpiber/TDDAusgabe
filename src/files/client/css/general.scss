@@ -134,14 +134,6 @@ button {
   }
 }
 
-// input:not([type="checkbox"]), button, select {
-//   height: 22px;
-//   min-width: 22px;
-//   padding: 2px 3px;
-//   margin: 0;
-//   box-sizing: border-box;
-// }
-
 .help {
   font-size: 70%;
   margin: 0;
@@ -207,4 +199,8 @@ input[type="checkbox"] {
   &:disabled {
     opacity: 0.5;
   }
+}
+
+.profile-pics img {
+  height: auto;
 }

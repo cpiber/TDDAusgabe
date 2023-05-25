@@ -190,6 +190,7 @@ ul.tab {
   #tab-head {
     float: left;
     max-width: 30%;
+    max-width: calc( min( 30%, 270px ) );
     position: relative;
     z-index: 1;
   }

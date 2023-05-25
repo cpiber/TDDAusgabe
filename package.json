@@ -20,6 +20,7 @@
     "@rollup/plugin-typescript": "^11.1.0",
     "@types/jquery": "^3.5.16",
     "concurrently": "^8.0.1",
+    "core-js-pure": "^3.30.2",
     "jquery": "^3.6.4",
     "jsbarcode": "^3.11.5",
     "object.values": "^1.1.6",

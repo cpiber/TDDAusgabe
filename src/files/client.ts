@@ -54,7 +54,7 @@ export interface TabElement extends HTMLAnchorElement {
 // load window
 jQuery(($) => {
   $('button, [type="button"]').on('mouseup', function () {
-    $(this).blur(); // remove focus
+    $(this).trigger('blur'); // remove focus
   });
 
   // init tabs
@@ -74,19 +74,6 @@ jQuery(($) => {
     $link.addClass('selected');
     $link.get(0).onOpen();
     $current_tab = $link;
-
-    // if (c.getAttribute('href') == '#tab2' && typeof (selected_fam) !== "undefined") {
-    //   selected_fam.save();
-    // }
-    // if (c.getAttribute('href') == '#tab5') { getOrte(); }
-    // location.href = h;
-
-    // if (h == '#tab2') {
-    //   if (typeof (tdd_orte) !== "undefined") { gruppeChange(); }
-    // }
-    // if (h == '#tab3') { searchV(searchFamV); }
-    // if (h == '#tab4') { var p = jQuery('#log-pagination').val(); getLogs(p); }
-    // if (h == '#tab5') { getOrte(); }
   };
 
   const tabLinks = $tabHs.find('a') as JQuery<TabElement>
@@ -97,9 +84,9 @@ jQuery(($) => {
 
   // Ausgabe + Verwaltung Tabs
   const $card = $('#card-modal');
-  const $cardframe = $card.find('.card-frame') as JQuery<HTMLIFrameElement>;
+  const $cardframe = $card.find<HTMLIFrameElement>('.card-frame');
 
-  const $os_select = $('#tab2 .search-header select, #tab3 .familie-data select') as JQuery<HTMLSelectElement>;
+  const $os_select = $<HTMLSelectElement>('#tab2 .search-header select, #tab3 .familie-data select');
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
 
   const loadOrte = ortGenerate($os_select);

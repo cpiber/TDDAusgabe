@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { cardWindow, familie as cardFam } from '../../card';
 import { JsBarcode } from '../../client';
-import request, { apiData } from './api';
+import request, { apiData, getImageUrl } from './api';
 import { fam, famdata, famdirty, famelems } from './familie_interfaces';
 import { numPad, open_modal, preis } from './helpers';
 import { orte } from './settings';
@@ -77,6 +77,8 @@ export class familie {
         el.text(val);
       }
     }
+    cls.elems.ProfilePic.attr('src', getImageUrl(this.data.ProfilePic));
+    cls.elems.ProfilePic2.attr('src', getImageUrl(this.data.ProfilePic2));
   }
 
   generateBarcode() {

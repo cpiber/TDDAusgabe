@@ -50,6 +50,11 @@ function _request(url: string, errorText: string, data_in: { [key: string]: any 
     });
 }
 
+export function getImageUrl(image: string): string {
+  if (!image) return '';
+  return '?' + $.param({ api: 'familie/profile', image });
+}
+
 let modal: JQuery<HTMLElement>;
 let loginpromise: JQuery.Deferred<never, never, never>;
 function login(url: string, errorText: string, data: { [key: string]: any }): apiRequest {

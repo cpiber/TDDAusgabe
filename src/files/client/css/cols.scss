@@ -1,4 +1,4 @@
-.cols2, .cols3 {
+.cols2, .cols3, .cols4 {
   overflow: auto;
 
   * {
@@ -49,6 +49,23 @@
       margin-right: unset;
     }
     &:not(:nth-child(3n+0)) {
+      margin-right: 15px;
+    }
+  }
+}
+
+.cols4 {
+  @media only screen and (min-width: 1460px) {
+    width: 20%; /* Support for older browser */
+    width: calc( 25% - 15px * 4 / 3 );
+      
+    &:not(:first-child):not(:nth-child(2)) {
+      margin-top: 1em;
+    }
+    &:nth-child(2n+1) {
+      margin-right: unset;
+    }
+    &:not(:nth-child(2n+0)) {
       margin-right: 15px;
     }
   }
