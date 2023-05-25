@@ -92,4 +92,10 @@
       box-sizing: border-box;
     }
   }
+
+  .camera * {
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
 }

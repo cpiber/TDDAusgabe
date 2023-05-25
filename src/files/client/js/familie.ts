@@ -31,7 +31,7 @@ export class familie {
     this.generateBarcode();
   }
 
-  static linkHtml($card: JQuery<HTMLElement>) {
+  static linkHtml($card: JQuery<HTMLElement>, $profile: JQuery<HTMLElement>) {
     familie.barcode = $('#barcode').get(0) as HTMLImageElement;
     familie.frame = $card.find('.card-frame').get(0) as HTMLIFrameElement;
     familie.$card = $card;
@@ -62,6 +62,8 @@ export class familie {
       }
     }
     this.disable();
+    this.elems.ProfilePic.attr('src', '');
+    this.elems.ProfilePic2.attr('src', '');
   }
 
   show(cls: typeof familie) {

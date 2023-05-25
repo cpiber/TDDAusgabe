@@ -15,6 +15,8 @@ $fam_data = array(
   'Num' => false,
   'Adresse' => true,
   'Telefonnummer' => true,
+  'ProfilePic' => true,
+  'ProfilePic2' => true,
 );
 
 function fields($fields, &$data, $insert=true) {
@@ -74,7 +76,7 @@ if ( array_key_exists( 'api', $_GET ) ) {
       api_deletefam($msg);
       break;
     case "familie/profile":
-      api_getfampicture();
+      api_getfampicture($msg);
       break;
     
     case "ort":

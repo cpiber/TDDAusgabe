@@ -65,7 +65,7 @@ export class ausgabeFam extends familie {
     ausgabeFam.enable();
   }
 
-  static linkHtml($card: JQuery<HTMLElement>) {
+  static linkHtml($card: JQuery<HTMLElement>, $profile: JQuery<HTMLElement>) {
     const $inputs = $('#tab2 .familie-data :input, #tab2 .familie-data span, #tab2 .profile-pics img') as JQuery<HTMLInputElement>;
     $inputs.filter('.print').on('click', () => {
       if (!ausgabeFam.current) return;
@@ -187,7 +187,7 @@ export class ausgabeFam extends familie {
       this.clear();
     });
 
-    super.linkHtml($card);
+    super.linkHtml($card, $profile);
   }
 
   static clear() {

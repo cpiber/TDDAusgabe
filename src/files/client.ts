@@ -85,6 +85,7 @@ jQuery(($) => {
   // Ausgabe + Verwaltung Tabs
   const $card = $('#card-modal');
   const $cardframe = $card.find<HTMLIFrameElement>('.card-frame');
+  const $profile = $('#profile-modal');
 
   const $os_select = $<HTMLSelectElement>('#tab2 .search-header select, #tab3 .familie-data select');
   const $forms = $('#tab2 .search-header form, #tab2 .select-list ul, #tab3 .search-header form, #tab3 .select-list ul');
@@ -95,9 +96,9 @@ jQuery(($) => {
   tabLinks.get(2).onOpen = verwSearch;
 
   // load forms and reset
-  ausgabeFam.linkHtml($card);
+  ausgabeFam.linkHtml($card, $profile);
   ausgabeFam.clear();
-  verwaltungFam.linkHtml($card);
+  verwaltungFam.linkHtml($card, $profile);
   verwaltungFam.setSearch(verwSearch);
   verwaltungFam.clear();
 

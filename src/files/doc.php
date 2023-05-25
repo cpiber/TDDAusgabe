@@ -177,9 +177,15 @@
           </div>
           <div class="cols4 profile-pics">
             <img class="profile-pic w100pm400px-mw800 ProfilePic" />
-            <button class="w100pm400px-mw800 update" data-ref="ProfilePic">Photo aktualisieren</button>
-            <img class="profile-pic w100pm400px-mw800 ProfilePic2" />
-            <button class="w100pm400px-mw800 update" data-ref="ProfilePic2">Photo 2 aktualisieren</button>
+            <div class="w100pm400px-mw800">
+              <button class="update" data-ref="ProfilePic">Photo aktualisieren</button>
+              <button class="remove" data-ref="ProfilePic">Photo entfernen</button>
+            </div>
+            <img class="profile-pic w100pm400px-mw800 ProfilePic2" style="margin-top: 1rem" />
+            <div class="w100pm400px-mw800">
+              <button class="update" data-ref="ProfilePic2">Photo 2 aktualisieren</button>
+              <button class="remove" data-ref="ProfilePic2">Photo 2 entfernen</button>
+            </div>
           </div>
         </div>
       </div>
@@ -187,7 +193,7 @@
         <h1>Logs</h1>
         <h2>Einnahmen</h2>
         <form><p>
-          <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
+    <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
           <button type="submit">Go</button>
           &nbsp; &nbsp;
           <button type="button" class="month">Monat</button>
@@ -402,6 +408,23 @@
       </div>
       <div class="modal-body">
         <div class="card-frame-wrapper"><iframe class="card-frame"></iframe></div>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+
+  <div id="profile-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close">&times;</span>
+        <h2 class="modal-head">Karte drucken</h2>
+      </div>
+      <div class="modal-body">
+        <div class="camera">
+          <video id="profile-video">Video stream not available.</video>
+          <button id="take-profile-pic">Photo aufnehmen</button>
+          <canvas id="profile-canvas" style="display:none"></canvas>
+        </div>
       </div>
       <div class="modal-footer"></div>
     </div>

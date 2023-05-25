@@ -50,9 +50,56 @@ function _request(url: string, errorText: string, data_in: { [key: string]: any 
     });
 }
 
-export function getImageUrl(image: string): string {
+export function upload(endpoint: string, errorText: string, key: string, image: Blob): apiRequest {
+  const url = `?api=${encodeURIComponent(endpoint)}&key=${encodeURIComponent(key)}`;
+  console.log('Trying to send image to url', url);
+  const data = new FormData();
+  data.set('image', image, 'upload.png');
+  return _upload(url, errorText, data);
+}
+function _upload(url: string, errorText: string, data: FormData): apiRequest {
+  return $.post({
+    url: url,
+    data,
+    processData: false,
+    contentType: false,
+  })
+    .then((data: apiData, status: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
+      if (!data) {
+        console.error(`${errorText} :: Failed request (NO DATA)`, data);
+        alert(`
+          <p>${errorText}</p>
+        `, "Fehler");
+        return $.Deferred().reject(jqXHR, "NO DATA", data).promise() as apiRequest;
+      }
+      if (data.status === "success") {
+        return $.Deferred().resolve(data, jqXHR).promise() as apiRequest;
+      }
+      if (data.loggedin !== false) {
+        console.error(`${errorText} :: Failed request (API denied): ${data.message}`, data);
+        alert(`
+          <p>${errorText}:<br />${data.status}: ${data.message}</p>
+        `, "Fehler");
+        return $.Deferred().reject(jqXHR, data.message, data).promise() as apiRequest;
+      }
+      console.debug(`${errorText} :: Failed request (API denied): ${data.message}`, data);
+      return $.Deferred().reject(jqXHR, errorText, data).promise() as apiRequest;
+    }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
+      const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+      console.error(`${errorText} :: Failed request (Network)`, jqXHR.status, error, msg);
+      alert(`
+        <p>${errorText}:<br />${jqXHR.status} ${jqXHR.status == 0 ? 'No internet / Blocked' : error}</p>
+        <p>${msg}</p>
+      `, "Fehler");
+      return $.Deferred().reject(jqXHR, error).promise() as apiRequest;
+    });
+}
+
+export function getImageUrl(image: string, refresh = false): string {
   if (!image) return '';
-  return '?' + $.param({ api: 'familie/profile', image });
+  const p = { api: 'familie/profile', image };
+  if (refresh) p['t'] = new Date().toString();
+  return '?' + $.param(p);
 }
 
 let modal: JQuery<HTMLElement>;

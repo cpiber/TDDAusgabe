@@ -1,5 +1,7 @@
 <?php
 
+// TODO: we could remove profile pictures here
+
 function api_updatefam($msg) {
   global $conn;
   global $fam_data;
