@@ -14,20 +14,20 @@
     "start:php": "phpinclude -c phpinclude.js -w src/TDD_Ausgabe.php build/TDD_Ausgabe.php"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
-    "@rollup/plugin-terser": "^0.4.1",
-    "@rollup/plugin-typescript": "^11.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-typescript": "^11.1.1",
     "@types/jquery": "^3.5.16",
     "concurrently": "^8.0.1",
     "core-js-pure": "^3.30.2",
-    "jquery": "^3.6.4",
+    "jquery": "^3.7.0",
     "jsbarcode": "^3.11.5",
     "object.values": "^1.1.6",
-    "phpinclude": "https://github.com/cpiber/PHPInclude/releases/download/v2.0.0/phpinclude-2.0.0.tgz",
-    "rollup": "^3.20.4",
-    "sass": "^1.62.0",
-    "tslib": "^2.5.0",
+    "phpinclude": "https://github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz",
+    "rollup": "^3.23.0",
+    "sass": "^1.62.1",
+    "tslib": "^2.5.2",
     "typescript": "^5.0.4"
   },
   "repository": {

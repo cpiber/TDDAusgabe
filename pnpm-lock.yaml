@@ -11,7 +11,7 @@ specifiers:
   jquery: ^3.6.4
   jsbarcode: ^3.11.5
   object.values: ^1.1.6
-  phpinclude: https://github.com/cpiber/PHPInclude/releases/download/v2.0.0/phpinclude-2.0.0.tgz
+  phpinclude: https://github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz
   rollup: ^3.20.4
   sass: ^1.62.0
   tslib: ^2.5.0
@@ -28,7 +28,7 @@ devDependencies:
   jquery: 3.6.4
   jsbarcode: 3.11.5
   object.values: 1.1.6
-  phpinclude: '@github.com/cpiber/PHPInclude/releases/download/v2.0.0/phpinclude-2.0.0.tgz'
+  phpinclude: '@github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz'
   rollup: 3.20.4
   sass: 1.62.0
   tslib: 2.5.0
@@ -1109,10 +1109,10 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
-  '@github.com/cpiber/PHPInclude/releases/download/v2.0.0/phpinclude-2.0.0.tgz':
-    resolution: {tarball: https://github.com/cpiber/PHPInclude/releases/download/v2.0.0/phpinclude-2.0.0.tgz}
+  '@github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz':
+    resolution: {tarball: https://github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz}
     name: phpinclude
-    version: 2.0.0
+    version: 2.0.1
     hasBin: true
     dependencies:
       chokidar: 3.5.3
