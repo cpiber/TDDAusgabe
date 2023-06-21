@@ -18,6 +18,11 @@ if ( array_key_exists( "file", $_GET ) ) {
       echo require('../../build/tmp/card.js');
       break;
 
+    case "syncjs":
+      header( 'Content-type: application/javascript' );
+      echo require('../../build/tmp/sync.js');
+      break;
+
     case "favicon":
       header( 'Content-type: image/vnd.microsoft.icon' );
       echo require('../files/favicon.ico');

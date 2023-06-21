@@ -4,6 +4,7 @@ global $conn;
 
 require "pages/print.php";
 require "pages/card.php";
+require "pages/sync.php";
 require "pages/backup_create.php";
 require "pages/backup_load.php";
 
@@ -14,6 +15,9 @@ if ( array_key_exists( 'page', $_GET ) ) {
       break;
     case "card":
       page_card();
+      break;
+    case "sync":
+      page_sync();
       break;
     case "backup/create":
       page_backupcreate();

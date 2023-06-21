@@ -17,6 +17,7 @@
 
   <p class="header-bar">
     <a class="button no-active" href="?page=print" target="_blank">Druckversion</a>
+    <a class="button no-active" href="?page=sync" target="_blank">Synchronisieren</a>
     <a class="button no-active" href="?login">Abmelden</a>
   </p>
   <img id="barcode" style="display:none" />

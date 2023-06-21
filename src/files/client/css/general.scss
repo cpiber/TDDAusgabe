@@ -204,3 +204,16 @@ input[type="checkbox"] {
 .profile-pics img {
   height: auto;
 }
+
+.alert {
+  padding: 8px 4px;
+  font-size: 1.3em;
+  border-radius: 5px;
+  border: 1px solid;
+
+  &.success {
+    background: lighten($green, 8%);
+    border-color: darken($green, 1%);
+    color: $whitish;
+  }
+}

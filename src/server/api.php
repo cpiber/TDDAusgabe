@@ -58,6 +58,8 @@ require "api/action_backupdb.php";
 require "api/action_resetfam.php";
 require "api/action_deldate.php";
 
+require "api/sync.php";
+
 if ( array_key_exists( 'api', $_GET ) ) {
   header( "Content-Type: application/json; charset=UTF-8" );
   $msg = array( "status" => "pending" );
@@ -114,6 +116,10 @@ if ( array_key_exists( 'api', $_GET ) ) {
       break;
     case "action/delDate":
       api_deldate($msg);
+      break;
+
+    case "sync":
+      api_sync($msg);
       break;
       
     default:

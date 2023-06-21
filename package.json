@@ -4,14 +4,16 @@
   "description": "Ausgabeprogramm für Tischlein Deck Dich",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:js && npm run build:css && npm run build:php",
+    "build": "npm run build:js && npm run build:css && npm run build:php && npm run build:php2",
     "build:js": "rollup -c",
     "build:css": "sass src/files/client.scss build/tmp/client.css --style=compressed",
     "build:php": "phpinclude -c phpinclude.js src/TDD_Ausgabe.php build/TDD_Ausgabe.php",
-    "start": "NODE_ENV=development concurrently \"npm:start:js\" \"npm:start:css\" \"npm:start:php\"",
+    "build:php2": "phpinclude -c phpinclude.js src/TDD_Server.php build/TDD_Server.php",
+    "start": "npm run build:js && npm run build:css && NODE_ENV=development concurrently \"npm:start:js\" \"npm:start:css\" \"npm:start:php\" \"npm:start:php2\"",
     "start:js": "rollup -c -w",
     "start:css": "sass src/files/client.scss build/tmp/client.css -w",
-    "start:php": "phpinclude -c phpinclude.js -w src/TDD_Ausgabe.php build/TDD_Ausgabe.php"
+    "start:php": "phpinclude -c phpinclude.js -w src/TDD_Ausgabe.php build/TDD_Ausgabe.php",
+    "start:php2": "phpinclude -c phpinclude.js -w src/TDD_Server.php build/TDD_Server.php"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",

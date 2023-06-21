@@ -34,5 +34,15 @@ export default [
       format: 'iife',
     },
     plugins,
-  }
+  },
+  {
+    input: 'src/files/sync.ts',
+    output: {
+      dir: 'build/tmp',
+      name: 'card',
+      sourcemap: build ? false : 'inline',
+      format: 'iife',
+    },
+    plugins,
+  },
 ];
