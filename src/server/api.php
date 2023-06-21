@@ -15,8 +15,8 @@ $fam_data = array(
   'Num' => false,
   'Adresse' => true,
   'Telefonnummer' => true,
-  'ProfilePic' => true,
-  'ProfilePic2' => true,
+  'ProfilePic' => false,
+  'ProfilePic2' => false,
 );
 
 function fields($fields, &$data, $insert=true) {
