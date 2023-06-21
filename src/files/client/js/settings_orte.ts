@@ -13,7 +13,7 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
   $opt.on('click', 'li', function (e) {
     if (e.target !== this && e.target.tagName !== 'BUTTON') return; // text box / link
     const $this = $(this);
-    const open: boolean = $this.data('open') || false;
+    const open = !!$this.data('open') || false;
 
     if ($this.hasClass('button-add')) {
       $('<li>').val(-1).insertBefore($this).trigger('click');
@@ -63,14 +63,14 @@ export function optionsOrteUpdate(loadOrte: () => JPromise<void>) {
 
     // update
     $this.empty()
-      .append($('<input>').val($this.data('name')).addClass('w100pm400px'))
-      .append($('<input>').attr('type', 'number').val($this.data('gruppen')).addClass('w100pm400px'))
+      .append($('<input>').val($this.data('name')).addClass('w100pm400px').attr('placeholder', 'Name'))
+      .append($('<input>').attr('type', 'number').val($this.data('gruppen')).addClass('w100pm400px').attr('placeholder', 'Anzahl Gruppen'))
       .append($('<button>').text('OK'))
       .append(' &nbsp; ')
       .append($('<a>').text('Löschen').addClass('link-delete').val($this.val()))
       .data('open', true).addClass('expanded');
 
-  }).on('click', 'a', function (e) {
+  }).on('click', 'a', function () {
     const $this = $(this);
     const id = +$this.val();
     if (id === -1) { // doesn't exist yet
