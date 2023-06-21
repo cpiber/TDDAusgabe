@@ -14,6 +14,7 @@ export interface OrtList extends Array<any> {
 export const settings = {
   preis: "",
   designs: "",
+  syncUrl: "",
   _loading: false
 };
 
@@ -28,7 +29,8 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
   const $in = $('#settings :input');
   const $preis = $in.eq(0).data('name', 'Preis').data('prop', 'preis');
   const $designs = $in.eq(1).data('name', 'Kartendesigns').data('prop', 'designs');
-  $in.eq(2).on('click', update.bind(null, null, $preis, $designs));
+  const $sync = $in.eq(2).data('name', 'SyncServer').data('prop', 'syncUrl');
+  $in.eq(2).on('click', update.bind(null, null, $preis, $designs, $sync));
 
   const card = $frame.on('load', () => {
     frameloaded = true;
@@ -46,8 +48,8 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
     }
   }).attr('src', '?page=card').get(0);
 
-  [$preis, $designs].forEach(element => {
-    let timeout;
+  [$preis, $designs, $sync].forEach(element => {
+    let timeout: number;
     element.on('keyup', function () {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -66,9 +68,11 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
     request('setting', 'Fehler beim laden der Einstellungen').then((data: apiData) => {
       settings.preis = data.data.Preis;
       settings.designs = data.data.Kartendesigns;
+      settings.syncUrl = data.data.SyncServer;
 
       $preis.val(settings.preis);
       $designs.val(settings.designs);
+      $sync.val(settings.syncUrl);
       
       if (!frameloaded) return;
       try {
@@ -88,7 +92,7 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
 }
 
 
-function update(element: JQuery<HTMLElement> = null, $preis: JQuery<HTMLElement> = null, $designs: JQuery<HTMLElement> = null) {
+function update(element: JQuery<HTMLElement> = null, $preis: JQuery<HTMLElement> = null, $designs: JQuery<HTMLElement> = null, $sync: JQuery<HTMLElement> = null) {
   const el = (element: JQuery<HTMLElement>) => {
     const name = element.data('name');
     const val = element.val();
@@ -102,7 +106,7 @@ function update(element: JQuery<HTMLElement> = null, $preis: JQuery<HTMLElement>
   if (element) {
     el(element);
   } else {
-    [$preis, $designs].forEach(el);
+    [$preis, $designs, $sync].forEach(el);
   }
 
   request('setting/update', 'Fehler beim Updaten', {

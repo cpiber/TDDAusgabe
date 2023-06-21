@@ -264,6 +264,12 @@
               </label>
             </p>
             <p>
+              <label class="heading" style="display: inline;">Synchronisierungs-URL:
+                <span class="help" title="Server URL, über die auf einen externen Server synchronisiert wird&#xA;&#013;z.b. http://localhost/server.php">(?)</span>
+                <input class="w100p" type="text" data-name="SyncServer" placeholder="Server URL" />
+              </label>
+            </p>
+            <p>
               <button class="w100p" title="Felder speichern automatisch">Alle Speichern</button>
             </p>
           </div>
