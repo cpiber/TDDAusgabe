@@ -10,7 +10,7 @@ function api_deleteort($msg) {
     $msg['message'] = 'Invalid ID';
   } else {
     try {
-      $sql = "DELETE FROM `orte` WHERE `ID` = :ID";
+      $sql = "UPDATE `orte` SET `deleted` = 1 WHERE `ID` = :ID";
       $stmt = $conn->prepare( $sql );
       $stmt->execute( array( ':ID' => $id ) );
 

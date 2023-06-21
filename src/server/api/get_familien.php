@@ -58,7 +58,7 @@ function api_getfam($msg) {
   }
 
   $data = array();
-  $parts = array( "1=1" );
+  $parts = array( "f.`deleted` = 0" );
   if ( array_key_exists( 'ID', $_POST ) || isset( $id ) ) {
     if ( !isset( $id ) )
       $id = $_POST['ID'];
@@ -102,7 +102,7 @@ function api_getfam($msg) {
   try {
     $where = implode( " AND ", $parts );
     if ( !isset( $search ) ) {
-      $sql = "SELECT * FROM `familien` WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
+      $sql = "SELECT * FROM `familien` AS f WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, `ID`";
     } else {
       $sql = "SELECT f.ID AS ID, f.Name AS Name, Erwachsene, Kinder, Ort, Gruppe, Schulden, Karte, lAnwesenheit, Notizen, Num, Adresse, Telefonnummer, ProfilePic, ProfilePic2 FROM `familien` AS f LEFT JOIN `orte` AS o ON (f.Ort = o.ID) WHERE $where ORDER BY `Ort`, `Gruppe`, `Num`, f.`ID`";
     }

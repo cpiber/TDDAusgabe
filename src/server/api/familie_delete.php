@@ -10,7 +10,7 @@ function api_deletefam($msg) {
     $msg['message'] = 'Invalid ID';
   } else {
     try {
-      $sql = "DELETE FROM `familien` WHERE `ID` = :ID";
+      $sql = "UPDATE `familien` SET `deleted` = 1 WHERE `ID` = :ID";
       $stmt = $conn->prepare( $sql );
       $stmt->execute( array( ':ID' => $id ) );
 

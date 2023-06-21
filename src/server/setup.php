@@ -135,6 +135,12 @@ $trigger_familienUpdate = "CREATE TRIGGER familienUpdate BEFORE UPDATE ON `famil
     IF NEW.`Num`<0 THEN
       SET NEW.`Num` = -NEW.`Num`;
     END IF;
+    SET NEW.`last_update` = NOW();
+  END;
+  ";
+$trigger_orteUpdate = "CREATE TRIGGER orteUpdate BEFORE UPDATE ON `orte`
+  FOR EACH ROW BEGIN
+    SET NEW.`last_update` = NOW();
   END;
   ";
 $view_logsalt = "CREATE VIEW logsalt AS SELECT `ID`, `DTime`, `Type`, `Val`, IF(`Type`IN('attendance','insert','update','delete'),splitStr(`Val`, '/', 1),'') AS `P1`, IF(`Type`IN('attendance','insert','update','delete'),splitStr(`Val`, '/', 2),'') AS `P2` FROM `logs`";
@@ -443,6 +449,20 @@ if ( isset( $_GET['setup'] ) ) {
       } catch ( PDOException $e ) {
         $conn->rollBack();
         echo "<p>Fehler beim Anlegen des Triggers `familienUpdate`.<br>";
+        echo setup_error( "", $e->getMessage() );
+      }
+      try {
+        $conn->beginTransaction();
+        $conn->exec( "USE tdd" );
+        
+        $conn->exec( "DROP TRIGGER IF EXISTS orteUpdate;" );
+        $conn->exec( $trigger_orteUpdate );
+        $conn->commit();
+        echo "<p>Trigger `orteUpdate` erfolgreich angelegt.</p>";
+        
+      } catch ( PDOException $e ) {
+        $conn->rollBack();
+        echo "<p>Fehler beim Anlegen des Triggers `orteUpdate`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {

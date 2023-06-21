@@ -14,7 +14,7 @@ function api_deldate($msg) {
     $msg['message'] = 'Missing date';
   } else {
     try {
-      $sql = "DELETE FROM `familien` WHERE `$col` <= :date AND `$col` IS NOT NULL";
+      $sql = "UPDATE `familien` SET `deleted` = 1 WHERE `$col` <= :date AND `$col` IS NOT NULL";
       $stmt = $conn->prepare( $sql );
       $stmt->execute(array(
         ":date" => $date

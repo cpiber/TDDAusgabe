@@ -1,6 +1,14 @@
 <?php
 
 global $conn;
+global $proc_resetFamNum;
+global $proc_newNum;
+global $proc_newGruppe;
+global $proc_splitStr;
+global $trigger_familienInsert;
+global $trigger_familienUpdate;
+global $trigger_orteUpdate;
+global $view_logsalt;
 
 //Check version and upgrade database
 $stmt = $conn->query( "SELECT Val FROM `einstellungen` WHERE `Name` = 'Version'" );
@@ -323,7 +331,35 @@ if ( $ver < DB_VER ) {
       $ver = 10;
 
     } catch ( PDOException $e ) {
+      $conn->rollBack();
       upgrade_error( 10, $e );
+      $error = true;
+    }
+  }
+
+  if ( $ver == 10 ) {
+    try {
+      $conn->exec( "SET autocommit = 0" );
+      $conn->beginTransaction();
+
+      $conn->exec( "DROP TRIGGER IF EXISTS familienUpdate;" );
+      $conn->exec( "DROP TRIGGER IF EXISTS orteUpdate;" );
+
+      $conn->exec( "ALTER TABLE `familien` ADD COLUMN `last_update` timestamp NOT NULL, ADD COLUMN `deleted` bit NOT NULL" );
+      $conn->exec( "ALTER TABLE `orte` ADD COLUMN `last_update` timestamp NOT NULL, ADD COLUMN `deleted` bit NOT NULL" );
+      $conn->exec( "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0')" );
+      $conn->exec( "UPDATE `familien` SET `last_update` = 0" );
+      $conn->exec( "UPDATE `orte` SET `last_update` = 0" );
+
+      $conn->exec( $trigger_familienUpdate );
+      $conn->exec( $trigger_orteUpdate );
+      
+      $conn->commit();
+      $ver = 11;
+
+    } catch ( PDOException $e ) {
+      $conn->rollBack();
+      upgrade_error( 11, $e );
       $error = true;
     }
   }

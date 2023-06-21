@@ -4,7 +4,7 @@ function api_getorte($msg) {
   global $conn;
 
   try {
-    $sql = "SELECT * FROM `orte`";
+    $sql = "SELECT * FROM `orte` WHERE `deleted` = 0";
     
     $stmt = $conn->query( $sql );
     $stmt->setFetchMode( PDO::FETCH_ASSOC );
