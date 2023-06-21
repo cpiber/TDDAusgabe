@@ -91,7 +91,8 @@ function api_sync($msg) {
     $conn->rollBack();
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
-    if ( isset( $response ) ) $msg['message'] .= " ($response)";
+    if ( isset( $serverdata ) && isset( $serverdata['message'] ) ) $msg['message'] .= " ({$serverdata['message']})";
+    else if ( isset( $response ) ) $msg['message'] .= " ($response)";
     if ( isset( $serverdata ) ) $msg['server'] = $serverdata;
   }
   $conn->exec( "UNLOCK TABLES" );

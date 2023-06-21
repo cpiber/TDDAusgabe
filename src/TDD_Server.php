@@ -16,8 +16,8 @@ function connectdb($servername, $dbname, $username, $password) {
 class ConflictException extends \Exception {
   public function __construct($cFam, $cOrte) {
     $ret = "Beide modifiziert: ";
-    if ( count( $cFam ) > 0 ) $ret .= "Familien " . implode( ", ", $cFam );
-    if ( count( $cOrte ) > 0 ) $ret .= "Orte " . implode( ", ", $cOrte );
+    if ( count( $cFam ) > 0 ) $ret .= "Familie(n) " . implode( ", ", $cFam );
+    if ( count( $cOrte ) > 0 ) $ret .= "Ort(e) " . implode( ", ", $cOrte );
     $this->message = $ret;
   }
 }
@@ -26,6 +26,35 @@ global $famfields, $ortefields;
 
 try {
   header( "Content-Type: application/json" );
+  
+  if ( $_SERVER["REQUEST_METHOD"] === "GET" ) {
+    if ( !array_key_exists( 'sync', $_GET ) || !is_numeric( $_GET['sync'] ) ) throw new InvalidArgumentException( "Sync is required" );
+
+    $conn = connectdb( DB_SERVER, DB_NAME, DB_USER, DB_PW ); 
+    $conn->exec( "LOCK TABLES `familien` READ, `orte` READ" );
+    $conn->exec( "SET time_zone = '+00:00'" );
+    $syncData = array();
+
+    $last_sync = floatval( $_GET['sync'] );
+    $recordsFam = "SELECT COUNT(*) FROM `familien` WHERE `last_update` > $last_sync";
+    $recordsOrte = "SELECT COUNT(*) FROM `orte` WHERE `last_update` > $last_sync";
+
+    $stmt = $conn->prepare( $recordsFam );
+    $stmt->execute();
+    $syncData['familien'] = $stmt->fetchColumn();
+
+    $stmt = $conn->prepare( $recordsOrte );
+    $stmt->execute();
+    $syncData['orte'] = $stmt->fetchColumn();
+
+    $conn->exec( "UNLOCK TABLES" );
+
+    $syncData['status'] = 'success';
+    echo json_encode( $syncData );
+    exit;
+  }
+
+
   if ( $_SERVER["REQUEST_METHOD"] !== "PUT" ) throw new BadMethodCallException( "Method not allowed" );
   $body = file_get_contents( 'php://input' );
   $body = json_decode( $body, true );
@@ -82,6 +111,7 @@ try {
   $syncData['sync'] = $stmt->fetchColumn();
   $conn->commit();
 
+  $syncData['status'] = 'success';
   echo json_encode( $syncData );
 } catch ( ConflictException $e ) {
   http_response_code( 409 );

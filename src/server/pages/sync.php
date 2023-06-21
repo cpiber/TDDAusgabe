@@ -1,6 +1,6 @@
 <?php
 
-$last_sync = "(SELECT COALESCE(CONVERT(`val`, datetime), 0) FROM `einstellungen` WHERE `name` = 'last_sync')";
+$last_sync = "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync')";
 
 function page_sync() {
   global $conn;
@@ -18,6 +18,7 @@ function page_sync() {
     echo "<p class=\"success alert\">Erfolgreich synchronisiert</p>";
   }
   
+  $conn->exec( "SET time_zone = '+00:00'" );
   try {
     $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte` WHERE `deleted` = 1 OR `last_update` >= $last_sync";
 
@@ -25,7 +26,6 @@ function page_sync() {
     $stmt->execute();
     $numOrte = $stmt->fetchColumn();
   } catch ( PDOException $e ) {
-    echo "</select>\n";
     echo "<i>Fehler bei abrufen der Orte</i><br>" . $e->getMessage();
     exit;
   }
@@ -36,12 +36,38 @@ function page_sync() {
     $stmt->execute();
     $numFam = $stmt->fetchColumn();
   } catch ( PDOException $e ) {
-    echo "</select>\n";
     echo "<i>Fehler bei abrufen der Orte</i><br>" . $e->getMessage();
     exit;
   }
+  try {
+    $stmt = $conn->prepare( $last_sync );
+    $stmt->execute();
+    $sync = $stmt->fetchColumn();
+    $stmt = $conn->prepare( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" );
+    $stmt->execute();
+    $server = $stmt->fetchColumn();
+    if ( !$server || ( substr( $server, 0, 7 ) !== "http://" && substr( $server, 0, 8 ) !== "https://" ) ) throw new Exception( "Not a valid server $server" );
+  } catch ( Exception $e ) {
+    echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
+    exit;
+  }
+  try {
+    $context = stream_context_create( array(
+      'http' => array(
+        'method'  => 'GET',
+        'ignore_errors' => true,
+      ),
+    ) );
+    $response = @file_get_contents( $server . "?sync=" . $sync, false, $context );
+    $serverdata = json_decode( $response, true );
+    if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] != 'success' ) throw new Exception( "Error communicating with server: $response" );
+  } catch ( Exception $e ) {
+    echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
+    exit;
+  }
 
-  echo "<p>Orte zu synchronisieren: <b>$numOrte</b>. Familien zu synchronisieren: <b>$numFam</b>.<br/>";
+  echo "<p>Lokale Orte zu synchronisieren: <b>$numOrte</b>. Lokale Familien zu synchronisieren: <b>$numFam</b>.<br/>";
+  echo "Entfernte Orte zu synchronisieren: <b>{$serverdata['orte']}</b> (geschätzt). Entfernte Familien zu synchronisieren: <b>{$serverdata['familien']}</b> (geschätzt).<br/>";
   echo "Einstellungen und Logs werden nicht synchronisiert.</p>";
   echo "<p><button id=\"start\">Start</button></p>";
 
