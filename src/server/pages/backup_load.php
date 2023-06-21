@@ -233,7 +233,7 @@ function page_backupload() {
   echo "<link href=\"?file=favicon\" rel=\"icon\" type=\"image/x-icon\" />";
   echo "<link href=\"?file=css\" rel=\"stylesheet\" />";
   echo "</head>\n<body>\n";
-  echo "<div id=\"header\" class=\"header\"><div><span><a href=\"\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
+  echo "<div id=\"header\" class=\"header\"><div><span><a href=\"?\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
   echo "<div class=\"body\">";
   foreach ( $msg as $m ) {
     printf( "<p class=\"msg msg-%s\">%s</p>", $m[1], $m[0] );

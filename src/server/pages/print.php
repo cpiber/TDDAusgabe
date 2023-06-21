@@ -10,12 +10,12 @@ function page_print() {
   echo "<link href=\"?file=css\" rel=\"stylesheet\" />";
   echo "<style>table { width: 100%; } table th { text-align: left; } tbody > tr > *:not(.clear) { border: 1px solid grey; padding: 5px; } h3 { margin-top: 1em; margin-bottom: 0; } span.check { width: 14px; height: 14px; border: 1px solid black; display: block; float: right; } p { font-size: 15px; }</style>\n";
   echo "</head>\n<body>\n";
-  echo "<div id=\"header\" class=\"header\"><div><span><a href=\"\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
+  echo "<div id=\"header\" class=\"header\"><div><span><a href=\"?\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
   $o = ( isset( $_GET['ort'] ) ? $_GET['ort'] : "Alle" );
   echo "<div class=\"body\"><form action=\"?page=print\" method=\"GET\">\n<input type=\"hidden\" name=\"page\" value=\"print\">\n<select id=\"ort\" name=\"ort\">\n<option value=\"Alle\">Alle</option>\n";
 
   try {
-    $sql = "SELECT * FROM `orte`";
+    $sql = "SELECT * FROM `orte` WHERE `deleted` = 0";
 
     $stmt = $conn->prepare( $sql );
     $stmt->execute();
@@ -70,7 +70,7 @@ function page_print() {
   try {
     if ( $o == "Alle" ) { $o = "%"; }
     if ( $g == "Alle" ) { $g = "%"; }
-    $sql = "SELECT * FROM `familien` WHERE `Ort` LIKE :ort AND `Gruppe` LIKE :gruppe ORDER BY Ort, Gruppe, Num, ID";
+    $sql = "SELECT * FROM `familien` WHERE `Ort` LIKE :ort AND `Gruppe` LIKE :gruppe AND `deleted` = 0 ORDER BY Ort, Gruppe, Num, ID";
     
     $stmt = $conn->prepare( $sql );
     $stmt->execute( array( ':ort' => $o, ':gruppe' => $g ) );
