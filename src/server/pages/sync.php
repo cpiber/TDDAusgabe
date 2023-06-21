@@ -43,7 +43,7 @@ function page_sync() {
 
   echo "<p>Orte zu synchronisieren: <b>$numOrte</b>. Familien zu synchronisieren: <b>$numFam</b>.<br/>";
   echo "Einstellungen und Logs werden nicht synchronisiert.</p>";
-  echo "<p><button id=\"start\">Start</button> &nbsp; <button onclick=\"window.close()\">Schließen</button></p>";
+  echo "<p><button id=\"start\">Start</button></p>";
 
 ?>
   <div id="modal" class="modal">

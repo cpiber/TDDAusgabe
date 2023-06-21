@@ -12,6 +12,11 @@ jQuery(($) => {
         const href = window.location.href;
         const url = href + (href.indexOf('?') >= 0 ? '&' : '?') + $.param({synced:true});
         window.location.href = url;
+      })
+      .catch(() => {
+        $(':input, button').removeAttr('disabled');
       });
   });
+
+  $('#close').on('click', () => window.close());
 });

@@ -1,16 +1,21 @@
 <?php
 
-$last_sync = "(SELECT COALESCE(CONVERT(`val`, datetime), 0) FROM `einstellungen` WHERE `name` = 'last_sync')";
+require "../synchelpers.php";
+
+$last_sync = "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync')";
 
 function api_sync($msg) {
   global $conn;
   global $last_sync;
+  global $famfields, $ortefields;
 
   $recordsFam = "SELECT * FROM `familien` WHERE `deleted` = 1 OR `last_update` >= $last_sync";
   $recordsOrte = "SELECT * FROM `orte` WHERE `deleted` = 1 OR `last_update` >= $last_sync";
 
   try { 
     $conn->exec( "LOCK TABLES `familien` WRITE, `orte` WRITE, `einstellungen` WRITE" );
+    $conn->exec( "SET time_zone = '+00:00'" );
+    $conn->beginTransaction();
     $syncData = array();
 
     $stmt = $conn->prepare( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" );
@@ -39,31 +44,55 @@ function api_sync($msg) {
         'method'  => 'PUT',
         'header'  => 'Content-Type: application/json',
         'content' => json_encode( $syncData ),
+        'timeout' => 500,
+        'ignore_errors' => true,
       ),
     ) );
-    $response = file_get_contents( $server, false, $context );
-    $msg['data'] = json_decode( $response, true );
+    $response = @file_get_contents( $server, false, $context );
+    $serverdata = json_decode( $response, true );
 
     $status = intval( explode( " ", $http_response_header[0] )[1] ); // HTTP/1.1 200 OK => 200
-    if ( $status != 200 ) throw new Exception( "Request failed: {$http_response_header[0]}" );
+    if ( $status != 200 || !is_array( $serverdata ) ) throw new Exception( "Request failed: {$http_response_header[0]}" );
 
     $famIds = array_map( function ($v) { return $v['ID']; }, $syncData['familien'] );
     $orteIds = array_map( function ($v) { return $v['ID']; }, $syncData['orte'] );
     $famPlaceholder = substr( str_repeat( ",?", count( $famIds ) ), 1 );
     $ortePlaceholder = substr( str_repeat( ",?", count( $orteIds ) ), 1 );
 
-    $stmt = $conn->prepare( "DELETE FROM `familien` WHERE `ID` IN ($famPlaceholder) AND `deleted` = 1" );
-    $stmt->execute( $famIds );
-    $stmt = $conn->prepare( "DELETE FROM `orte` WHERE `ID` IN ($ortePlaceholder) AND `deleted` = 1" );
-    $stmt->execute( $orteIds );
+    if ( count( $famIds ) > 0 ) {
+      $stmt = $conn->prepare( "DELETE FROM `familien` WHERE `ID` IN ($famPlaceholder) AND `deleted` = 1" );
+      $stmt->execute( $famIds );
+    }
+    if ( count( $orteIds ) > 0 ) {
+      $stmt = $conn->prepare( "DELETE FROM `orte` WHERE `ID` IN ($ortePlaceholder) AND `deleted` = 1" );
+      $stmt->execute( $orteIds );
+    }
 
-    $stmt = $conn->prepare( "UPDATE `einstellungen` SET `val` = NOW()+0 WHERE `name` = 'last_sync'" );
-    $stmt->execute();
+    // update with remote values
+    if ( count( $serverdata['familien'] ) > 0 ) {
+      $sql = buildInsert( "familien", $famfields, $serverdata['familien'], $data );
+      $stmt = $conn->prepare( $sql );
+      $stmt->execute( $data );
+    }
+    if ( count( $serverdata['orte'] ) > 0 ) {
+      $sql = buildInsert( "orte", $orteIds, $serverdata['orte'], $data );
+      $stmt = $conn->prepare( $sql );
+      $stmt->execute( $data );
+    }
+    $msg['numfam'] = count( $serverdata['familien'] );
+    $msg['numorte'] = count( $serverdata['orte'] );
+
+    $stmt = $conn->prepare( "UPDATE `einstellungen` SET `val` = ? WHERE `name` = 'last_sync'" );
+    $stmt->execute( array( $serverdata['sync'] ) );
+    $conn->commit();
 
     $msg['status'] = 'success';
   } catch ( Exception $e ) {
+    $conn->rollBack();
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
+    if ( isset( $response ) ) $msg['message'] .= " ($response)";
+    if ( isset( $serverdata ) ) $msg['server'] = $serverdata;
   }
   $conn->exec( "UNLOCK TABLES" );
 
