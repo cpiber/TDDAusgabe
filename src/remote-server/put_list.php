@@ -21,8 +21,12 @@ function put_list($conn) {
   $syncData = array();
 
   $last_sync = floatval( $body['sync'] );
-  $recordsFam = "SELECT * FROM `familien` WHERE `last_update` >= $last_sync";
-  $recordsOrte = "SELECT * FROM `orte` WHERE `last_update` >= $last_sync";
+  $recordsFam = "SELECT * FROM `familien` WHERE `last_update` > $last_sync";
+  $recordsOrte = "SELECT * FROM `orte` WHERE `last_update` > $last_sync";
+  if ( $last_sync === 0 ) {
+    $recordsFam = "SELECT * FROM `familien`";
+    $recordsOrte = "SELECT * FROM `orte`";
+  }
 
   $stmt = $conn->prepare( $recordsFam );
   $stmt->setFetchMode( PDO::FETCH_ASSOC );
@@ -54,9 +58,7 @@ function put_list($conn) {
     $stmt->execute( $data );
   }
   
-  $stmt = $conn->prepare( "SELECT NOW()+0" );
-  $stmt->execute();
-  $syncData['sync'] = $stmt->fetchColumn();
+  $syncData['sync'] = $conn->query( "SELECT NOW()+0" )->fetchColumn();
   $conn->commit();
 
   $syncData['status'] = 'success';

@@ -13,14 +13,12 @@ function page_sync() {
   echo "</head>\n<body>\n";
   echo "<div id=\"header\" class=\"header\"><div><span><a href=\"?\"><img src=\"?file=logo\" class=\"logo\" /></a></span></div></div>\n";
   echo "<div class=\"body\">";
-
-  if ( array_key_exists( 'synced', $_GET ) ) {
-    echo "<p class=\"success alert\">Erfolgreich synchronisiert</p>";
-  }
   
   $conn->exec( "SET time_zone = '+00:00'" );
+  $synctime = floatval( $conn->query( $last_sync )->fetchColumn() );
   try {
-    $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte` WHERE `deleted` = 1 OR `last_update` >= $last_sync";
+    $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync";
+    if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte`";
 
     $stmt = $conn->prepare( $sql );
     $stmt->execute();
@@ -30,7 +28,8 @@ function page_sync() {
     exit;
   }
   try {
-    $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien` WHERE `deleted` = 1 OR `last_update` >= $last_sync";
+    $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync";
+    if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien`";
 
     $stmt = $conn->prepare( $sql );
     $stmt->execute();
@@ -40,12 +39,8 @@ function page_sync() {
     exit;
   }
   try {
-    $stmt = $conn->prepare( $last_sync );
-    $stmt->execute();
-    $sync = $stmt->fetchColumn();
-    $stmt = $conn->prepare( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" );
-    $stmt->execute();
-    $server = $stmt->fetchColumn();
+    $sync = $conn->query( "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync_servertime')" )->fetchColumn();
+    $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
     if ( !$server || ( substr( $server, 0, 7 ) !== "http://" && substr( $server, 0, 8 ) !== "https://" ) ) throw new Exception( "Not a valid server $server" );
   } catch ( Exception $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();

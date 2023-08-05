@@ -9,8 +9,12 @@ function get_status($conn) {
   $syncData = array();
 
   $last_sync = floatval( $_GET['sync'] );
-  $recordsFam = "SELECT COUNT(*) FROM `familien` WHERE `last_update` >= $last_sync";
-  $recordsOrte = "SELECT COUNT(*) FROM `orte` WHERE `last_update` >= $last_sync";
+  $recordsFam = "SELECT COUNT(*) FROM `familien` WHERE `last_update` > $last_sync";
+  $recordsOrte = "SELECT COUNT(*) FROM `orte` WHERE `last_update` > $last_sync";
+  if ( $last_sync === 0 ) {
+    $recordsFam = "SELECT COUNT(*) FROM `familien`";
+    $recordsOrte = "SELECT COUNT(*) FROM `orte`";
+  }
 
   $stmt = $conn->prepare( $recordsFam );
   $stmt->execute();
