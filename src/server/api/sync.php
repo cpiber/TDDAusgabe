@@ -90,25 +90,6 @@ function api_sync($msg) {
     $conn->commit();
     $conn->exec( "UNLOCK TABLES" );
 
-    // if ( !file_exists( STATIC_DIR ) ) mkdir( STATIC_DIR, 0755 );
-    // // upload files not present on the server
-    // foreach ($serverdata['static_upload'] as $file) {
-    //   _upload_file( $server, "static&file=$file", STATIC_DIR . $file );
-    // }
-
-    // // download files from server
-    // foreach ($serverdata['static_download'] as $file) {
-    //   $serverdata = _server_send($server, "static&file=$file", array(
-    //     'method'  => 'GET',
-    //     'timeout' => 100,
-    //     'ignore_errors' => true,
-    //   ), false);
-    //   $f = @fopen( STATIC_DIR . $file, 'wb' );
-    //   if ( $f === false ) throw new UnexpectedValueException( "Could not open file $file" );
-    //   if ( fwrite( $f, $serverdata ) === false ) throw new UnexpectedValueException( "Could not write file $file" );
-    //   if ( fclose( $f ) === false ) throw new UnexpectedValueException( "Could not close file $file" );
-    // }
-
     $msg['status'] = 'success';
   } catch ( Exception $e ) {
     if ( $conn->inTransaction() ) $conn->rollBack();
