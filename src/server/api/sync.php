@@ -48,7 +48,7 @@ function api_sync($msg) {
         'ignore_errors' => true,
       ),
     ) );
-    $response = @file_get_contents( $server, false, $context );
+    $response = @file_get_contents( $server . "?api=list", false, $context );
     $serverdata = json_decode( $response, true );
 
     $status = intval( explode( " ", $http_response_header[0] )[1] ); // HTTP/1.1 200 OK => 200

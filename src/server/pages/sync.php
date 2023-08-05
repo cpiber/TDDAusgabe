@@ -58,9 +58,9 @@ function page_sync() {
         'ignore_errors' => true,
       ),
     ) );
-    $response = @file_get_contents( $server . "?sync=" . $sync, false, $context );
+    $response = @file_get_contents( $server . "?api=status&sync=" . $sync, false, $context );
     $serverdata = json_decode( $response, true );
-    if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] != 'success' ) throw new Exception( "Error communicating with server: $response" );
+    if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] !== 'success' ) throw new Exception( "Error communicating with server: $response" );
   } catch ( Exception $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
     exit;
