@@ -262,6 +262,10 @@ if ( isset( $_GET['setup'] ) ) {
           Num int DEFAULT '0',
           Adresse varchar(255),
           Telefonnummer varchar(255),
+          ProfilePic varchar(255) NOT NULL DEFAULT '',
+          ProfilePic2 varchar(255) NOT NULL DEFAULT '',
+          last_update timestamp NOT NULL,
+          deleted bit NOT NULL,
           PRIMARY KEY (ID)
         )";
         $conn->exec( $sql );
@@ -279,6 +283,8 @@ if ( isset( $_GET['setup'] ) ) {
           ID int NOT NULL AUTO_INCREMENT,
           Name varchar(255) NOT NULL,
           Gruppen int NOT NULL DEFAULT '0',
+          last_update timestamp NOT NULL,
+          deleted bit NOT NULL,
           PRIMARY KEY (ID)
         )";
         $conn->exec( $sql );
@@ -342,6 +348,18 @@ if ( isset( $_GET['setup'] ) ) {
         
       } catch ( PDOException $e ) {
         echo "<p>Fehler beim Initialisieren von `Version`.<br>";
+        echo setup_error( $sql, $e->getMessage() );
+      }
+
+      try {
+        $conn->exec( "USE tdd" );
+
+        $sql = "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0'), ('SyncServer', 'https://www.tischlein-deckdich.at/ausgabe/api.php')";
+        $conn->exec( $sql );
+        echo "<p>Synchronisierungsfelder erfolgreich initialisiert.</p>";
+        
+      } catch ( PDOException $e ) {
+        echo "<p>Fehler beim Initialisieren der Synchronisierungsfelder.<br>";
         echo setup_error( $sql, $e->getMessage() );
       }
 
