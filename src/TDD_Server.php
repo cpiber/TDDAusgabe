@@ -4,10 +4,13 @@ define( 'DB_SERVER', '127.0.0.1:3307' );
 define( 'DB_NAME', 'tdd_server' );
 define( 'DB_USER', 'tdd' );
 define( 'DB_PW', 'tdd2003' );
+define( 'STATIC_DIR', __DIR__ . '/remote-static/' );
 
 require "server/synchelpers.php";
 require "remote-server/get_status.php";
 require "remote-server/put_list.php";
+require "remote-server/get_static.php";
+require "remote-server/put_static.php";
 
 function connectdb($servername, $dbname, $username, $password) {
   $c = new PDO( "mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password );
@@ -31,21 +34,28 @@ global $famfields, $ortefields;
 try {
   header( "Content-Type: application/json" );
 
-  if ( !array_key_exists( 'api', $_GET ) ) throw new InvalidArgumentException( "Api path is required" );
+  if ( !array_key_exists( 'api', $_REQUEST ) ) throw new InvalidArgumentException( "Api path is required" );
   $conn = connectdb( DB_SERVER, DB_NAME, DB_USER, DB_PW ); 
+  $conn->exec( "SET time_zone = '+00:00'" );
   
   if ( $_SERVER["REQUEST_METHOD"] === "GET" ) {
-    switch ( $_GET['api'] ) {
+    switch ( $_REQUEST['api'] ) {
       case "status":
         get_status( $conn );
+        break;
+      case "static":
+        get_static();
         break;
       default:
         throw new BadMethodCallException( "Api Method not allowed" );
     }
-  } else if ( $_SERVER["REQUEST_METHOD"] === "PUT" ) {
-    switch ( $_GET['api'] ) {
+  } else if ( $_SERVER["REQUEST_METHOD"] === "PUT" || $_SERVER["REQUEST_METHOD"] === "POST" ) {
+    switch ( $_REQUEST['api'] ) {
       case "list":
         put_list( $conn );
+        break;
+      case "static":
+        put_static();
         break;
       default:
         throw new BadMethodCallException( "Api Method not allowed" );

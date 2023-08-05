@@ -3,7 +3,13 @@ import request from './client/js/api';
 
 // load window
 jQuery(($) => {
-  const createSuccess = () => $('.body').prepend($('<p>').text('Erfolgreich synchronisiert').addClass(['alert', 'success']));
+  const createSuccess = (more?: string) => {
+    $('.alert').remove();
+    $('.body').prepend($('<p>').text('Erfolgreich synchronisiert' + (more ? ` (${more})` : '')).addClass(['alert', 'success']));
+  };
+
+  const upload_file = (name: string) => request('sync_upload', 'Upload fehlgeschlagen', { file: name });
+  const download_file = (name: string) => request('sync_download', 'Download fehlgeschlagen', { file: name });
 
   const $button = $<HTMLButtonElement>('#start');
   $button.on('click', () => {
@@ -11,8 +17,24 @@ jQuery(($) => {
     $('.alert').remove();
 
     request('sync', 'Synchronisieren fehlgeschlagen')
-      .then(() => {
-        createSuccess();
+      .then((data) => {
+        let prom = $.Deferred().resolve().promise();
+        const toupload = data['static_upload'] as string[];
+        const todownload = data['static_download'] as string[];
+        createSuccess(`Upload: 0/${toupload.length}, Download: 0/${todownload.length}`);
+        for (let i = 0; i < toupload.length; i++) {
+          const j = i;
+          prom = prom.then(() => upload_file(toupload[i]))
+            .then(() => createSuccess(`Upload: ${j+1}/${toupload.length}, Download: 0/${todownload.length}`));
+        }
+        for (let i = 0; i < todownload.length; i++) {
+          const j = i;
+          prom = prom.then(() => download_file(todownload[i]))
+            .then(() => createSuccess(`Upload: ${toupload.length}/${toupload.length}, Download: ${j+1}/${todownload.length}`));
+        }
+        return prom;
+      }).then(() => {
+        createSuccess('Werte werden neu geladen...');
         const href = window.location.href.replace(/[&?]synced=true(&|$)/,'$1');
         const url = href + (href.indexOf('?') >= 0 ? '&' : '?') + $.param({synced:true});
         window.location.href = url;

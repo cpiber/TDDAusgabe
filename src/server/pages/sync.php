@@ -16,28 +16,17 @@ function page_sync() {
   
   $conn->exec( "SET time_zone = '+00:00'" );
   $synctime = floatval( $conn->query( $last_sync )->fetchColumn() );
-  try {
-    $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync";
-    if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte`";
 
-    $stmt = $conn->prepare( $sql );
-    $stmt->execute();
-    $numOrte = $stmt->fetchColumn();
-  } catch ( PDOException $e ) {
-    echo "<i>Fehler bei abrufen der Orte</i><br>" . $e->getMessage();
-    exit;
-  }
-  try {
-    $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync";
-    if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien`";
+  $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync";
+  if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numOrte` FROM `orte`";
+  $numOrte = $conn->query( $sql )->fetchColumn();
 
-    $stmt = $conn->prepare( $sql );
-    $stmt->execute();
-    $numFam = $stmt->fetchColumn();
-  } catch ( PDOException $e ) {
-    echo "<i>Fehler bei abrufen der Orte</i><br>" . $e->getMessage();
-    exit;
-  }
+  $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync";
+  if ( $synctime === 0 ) $sql = "SELECT COUNT(*) AS `numFamilien` FROM `familien`";
+  $numFam = $conn->query( $sql )->fetchColumn();
+
+  $numFiles = count( getStaticFiles( STATIC_DIR ) );
+
   try {
     $sync = $conn->query( "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync_servertime')" )->fetchColumn();
     $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
@@ -50,6 +39,7 @@ function page_sync() {
     $context = stream_context_create( array(
       'http' => array(
         'method'  => 'GET',
+        'timeout' => 5,
         'ignore_errors' => true,
       ),
     ) );
@@ -63,6 +53,7 @@ function page_sync() {
 
   echo "<p>Lokale Orte zu synchronisieren: <b>$numOrte</b>. Lokale Familien zu synchronisieren: <b>$numFam</b>.<br/>";
   echo "Entfernte Orte zu synchronisieren: <b>{$serverdata['orte']}</b> (geschätzt). Entfernte Familien zu synchronisieren: <b>{$serverdata['familien']}</b> (geschätzt).<br/>";
+  echo "Differenz in Dateien: "; echo abs(intval($serverdata['static']) - $numFiles); echo ".<br/>";
   echo "Einstellungen und Logs werden nicht synchronisiert.</p>";
   echo "<p><button id=\"start\">Start</button></p>";
 

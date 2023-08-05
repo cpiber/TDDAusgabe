@@ -8,15 +8,14 @@ function put_list($conn) {
   $body = json_decode( $body, true );
   if ( is_null( $body ) || !is_array( $body ) ) throw new InvalidArgumentException( "Invalid JSON body" );
   // validate schema
-  if ( !array_key_exists( 'sync', $body ) || !array_key_exists( 'familien', $body ) || !array_key_exists( 'orte', $body ) ) throw new InvalidArgumentException( "Missing required field" );
+  if ( !array_key_exists( 'sync', $body ) || !array_key_exists( 'familien', $body ) || !array_key_exists( 'orte', $body ) || !array_key_exists( 'static', $body ) ) throw new InvalidArgumentException( "Missing required field" );
   if ( !is_numeric( $body['sync'] ) ) throw new InvalidArgumentException( "Sync is not a number" );
   if ( !is_array( $body['familien'] ) ) throw new InvalidArgumentException( "Familien is not an array" );
   if ( !is_array( $body['orte'] ) ) throw new InvalidArgumentException( "Orte is not an array" );
+  if ( !is_array( $body['static'] ) ) throw new InvalidArgumentException( "Static is not an array" );
   // TODO further validation
 
-  $conn = connectdb( DB_SERVER, DB_NAME, DB_USER, DB_PW ); 
   $conn->exec( "LOCK TABLES `familien` WRITE, `orte` WRITE" );
-  $conn->exec( "SET time_zone = '+00:00'" );
   $conn->beginTransaction();
   $syncData = array();
 
@@ -60,6 +59,14 @@ function put_list($conn) {
   
   $syncData['sync'] = $conn->query( "SELECT NOW()+0" )->fetchColumn();
   $conn->commit();
+  $conn->exec( "UNLOCK TABLES" );
+
+  $files = getStaticFiles( STATIC_DIR );
+  $filesBoth = array_intersect( $files, $body['static'] );
+  $filesRequest = array_diff( $body['static'], $filesBoth );
+  $filesDownload = array_diff( $files, $filesBoth );
+  $syncData['static_upload'] = array_values( $filesRequest );
+  $syncData['static_download'] = array_values( $filesDownload );
 
   $syncData['status'] = 'success';
   echo json_encode( $syncData );

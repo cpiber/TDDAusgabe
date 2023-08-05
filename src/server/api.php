@@ -58,7 +58,10 @@ require "api/action_backupdb.php";
 require "api/action_resetfam.php";
 require "api/action_deldate.php";
 
+require "synchelpers.php";
 require "api/sync.php";
+require "api/sync_upload.php";
+require "api/sync_download.php";
 
 if ( array_key_exists( 'api', $_GET ) ) {
   header( "Content-Type: application/json; charset=UTF-8" );
@@ -120,6 +123,12 @@ if ( array_key_exists( 'api', $_GET ) ) {
 
     case "sync":
       api_sync($msg);
+      break;
+    case "sync_upload":
+      api_sync_upload($msg);
+      break;
+    case "sync_download":
+      api_sync_download($msg);
       break;
       
     default:
