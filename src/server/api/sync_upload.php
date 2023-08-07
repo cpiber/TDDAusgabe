@@ -10,7 +10,8 @@ function api_sync_upload($msg) {
     if ( !file_exists( STATIC_DIR ) ) mkdir( STATIC_DIR, 0755 );
 
     $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
-    upload_file( $server, "static&file=$file", STATIC_DIR . $file );
+    $key = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncKey'" )->fetchColumn();
+    upload_file( $key, $server, "static&file=$file", STATIC_DIR . $file );
 
     $msg['status'] = 'success';
   } catch ( HTTPException $e ) {

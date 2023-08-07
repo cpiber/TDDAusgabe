@@ -355,7 +355,7 @@ if ( isset( $_GET['setup'] ) ) {
       try {
         $conn->exec( "USE tdd" );
 
-        $sql = "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0'), ('last_sync_servertime', '0'), ('SyncServer', 'https://www.tischlein-deckdich.at/ausgabe/api.php')";
+        $sql = "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0'), ('last_sync_servertime', '0'), ('SyncServer', 'https://www.tischlein-deckdich.at/ausgabe/api.php'), ('SyncKey', '')";
         $conn->exec( $sql );
         echo "<p>Synchronisierungsfelder erfolgreich initialisiert.</p>";
         
