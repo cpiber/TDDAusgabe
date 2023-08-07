@@ -9,7 +9,8 @@ function api_sync_download($msg) {
     if ( !file_exists( STATIC_DIR ) ) mkdir( STATIC_DIR, 0755 );
 
     $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
-    $serverdata = server_send( $server, "static&file=$file", HTTP_GET, "", "", 100, false );
+    $key = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncKey'" )->fetchColumn();
+    $serverdata = server_send( $key, $server, "static&file=$file", HTTP_GET, "", "", 100, false );
     $f = @fopen( STATIC_DIR . $file, 'wb' );
     if ( $f === false ) throw new UnexpectedValueException( "Could not open file $file" );
     if ( fwrite( $f, $serverdata ) === false ) throw new UnexpectedValueException( "Could not write file $file" );

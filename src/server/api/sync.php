@@ -23,6 +23,7 @@ function api_sync($msg) {
 
     $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
     if ( !$server || ( substr( $server, 0, 7 ) !== "http://" && substr( $server, 0, 8 ) !== "https://" ) ) throw new Exception( "Not a valid server $server" );
+    $key = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncKey'" )->fetchColumn();
 
     // TODO: batches?
     
@@ -39,7 +40,7 @@ function api_sync($msg) {
     $stmt = $conn->query( "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync_servertime')" );
     $syncData['sync'] = $stmt->fetchColumn();
 
-    $serverdata = server_send( $server, "list", HTTP_PUT, 'Content-Type: application/json', json_encode( $syncData ) );
+    $serverdata = server_send( $key, $server, "list", HTTP_PUT, 'Content-Type: application/json', json_encode( $syncData ) );
 
     // update with remote values
     if ( count( $serverdata['familien'] ) > 0 ) {

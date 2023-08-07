@@ -347,7 +347,7 @@ if ( $ver < DB_VER ) {
 
       $conn->exec( "ALTER TABLE `familien` ADD COLUMN `last_update` timestamp NOT NULL, ADD COLUMN `deleted` bit NOT NULL" );
       $conn->exec( "ALTER TABLE `orte` ADD COLUMN `last_update` timestamp NOT NULL, ADD COLUMN `deleted` bit NOT NULL" );
-      $conn->exec( "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0'), ('last_sync_servertime', '0'), ('SyncServer', 'https://www.tischlein-deckdich.at/ausgabe/api.php')" );
+      $conn->exec( "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('last_sync', '0'), ('last_sync_servertime', '0'), ('SyncServer', 'https://www.tischlein-deckdich.at/ausgabe/api.php'), ('SyncKey', '')" );
       $conn->exec( "UPDATE `familien` SET `last_update` = 0" );
       $conn->exec( "UPDATE `orte` SET `last_update` = 0" );
 

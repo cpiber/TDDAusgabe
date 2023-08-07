@@ -31,12 +31,13 @@ function page_sync() {
     $sync = $conn->query( "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync_servertime')" )->fetchColumn();
     $server = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncServer'" )->fetchColumn();
     if ( !$server || ( substr( $server, 0, 7 ) !== "http://" && substr( $server, 0, 8 ) !== "https://" ) ) throw new Exception( "Not a valid server $server" );
+    $key = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncKey'" )->fetchColumn();
   } catch ( Exception $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
     exit;
   }
   try {
-    $serverdata = server_send( $server, "status&sync=$sync", HTTP_GET ); 
+    $serverdata = server_send( $key, $server, "status&sync=$sync", HTTP_GET ); 
     if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] !== 'success' ) throw new Exception( "Error communicating with server: $serverdata" );
   } catch ( HTTPException $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage() . " - " . strval( $e->serverdata );

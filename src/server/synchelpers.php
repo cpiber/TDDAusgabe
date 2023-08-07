@@ -62,7 +62,8 @@ class HTTPException extends \Exception {
 
 define( 'HTTP_PUT', 'PUT' );
 define( 'HTTP_GET', 'GET' );
-/** @param string $server
+/** @param string $key
+  * @param string $server
   * @param string $endpoint
   * @param string $method
   * @param ?string|string[] $header
@@ -70,7 +71,12 @@ define( 'HTTP_GET', 'GET' );
   * @param ?int $timeout
   * @param ?bool $json
   * @return mixed */
-function server_send($server, $endpoint, $method, $header = "", $content = "", $timeout = 10, $json = true) {
+function server_send($key, $server, $endpoint, $method, $header = "", $content = "", $timeout = 10, $json = true) {
+  if ( is_array( $header ) ) {
+    $header[] = "Authorization: Basic $key";
+  } else {
+    $header = array( $header, "Authorization: Basic $key" );
+  }
   $context = stream_context_create( array(
     'http' => array(
       'method'  => $method,
@@ -95,8 +101,8 @@ function server_send($server, $endpoint, $method, $header = "", $content = "", $
   return $serverdata;
 }
 
-function upload_file($server, $endpoint, $file) {
-  return server_send( $server, $endpoint, HTTP_PUT, 'Content-Type: application/octet-stream', file_get_contents($file) );
+function upload_file($key, $server, $endpoint, $file) {
+  return server_send( $key, $server, $endpoint, HTTP_PUT, 'Content-Type: application/octet-stream', file_get_contents($file) );
 }
 
 $famfields = array(

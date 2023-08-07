@@ -15,6 +15,7 @@ export const settings = {
   preis: "",
   designs: "",
   syncUrl: "",
+  syncKey: "",
   _loading: false
 };
 
@@ -30,6 +31,7 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
   const $preis = $in.eq(0).data('name', 'Preis').data('prop', 'preis');
   const $designs = $in.eq(1).data('name', 'Kartendesigns').data('prop', 'designs');
   const $sync = $in.eq(2).data('name', 'SyncServer').data('prop', 'syncUrl');
+  const $key = $in.eq(3).data('name', 'SyncKey').data('prop', 'syncKey');
   $in.eq(2).on('click', update.bind(null, null, $preis, $designs, $sync));
 
   const card = $frame.on('load', () => {
@@ -48,7 +50,7 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
     }
   }).attr('src', '?page=card').get(0);
 
-  [$preis, $designs, $sync].forEach(element => {
+  [$preis, $designs, $sync, $key].forEach(element => {
     let timeout: number;
     element.on('keyup', function () {
       if (timeout) clearTimeout(timeout);
@@ -69,10 +71,12 @@ export function optionsSettingsUpdate($frame: JQuery<HTMLIFrameElement>) {
       settings.preis = data.data.Preis;
       settings.designs = data.data.Kartendesigns;
       settings.syncUrl = data.data.SyncServer;
+      settings.syncKey = data.data.SyncKey;
 
       $preis.val(settings.preis);
       $designs.val(settings.designs);
       $sync.val(settings.syncUrl);
+      $key.val(settings.syncKey);
       
       if (!frameloaded) return;
       try {

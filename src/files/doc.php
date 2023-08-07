@@ -271,6 +271,12 @@
               </label>
             </p>
             <p>
+              <label class="heading" style="display: inline;">Synchronisierungs-Key:
+                <span class="help" title="Key, der zur Authorisierung am Server verwendet wird">(?)</span>
+                <input class="w100p" type="text" data-name="SyncKey" placeholder="Server Key" />
+              </label>
+            </p>
+            <p>
               <button class="w100p" title="Felder speichern automatisch">Alle Speichern</button>
             </p>
           </div>

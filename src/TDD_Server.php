@@ -33,10 +33,16 @@ global $famfields, $ortefields;
 
 try {
   header( "Content-Type: application/json" );
+  $auth = array_key_exists( 'HTTP_AUTHORIZATION', $_SERVER ) ? $_SERVER['HTTP_AUTHORIZATION'] : "";
+  if ( substr( $auth, 0, 6 ) !== "Basic " ) throw new InvalidArgumentException( "Basic authorization required" );
+  $key = substr( $auth, 6 );
 
-  if ( !array_key_exists( 'api', $_REQUEST ) ) throw new InvalidArgumentException( "Api path is required" );
   $conn = connectdb( DB_SERVER, DB_NAME, DB_USER, DB_PW ); 
   $conn->exec( "SET time_zone = '+00:00'" );
+  $expected = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'Key'" )->fetchColumn();
+  if ( $expected !== $key ) throw new InvalidArgumentException( "Invalid authorization" );
+
+  if ( !array_key_exists( 'api', $_REQUEST ) ) throw new InvalidArgumentException( "Api path is required" );
   
   if ( $_SERVER["REQUEST_METHOD"] === "GET" ) {
     switch ( $_REQUEST['api'] ) {
