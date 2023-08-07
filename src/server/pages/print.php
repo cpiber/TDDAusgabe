@@ -1,5 +1,8 @@
 <?php
 
+function nullstr( $val ) {
+  return is_null( $val ) ? "" : $val;
+}
 
 // Print-Version
 function page_print() {
@@ -83,7 +86,7 @@ function page_print() {
       if ( $ort != $r['Ort'] ) {
         $ort = $r['Ort']; $gruppe = -1;
         $ortname = array_key_exists( $ort, $orte ) ? $orte[$ort]['Name'] : "Unbekannt";
-        printf( "<tr><td colspan=\"8\" class=\"clear\"><br /><h1>%s</h1></td></tr>\n", htmlentities($ortname) );
+        printf( "<tr><td colspan=\"8\" class=\"clear\"><br /><h1>%s</h1></td></tr>\n", htmlentities( nullstr( $ortname ) ) );
       }
       if ( $gruppe != $r['Gruppe'] ) {
         $gruppe = $r['Gruppe'];
@@ -91,7 +94,7 @@ function page_print() {
       }
 
       $num = $r['Num'];
-      $name = htmlentities($r['Name']);
+      $name = htmlentities( nullstr( $r['Name'] ) );
       $anw = "<span class=\"check\"></span>";
       $leute = sprintf( "%s / %s", $r['Erwachsene'], $r['Kinder'] );
       $preis = $einst['Preis'];
@@ -111,11 +114,13 @@ function page_print() {
       ob_clean();
       $schuld = sprintf( "%s€", number_format( floatval($r['Schulden']), 2 ) );
       date_default_timezone_set( "UTC" );
-      $karte = strtotime( $r['Karte'] );
-      $karte = date( "d. m. Y", $karte );
-      $karte = ( $r['Karte'] == "" || $r['Karte'] == "0000-00-00" ? "" : $karte );
-      $notiz = htmlentities($r['Notizen']);
-      $addr = htmlentities($r['Adresse']);
+      if ( !is_null( $r['Karte'] ) ) {
+        $karte = strtotime( $r['Karte'] );
+        $karte = date( "d. m. Y", $karte );
+      }
+      $karte = ( !isset( $karte ) || $r['Karte'] == "" || $r['Karte'] == "0000-00-00" ? "" : $karte );
+      $notiz = htmlentities( nullstr( $r['Notizen'] ) );
+      $addr = htmlentities( nullstr( $r['Adresse'] ) );
       printf( "<tr><td>%s</td><td><span>%s</span>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", $num, $name, $anw, $leute, $preis, $schuld, $karte, $notiz, $addr );
 
     }
