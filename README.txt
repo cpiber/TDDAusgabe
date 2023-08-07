@@ -13,7 +13,7 @@ EINFÜHRUNG
 		lokaler Server (XAMPP, Laragon, etc.)
 	- Getestet mit:
 			Laragon (MySQL v5.1 Datenbank, PHP 5.4.9)
-			XAMPP (MariaDB 15.1 Datenbank, PHP 7.2.3)
+			XAMPP (MariaDB v10.4 Datenbank, PHP 8.2.4)
 			--> sollte mit jedem gewöhnlichen Webserver funktionieren
 	- Datei muss über localhost/Adresse der Webseite aufgerufen werden
 		- Lokaler Server: localhost ist URL zur Webseite
@@ -53,5 +53,5 @@ Nutzung
 
 
 
-Constantin Piber, 2018-2020
+Constantin Piber, 2018-2023
  constantin.piber@gmail.com
