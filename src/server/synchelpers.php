@@ -74,30 +74,30 @@ define( 'HTTP_GET', 'GET' );
 function server_send($key, $server, $endpoint, $method, $header = "", $content = "", $timeout = 10, $json = true) {
   if ( is_array( $header ) ) {
     $header[] = "Authorization: Basic $key";
-  } else {
+  } else if ( $header !== "" ) {
     $header = array( $header, "Authorization: Basic $key" );
+  } else {
+    $header = array( "Authorization: Basic $key" );
   }
-  $context = stream_context_create( array(
-    'http' => array(
-      'method'  => $method,
-      'header'  => $header,
-      'content' => $content,
-      'timeout' => $timeout,
-      'ignore_errors' => true,
-    ),
-  ) );
-  $response = @file_get_contents( "$server?api=$endpoint", false, $context );
-  if ( $response === false ) throw new HTTPException( "Request failed: Could not connect ($method $endpoint)", $response );
-  $serverdata = $json ? json_decode( $response, true ) : $response;
+  $ch = curl_init( "$server?api=$endpoint" );
+  curl_setopt( $ch, CURLOPT_VERBOSE, 1 );
+  curl_setopt( $ch, CURLOPT_STDERR, fopen( 'curl.log', 'w' ) );
+  curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, $method );
+  curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+  curl_setopt( $ch, CURLOPT_HTTPHEADER, $header );
+  curl_setopt( $ch, CURLOPT_POSTFIELDS, $content );
+  curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+  $response = curl_exec($ch);
 
-  while ( count( $http_response_header ) > 0 ) {
-    $v = array_shift( $http_response_header );
-    if ( substr( $v, 0, 5 ) !== "HTTP/" ) break;
-    $status_line = $v;
+  if ( $response === false || curl_error( $ch ) ) {
+    $err = curl_error( $ch );
+    curl_close( $ch );
+    throw new HTTPException( "Request failed: Could not connect ($method $endpoint)", $err );
   }
-  if ( ! isset( $status_line ) ) throw new HTTPException( "Request failed: Could not read status code ($method $endpoint)", $serverdata );
-  $status = intval( explode( " ", $status_line )[1] ); // HTTP/1.1 200 OK => 200
-  if ( $status !== 200 || ( $json && !is_array( $serverdata ) ) ) throw new HTTPException( "Request failed: $status_line ($method $endpoint)", $serverdata );
+  $serverdata = $json ? json_decode( $response, true ) : $response;
+  $status = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+  curl_close( $ch  );
+  if ( $status !== 200 || ( $json && !is_array( $serverdata ) ) ) throw new HTTPException( "Request failed: $status ($method $endpoint)", $serverdata );
   return $serverdata;
 }
 
