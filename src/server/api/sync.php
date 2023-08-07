@@ -7,9 +7,9 @@ function api_sync($msg) {
   global $last_sync;
   global $famfields, $ortefields;
 
+  $synctime = floatval( $conn->query( $last_sync )->fetchColumn() );
   $recordsFam = "SELECT * FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync";
   $recordsOrte = "SELECT * FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync";
-  $synctime = floatval( $conn->query( $last_sync )->fetchColumn() );
   if ( $synctime === 0 ) {
     $recordsFam = "SELECT * FROM `familien`";
     $recordsOrte = "SELECT * FROM `orte`";
@@ -39,13 +39,7 @@ function api_sync($msg) {
     $stmt = $conn->query( "(SELECT COALESCE(CONVERT(`val`, datetime)+0, 0) FROM `einstellungen` WHERE `name` = 'last_sync_servertime')" );
     $syncData['sync'] = $stmt->fetchColumn();
 
-    $serverdata = _server_send($server, "list", array(
-      'method'  => 'PUT',
-      'header'  => 'Content-Type: application/json',
-      'content' => json_encode( $syncData ),
-      'timeout' => 10,
-      'ignore_errors' => true,
-    ));
+    $serverdata = server_send( $server, "list", HTTP_PUT, 'Content-Type: application/json', json_encode( $syncData ) );
 
     // update with remote values
     if ( count( $serverdata['familien'] ) > 0 ) {

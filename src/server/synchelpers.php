@@ -36,16 +36,26 @@ function getStaticFiles($dir) {
   }
 }
 
+define( 'HTTP_PUT', 'PUT' );
+define( 'HTTP_GET', 'GET' );
 /** @param string $server
   * @param string $endpoint
-  * @param string[] $http
+  * @param string $method
+  * @param ?string|string[] $header
+  * @param ?string $content
+  * @param ?int $timeout
   * @param ?bool $json
   * @return mixed */
-function _server_send($server, $endpoint, $http, $json = true) {
+function server_send($server, $endpoint, $method, $header = "", $content = "", $timeout = 10, $json = true) {
   $context = stream_context_create( array(
-    'http' => $http,
+    'http' => array(
+      'method'  => $method,
+      'header'  => $header,
+      'content' => $content,
+      'timeout' => $timeout,
+      'ignore_errors' => true,
+    ),
   ) );
-  $method = array_key_exists( 'method', $http ) ? $http['method'] : 'GET';
   $response = @file_get_contents( "$server?api=$endpoint", false, $context );
   if ( $response === false ) throw new Exception( "Request failed: Could not connect ($method $endpoint)" );
   $serverdata = $json ? json_decode( $response, true ) : $response;
@@ -61,14 +71,8 @@ function _server_send($server, $endpoint, $http, $json = true) {
   return $serverdata;
 }
 
-function _upload_file($server, $endpoint, $file) {
-  return _server_send($server, $endpoint, array(
-    'method'  => 'PUT',
-    'header'  => 'Content-Type: application/octet-stream',
-    'content' => file_get_contents($file),
-    'timeout' => 10,
-    'ignore_errors' => true,
-  ));
+function upload_file($server, $endpoint, $file) {
+  return server_send( $server, $endpoint, HTTP_PUT, 'Content-Type: application/octet-stream', file_get_contents($file) );
 }
 
 $famfields = array(

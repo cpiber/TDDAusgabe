@@ -36,16 +36,8 @@ function page_sync() {
     exit;
   }
   try {
-    $context = stream_context_create( array(
-      'http' => array(
-        'method'  => 'GET',
-        'timeout' => 5,
-        'ignore_errors' => true,
-      ),
-    ) );
-    $response = @file_get_contents( $server . "?api=status&sync=" . $sync, false, $context );
-    $serverdata = json_decode( $response, true );
-    if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] !== 'success' ) throw new Exception( "Error communicating with server: $response" );
+    $serverdata = server_send( $server, "status&sync=$sync", HTTP_GET ); 
+    if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] !== 'success' ) throw new Exception( "Error communicating with server: $serverdata" );
   } catch ( Exception $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
     exit;
