@@ -5,13 +5,12 @@ session_start();
 
 function login($out = true) {
   global $conn;
-  global $servername;
 
   if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
     $username = $_SESSION['user'];
     $password = $_SESSION['pw'];
 
-    $conn = connectdb($servername, $username, $password);
+    $conn = connectdb(DB_SERVER, $username, $password);
     if ( is_string($conn) ) {
       if ( $out ) connect_error($conn);
       return $conn;

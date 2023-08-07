@@ -1,6 +1,6 @@
 <?php
 
-define( 'DB_SERVER', '127.0.0.1:3307' );
+define( 'DB_SERVER', 'localhost' );
 define( 'DB_NAME', 'tdd_server' );
 define( 'DB_USER', 'tdd' );
 define( 'DB_PW', 'tdd2003' );

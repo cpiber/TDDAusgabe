@@ -1,6 +1,6 @@
 <?php
 
-global $conn, $servername;
+global $conn;
 
 function setup_error($sql, $error) {
   return sprintf( "<a class=\"pointer\" onclick=\"this.nextSibling.style.display='block'\">Mehr</a><span style=\"display:none;font-size:90%%;padding:6px;\">%s: <strong>%s</strong><br></span></p>", $sql, $error );
@@ -152,6 +152,7 @@ if ( isset( $_GET['setup'] ) ) {
 
   if ( isset( $_SESSION['user'] ) && isset( $_SESSION['pw'] ) ) {
     try {
+      $servername = DB_SERVER;
       $conn = new PDO( "mysql:host=$servername;charset=utf8", $_SESSION['user'], $_SESSION['pw'] );
       
       // set the PDO error mode to exception
