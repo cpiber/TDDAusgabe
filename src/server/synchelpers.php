@@ -36,6 +36,30 @@ function getStaticFiles($dir) {
   }
 }
 
+/** @param PDO $conn
+  * @param string[] $files */
+function queryMissingFiles($conn, $files) {
+  $missing = array();
+  $stmt = $conn->query( "SELECT DISTINCT `ProfilePic` FROM `familien` WHERE `ProfilePic` IS NOT NULL AND `ProfilePic` <> ''
+                   UNION SELECT DISTINCT `ProfilePic2` FROM `familien` WHERE `ProfilePic2` IS NOT NULL AND `ProfilePic2` <> ''" );
+  while ( ( $res = $stmt->fetchColumn() ) !== false ) {
+    if ( !in_array( $res, $files ) ) $missing[] = $res;
+  }
+  return $missing;
+}
+
+class HTTPException extends \Exception {
+  public $serverdata;
+
+  public function __construct($message, $data) {
+    $json = is_string( $data ) ? json_decode( $data, true ) : $data;
+    if ( $json !== null ) $data = $json;
+    if ( is_array( $json ) && array_key_exists( 'message', $json ) ) $message .= ". Fehler: {$json['message']}";
+    parent::__construct($message);
+    $this->serverdata = $data;
+  }
+}
+
 define( 'HTTP_PUT', 'PUT' );
 define( 'HTTP_GET', 'GET' );
 /** @param string $server
@@ -57,7 +81,7 @@ function server_send($server, $endpoint, $method, $header = "", $content = "", $
     ),
   ) );
   $response = @file_get_contents( "$server?api=$endpoint", false, $context );
-  if ( $response === false ) throw new Exception( "Request failed: Could not connect ($method $endpoint)" );
+  if ( $response === false ) throw new HTTPException( "Request failed: Could not connect ($method $endpoint)", $response );
   $serverdata = $json ? json_decode( $response, true ) : $response;
 
   while ( count( $http_response_header ) > 0 ) {
@@ -65,9 +89,9 @@ function server_send($server, $endpoint, $method, $header = "", $content = "", $
     if ( substr( $v, 0, 5 ) !== "HTTP/" ) break;
     $status_line = $v;
   }
-  if ( ! isset( $status_line ) ) throw new Exception( "Request failed: Could not read status code ($method $endpoint)" );
+  if ( ! isset( $status_line ) ) throw new HTTPException( "Request failed: Could not read status code ($method $endpoint)", $serverdata );
   $status = intval( explode( " ", $status_line )[1] ); // HTTP/1.1 200 OK => 200
-  if ( $status !== 200 || ( $json && !is_array( $serverdata ) ) ) throw new Exception( "Request failed: $status_line ($method $endpoint)" );
+  if ( $status !== 200 || ( $json && !is_array( $serverdata ) ) ) throw new HTTPException( "Request failed: $status_line ($method $endpoint)", $serverdata );
   return $serverdata;
 }
 

@@ -21,6 +21,7 @@ jQuery(($) => {
         let prom = $.Deferred().resolve().promise();
         const toupload = data['static_upload'] as string[];
         const todownload = data['static_download'] as string[];
+        let hasFailed = false;
         createSuccess(`Upload: 0/${toupload.length}, Download: 0/${todownload.length}`);
         for (let i = 0; i < toupload.length; i++) {
           const j = i;
@@ -30,9 +31,10 @@ jQuery(($) => {
         for (let i = 0; i < todownload.length; i++) {
           const j = i;
           prom = prom.then(() => download_file(todownload[i]))
+            .catch(() => hasFailed = true) // ignore failed downloads. there will be an alert, continue with the rest, but don't reload
             .then(() => createSuccess(`Upload: ${toupload.length}/${toupload.length}, Download: ${j+1}/${todownload.length}`));
         }
-        return prom;
+        return prom.then(() => (hasFailed ? $.Deferred().reject() : $.Deferred().resolve()).promise());
       }).then(() => {
         createSuccess('Werte werden neu geladen...');
         const href = window.location.href.replace(/[&?]synced=true(&|$)/,'$1');

@@ -13,6 +13,10 @@ function api_sync_upload($msg) {
     upload_file( $server, "static&file=$file", STATIC_DIR . $file );
 
     $msg['status'] = 'success';
+  } catch ( HTTPException $e ) {
+    $msg['status'] = 'failure';
+    $msg['message'] = $e->getMessage();
+    $msg['server'] = $e->serverdata;
   } catch ( Exception $e ) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();

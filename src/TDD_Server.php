@@ -81,6 +81,13 @@ try {
     'status' => 'error',
     'message' => $e->getMessage(),
   ) );
+} catch ( HTTPException $e ) {
+  http_response_code( 500 );
+  echo json_encode( array(
+    'status' => 'error',
+    'message' => $e->getMessage(),
+    'remote' => $e->serverdata,
+  ) );
 } catch ( Exception $e ) {
   http_response_code( 500 );
   echo json_encode( array(

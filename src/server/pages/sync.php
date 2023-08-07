@@ -38,6 +38,9 @@ function page_sync() {
   try {
     $serverdata = server_send( $server, "status&sync=$sync", HTTP_GET ); 
     if ( is_null( $serverdata ) || !is_array( $serverdata ) || $serverdata['status'] !== 'success' ) throw new Exception( "Error communicating with server: $serverdata" );
+  } catch ( HTTPException $e ) {
+    echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage() . " - " . strval( $e->serverdata );
+    exit;
   } catch ( Exception $e ) {
     echo "<i>Fehler bei abrufen des Servers</i><br>" . $e->getMessage();
     exit;

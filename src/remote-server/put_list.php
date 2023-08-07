@@ -59,14 +59,13 @@ function put_list($conn) {
   
   $syncData['sync'] = $conn->query( "SELECT NOW()+0" )->fetchColumn();
   $conn->commit();
-  $conn->exec( "UNLOCK TABLES" );
 
+  // now figure out which files we still need, only if the client has them
   $files = getStaticFiles( STATIC_DIR );
-  $filesBoth = array_intersect( $files, $body['static'] );
-  $filesRequest = array_diff( $body['static'], $filesBoth );
-  $filesDownload = array_diff( $files, $filesBoth );
-  $syncData['static_upload'] = array_values( $filesRequest );
-  $syncData['static_download'] = array_values( $filesDownload );
+  $filesRequest = array_intersect( $body['static'], queryMissingFiles( $conn, $files ) );
+  $syncData['static_upload'] = $filesRequest;
+
+  $conn->exec( "UNLOCK TABLES" );
 
   $syncData['status'] = 'success';
   echo json_encode( $syncData );

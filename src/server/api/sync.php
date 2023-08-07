@@ -54,12 +54,7 @@ function api_sync($msg) {
     }
     $msg['numfam'] = count( $serverdata['familien'] );
     $msg['numorte'] = count( $serverdata['orte'] );
-    $msg['numupload'] = count( $serverdata['static_upload'] );
-    $msg['numdownload'] = count( $serverdata['static_download'] );
-    // NOTE: Workaround because for some reason all further requests fail, maybe Nginx problem?
-    $msg['static_upload'] = $serverdata['static_upload'];
-    $msg['static_download'] = $serverdata['static_download'];
-    
+
     // delete deleted values, both uploaded by us and downloaded by server
     $famIds = array_map( function ($v) { return $v['ID']; }, $syncData['familien'] );
     $orteIds = array_map( function ($v) { return $v['ID']; }, $syncData['orte'] );
@@ -82,6 +77,16 @@ function api_sync($msg) {
     $stmt = $conn->prepare( "UPDATE `einstellungen` SET `val` = NOW()+0 WHERE `name` = 'last_sync'" );
     $stmt->execute();
     $conn->commit();
+
+    // figure out which files we need to download
+    $files = getStaticFiles( STATIC_DIR );
+    $filesDownload = queryMissingFiles( $conn, $files );
+    $msg['numupload'] = count( $serverdata['static_upload'] );
+    $msg['numdownload'] = count( $filesDownload );
+    // NOTE: Workaround because for some reason all further requests fail, maybe Nginx problem?
+    $msg['static_upload'] = $serverdata['static_upload'];
+    $msg['static_download'] = $filesDownload;
+    
     $conn->exec( "UNLOCK TABLES" );
 
     $msg['status'] = 'success';
@@ -89,6 +94,7 @@ function api_sync($msg) {
     if ( $conn->inTransaction() ) $conn->rollBack();
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
+    if ( $e instanceof HTTPException ) $serverdata = $e->serverdata;
     if ( isset( $serverdata ) && isset( $serverdata['message'] ) ) $msg['message'] .= " ({$serverdata['message']})";
     else if ( isset( $response ) ) $msg['message'] .= " ($response)";
     if ( isset( $serverdata ) ) $msg['server'] = $serverdata;

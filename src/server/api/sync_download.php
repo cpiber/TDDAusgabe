@@ -16,6 +16,10 @@ function api_sync_download($msg) {
     if ( fclose( $f ) === false ) throw new UnexpectedValueException( "Could not close file $file" );
 
     $msg['status'] = 'success';
+  } catch ( HTTPException $e ) {
+    $msg['status'] = 'failure';
+    $msg['message'] = $e->getMessage();
+    $msg['server'] = $e->serverdata;
   } catch ( Exception $e ) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
