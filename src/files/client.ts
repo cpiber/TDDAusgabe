@@ -139,7 +139,7 @@ jQuery(($) => {
 
 
   // register handlers
-  $(window).resize(tabH).on('keydown', keyboardHandler);
+  $(window).on('resize', tabH).on('keydown', keyboardHandler);
 
   const $cardwindow = $($cardframe.get(0).contentWindow);
   const $cardbody = $($cardframe.get(0).contentWindow.document.body);
@@ -162,16 +162,16 @@ jQuery(($) => {
     if ($current_tab.attr('href') !== '#tab2') return true;
     if (!event.altKey) return true;
     switch (event.key) {
-      case 'n': $os_select.eq(0).focus(); break;
-      case 'm': $os_select.eq(1).focus(); break;
-      case 'j': ausgabeFam.elems.Karte.focus(); break;
-      case 'k': ausgabeFam.elems.Schulden.focus(); break;
-      case 'l': ausgabeFam.elems.Notizen.focus(); break;
-      case 'u': ausgabeFam.$anwesend.click(); break;
-      case 'i': ausgabeFam.$geldverg.click(); break;
-      case 'o': ausgabeFam.$schuldbeg.click(); break;
-      case ',': $search_field.focus().select(); break;
-      case '.': $search_button.click(); break;
+      case 'n': $os_select.eq(0).trigger('focus'); break;
+      case 'm': $os_select.eq(1).trigger('focus'); break;
+      case 'j': ausgabeFam.elems.Karte.trigger('focus'); break;
+      case 'k': ausgabeFam.elems.Schulden.trigger('focus'); break;
+      case 'l': ausgabeFam.elems.Notizen.trigger('focus'); break;
+      case 'u': ausgabeFam.$anwesend.trigger('click'); break;
+      case 'i': ausgabeFam.$geldverg.trigger('click'); break;
+      case 'o': ausgabeFam.$schuldbeg.trigger('click'); break;
+      case ',': $search_field.trigger('focus').trigger('select'); break;
+      case '.': $search_button.trigger('click'); break;
       case 'ArrowUp': prev(); break;
       case 'ArrowDown': next(); break;
       default: return true;
@@ -182,7 +182,7 @@ jQuery(($) => {
     let i = +$f.find('.selected').data('idx');
     if (i === 0) return;
     if (!i) i = 0;
-    const $n = $f.children(':not([value="-1"])').eq(i - 1).click();
+    const $n = $f.children(':not([value="-1"])').eq(i - 1).trigger('click');
     const h = $list.innerHeight();
     const cs = $list.scrollTop();
     const ns = $n.position().top;
@@ -193,13 +193,13 @@ jQuery(($) => {
     if (!i && i !== 0) i = -1;
     const $n = $f.children(':not([value="-1"])').eq(i + 1);
     if ($n.length) {
-      $n.click();
+      $n.trigger('click');
       const h = $list.innerHeight();
       const cs = $list.scrollTop();
       const ns = $n.position().top - h + $n.innerHeight();
       if (ns > cs || ns < cs + h) $list.scrollTop(ns);
     } else {
-      $more.click();
+      $more.trigger('click');
     }
   }
 });

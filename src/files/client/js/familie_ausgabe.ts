@@ -232,9 +232,6 @@ export class ausgabeFam extends familie {
     ausgabeFam.$schuldbeg.prop('checked', false);
 
     this.errors();
-
-    // if (!ausgabeFam.errors.already && !ausgabeFam.errors.money_now && !lToday)
-    //   ausgabeFam.$anwesend.click();
   }
 
   errors() {

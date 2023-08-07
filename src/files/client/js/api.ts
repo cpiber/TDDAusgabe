@@ -18,7 +18,7 @@ export default function request(endpoint: string, errorText: string = '', data: 
 function _request(url: string, errorText: string, data_in: { [key: string]: any }): apiRequest {
   if (loginpromise) return login(url, errorText, data_in);
   return $.post(url, data_in)
-    .then((data: apiData, status: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
+    .then((data: apiData, _: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
       if (!data) {
         console.error(`${errorText} :: Failed request (NO DATA)`, data);
         alert(`
@@ -39,7 +39,7 @@ function _request(url: string, errorText: string, data_in: { [key: string]: any 
       console.debug(`${errorText} :: Failed request (API denied): ${data.message}`, data);
       console.debug(`Opening login dialog to retry...`);
       return login(url, errorText, data_in);
-    }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
+    }, (jqXHR: JQueryXHR, _: JQuery.Ajax.ErrorTextStatus, error: string) => {
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`${errorText} :: Failed request (Network)`, jqXHR.status, error, msg);
       alert(`
@@ -64,7 +64,7 @@ function _upload(url: string, errorText: string, data: FormData): apiRequest {
     processData: false,
     contentType: false,
   })
-    .then((data: apiData, status: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
+    .then((data: apiData, _: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
       if (!data) {
         console.error(`${errorText} :: Failed request (NO DATA)`, data);
         alert(`
@@ -84,7 +84,7 @@ function _upload(url: string, errorText: string, data: FormData): apiRequest {
       }
       console.debug(`${errorText} :: Failed request (API denied): ${data.message}`, data);
       return $.Deferred().reject(jqXHR, errorText, data).promise() as apiRequest;
-    }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
+    }, (jqXHR: JQueryXHR, _: JQuery.Ajax.ErrorTextStatus, error: string) => {
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`${errorText} :: Failed request (Network)`, jqXHR.status, error, msg);
       alert(`
@@ -123,7 +123,7 @@ $(() => {
     $.post('?api=login', {
       username: $un.val(),
       password: $pw.val(),
-    }).then((data: apiData, status: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
+    }).then((data: apiData, _: JQuery.Ajax.SuccessTextStatus, __: JQueryXHR) => {
       if (data && data.status === "success") {
         console.debug('Logged in');
         loginpromise.resolve();
@@ -138,7 +138,7 @@ $(() => {
       $un.val('');
       $pw.val('');
       $inputs.prop('disabled', false);
-    }, (jqXHR: JQueryXHR, status: JQuery.Ajax.ErrorTextStatus, error: string) => {
+    }, (jqXHR: JQueryXHR, _: JQuery.Ajax.ErrorTextStatus, error: string) => {
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`Login Failed (Network)`, jqXHR.status, error, msg);
       console.log('Reload in 5 sec');
