@@ -387,100 +387,79 @@ if ( isset( $_GET['setup'] ) ) {
     case 4:
       echo "<h1>Step 4: Misc</h1><br>";
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP PROCEDURE IF EXISTS resetFamNum;" );
         $conn->exec( $proc_resetFamNum );
-        $conn->commit();
         echo "<p>Prozedur `resetFamNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `resetFamNum`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP FUNCTION IF EXISTS newNum;" );
         $conn->exec( $proc_newNum );
-        $conn->commit();
         echo "<p>Prozedur `newNum` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `newNum`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP FUNCTION IF EXISTS newGruppe;" );
         $conn->exec( $proc_newGruppe );
-        $conn->commit();
         echo "<p>Prozedur `newGruppe` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `newGruppe`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP FUNCTION IF EXISTS splitStr;" );
         $conn->exec( $proc_splitStr );
-        $conn->commit();
         echo "<p>Prozedur `splitStr` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen der Prozedur `splitStr`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP TRIGGER IF EXISTS familienInsert;" );
         $conn->exec( $trigger_familienInsert );
-        $conn->commit();
         echo "<p>Trigger `familienInsert` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen des Triggers `familienInsert`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP TRIGGER IF EXISTS familienUpdate;" );
         $conn->exec( $trigger_familienUpdate );
-        $conn->commit();
         echo "<p>Trigger `familienUpdate` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen des Triggers `familienUpdate`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
       try {
-        $conn->beginTransaction();
         $conn->exec( "USE tdd" );
         
         $conn->exec( "DROP TRIGGER IF EXISTS orteUpdate;" );
         $conn->exec( $trigger_orteUpdate );
-        $conn->commit();
         echo "<p>Trigger `orteUpdate` erfolgreich angelegt.</p>";
         
       } catch ( PDOException $e ) {
-        $conn->rollBack();
         echo "<p>Fehler beim Anlegen des Triggers `orteUpdate`.<br>";
         echo setup_error( "", $e->getMessage() );
       }
