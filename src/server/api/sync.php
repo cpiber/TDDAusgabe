@@ -8,8 +8,8 @@ function api_sync($msg) {
   global $famfields, $ortefields;
 
   $synctime = floatval( $conn->query( $last_sync )->fetchColumn() );
-  $recordsFam = "SELECT * FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync";
-  $recordsOrte = "SELECT * FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync";
+  $recordsFam = "SELECT * FROM `familien` WHERE `deleted` = 1 OR `last_update` > $last_sync OR `last_update` = '0000-00-00'";
+  $recordsOrte = "SELECT * FROM `orte` WHERE `deleted` = 1 OR `last_update` > $last_sync OR `last_update` = '0000-00-00'";
   if ( $synctime === 0 ) {
     $recordsFam = "SELECT * FROM `familien`";
     $recordsOrte = "SELECT * FROM `orte`";

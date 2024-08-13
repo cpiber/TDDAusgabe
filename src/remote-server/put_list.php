@@ -20,8 +20,8 @@ function put_list($conn) {
   $syncData = array();
 
   $last_sync = floatval( $body['sync'] );
-  $recordsFam = "SELECT * FROM `familien` WHERE `last_update` > $last_sync";
-  $recordsOrte = "SELECT * FROM `orte` WHERE `last_update` > $last_sync";
+  $recordsFam = "SELECT * FROM `familien` WHERE `last_update` > $last_sync OR `last_update` = '0000-00-00'";
+  $recordsOrte = "SELECT * FROM `orte` WHERE `last_update` > $last_sync OR `last_update` = '0000-00-00'";
   if ( $last_sync === 0 ) {
     $recordsFam = "SELECT * FROM `familien`";
     $recordsOrte = "SELECT * FROM `orte`";
