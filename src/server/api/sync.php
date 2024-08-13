@@ -26,7 +26,6 @@ function api_sync($msg) {
     $key = $conn->query( "SELECT `Val` FROM `einstellungen` WHERE `Name` = 'SyncKey'" )->fetchColumn();
 
     // TODO: batches?
-    
     $stmt = $conn->query( $recordsFam );
     $stmt->setFetchMode( PDO::FETCH_ASSOC );
     $syncData['familien'] = $stmt->fetchAll();

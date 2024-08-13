@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="clear"></div>
-        <p style="text-align: right;">2018-2023 by Constantin, Version <?php echo VERSION; ?><br />
+        <p style="text-align: right;">2018-2024 by Constantin, Version <?php echo VERSION; ?><br />
           <a href="https://github.com/cpiber/TDDAusgabe" target="_blank">Github</a></p>
       </div>
       <div id="tab2">
