@@ -1,3 +1,5 @@
+@use "colors";
+
 
 .header {
   font-size: 32px;
@@ -5,7 +7,7 @@
   
   height: 100px;
   width: 100%;
-  background-color: $lighterred;
+  background-color: colors.$lighterred;
   
   margin: 8px 0;
   

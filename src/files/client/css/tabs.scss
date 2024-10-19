@@ -1,3 +1,4 @@
+@use "colors";
 
 
 #tab1 {
@@ -26,7 +27,7 @@ ul.tab {
       left: 12px;
       right: 12px;
       height: 1.5px;
-      background-color: $darkgray;
+      background-color: colors.$darkgray;
     }
 
     a {
@@ -34,17 +35,17 @@ ul.tab {
       position: relative;
 
       padding: 12px 15px;
-      background-color: $mediumgray;
+      background-color: colors.$mediumgray;
       text-decoration: none;
       
       border-style: solid solid hidden solid;
-      border-color: $darkgray;
+      border-color: colors.$darkgray;
       border-width: 2px;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
 
       &.selected {
-        background-color: $mediumred;
+        background-color: colors.$mediumred;
         
         &::after {
           content: '';
@@ -53,15 +54,15 @@ ul.tab {
           left: 0;
           right: 0;
           height: 3px;
-          background-color: $mediumred;
-          background: linear-gradient($mediumred, $darkred);
+          background-color: colors.$mediumred;
+          background: linear-gradient(colors.$mediumred, colors.$darkred);
           z-index: 1;
         }
       }
 
       &:not(.selected) {
         &:hover, &:focus {
-          background-color: $darkgray;
+          background-color: colors.$darkgray;
         }
       }
     }
@@ -70,7 +71,7 @@ ul.tab {
 
 
 #tab-body {
-  border: 2px solid $darkgray;
+  border: 2px solid colors.$darkgray;
   
   margin: 0;
   padding: 8px;
@@ -80,7 +81,7 @@ ul.tab {
   position: relative;
   overflow: auto;
   
-  background-color: $darkred;
+  background-color: colors.$darkred;
 
   > div {
     animation: opac 0.5s;
@@ -127,15 +128,15 @@ ul.tab {
 
   .err-box:not(:empty) {
     display: block;
-    border: 2px solid $lightgray;
-    background-color: $lightestred;
+    border: 2px solid colors.$lightgray;
+    background-color: colors.$lightestred;
     padding: 2px 4px;
   }
 
   .warn-box:not(:empty) {
     display: block;
-    border: 2px solid $lightgray;
-    background-color: $darkerorange;
+    border: 2px solid colors.$lightgray;
+    background-color: colors.$darkerorange;
     padding: 2px 4px;
   }
 
@@ -153,17 +154,17 @@ ul.tab {
     border-radius: 50%;
 
     &-red, &-orange, &-green {
-      border: 1px solid $lightgray;
+      border: 1px solid colors.$lightgray;
     }
 
     &-red {
-      background-color: $lightestred;
+      background-color: colors.$lightestred;
     }
     &-orange {
-      background-color: $darkerorange;
+      background-color: colors.$darkerorange;
     }
     &-green {
-      background-color: $green;
+      background-color: colors.$green;
     }
   }
 
@@ -224,7 +225,7 @@ ul.tab {
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(90deg, $mediumred, $darkred);
+            background: linear-gradient(90deg, colors.$mediumred, colors.$darkred);
           }
         }
       }

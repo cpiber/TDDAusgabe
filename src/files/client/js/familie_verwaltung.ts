@@ -53,7 +53,7 @@ export class verwaltungFam extends familie {
       const cur = this.current;
       if (!cur) return;
       if (!this.elems.Ort.val()) return;
-      if (cur.data.Ort == this.elems.Ort.val()) return;
+      if (cur.data.Ort == +this.elems.Ort.val()) return;
       cur.data.Gruppe = 0;
       cur.data.Num = 0;
       cur.dirty.Gruppe = true;
@@ -64,7 +64,7 @@ export class verwaltungFam extends familie {
     this.elems.Gruppe.on('change', () => {
       const cur = this.current;
       if (!cur) return;
-      if (cur.data.Gruppe == this.elems.Gruppe.val()) return;
+      if (cur.data.Gruppe == +this.elems.Gruppe.val()) return;
       cur.data.Num = 0;
       cur.dirty.Num = true;
       this.elems.Num.val(0);
@@ -226,7 +226,7 @@ class ProfilePictureHelper {
     open_modal(this.$modal);
     const close = () => dfd.reject('close');
     this.$modal.one('close', close);
-    
+
     this.setStream().catch(err => dfd.reject(err));
     navigator.mediaDevices.removeEventListener('devicechange', this.setStream);
     navigator.mediaDevices.addEventListener('devicechange', this.setStream);

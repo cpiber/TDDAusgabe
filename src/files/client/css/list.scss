@@ -1,7 +1,9 @@
+@use "colors";
+
 
 .select-list {
-  border: 1px solid $dark;
-  background-color: $lightestgray;
+  border: 1px solid colors.$dark;
+  background-color: colors.$lightestgray;
   color: initial;
   box-sizing: border-box;
   overflow: auto;
@@ -30,12 +32,12 @@
       font-size: 14px;
 
       &.selected, &.expanded {
-        background-color: $mediumgray;
+        background-color: colors.$mediumgray;
       }
 
       &.expanded {
         border-width: 0.5px;
-        border-color: $darkgray;
+        border-color: colors.$darkgray;
         border-top-style: solid;
         border-bottom-style: solid;
       }
@@ -45,7 +47,7 @@
           cursor: pointer;
 
           &:not(.selected):not(.expanded) {
-            background-color: $lightergray;
+            background-color: colors.$lightergray;
           }
         }
       }

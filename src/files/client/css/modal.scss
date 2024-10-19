@@ -1,3 +1,5 @@
+@use "colors";
+
 
 .modal {
   display: none;
@@ -17,11 +19,11 @@
 
   &-content {
     position: relative;
-    background-color: $whitish;
+    background-color: colors.$whitish;
     color: black;
     margin: 100px auto;
     padding: 0;
-    border: 1px solid $darkgray;
+    border: 1px solid colors.$darkgray;
     width: 80%;
     max-width: 900px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
@@ -40,7 +42,7 @@
 
   &-header {
     padding: 2px 16px;
-    background-color: $lightestred_var;
+    background-color: colors.$lightestred_var;
     color: white;
     min-height: 35px;
   }
@@ -50,7 +52,7 @@
   }
   &-footer {
     padding: 2px 16px;
-    background-color: $lightestred_var;
+    background-color: colors.$lightestred_var;
     color: white;
   }
 
@@ -61,7 +63,7 @@
     font-weight: bold;
 
     &:hover, &:focus {
-      color: $dark;
+      color: colors.$dark;
       text-decoration: none;
       cursor: pointer;
     }

@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "colors";
+
 
 html, body {
   margin: 0;
@@ -38,8 +41,8 @@ a, a[href], a:visited {
 }
 
 html.main {
-  background-color: $pink;
-  color: $whitish;
+  background-color: colors.$pink;
+  color: colors.$whitish;
 }
 
 .body {
@@ -65,7 +68,7 @@ html.main {
 
 .link {
   text-decoration: underline;
-  color: $lightergray;
+  color: colors.$lightergray;
   font-style: italic;
 
   &:hover, &:focus {
@@ -83,28 +86,28 @@ html.main {
 }
 
 .button {
-  border: 1px solid $lightgray;
+  border: 1px solid colors.$lightgray;
   border-radius: 3px;
 
-  background-color: $lightestgray;
+  background-color: colors.$lightestgray;
   padding: 6px;
 
   color: black;
   text-decoration: none;
 
   &:disabled {
-    background-color: $mediumgray;
-    color: $dark;
+    background-color: colors.$mediumgray;
+    color: colors.$dark;
   }
 
   &:not(:disabled) {
     cursor: pointer;
 
     &:hover {
-      background-color: $lightergray;
+      background-color: colors.$lightergray;
     }
     &:focus:not(.no-active):not([target]) {
-      background-color: $darkgray;
+      background-color: colors.$darkgray;
     }
   }
 
@@ -149,16 +152,16 @@ button {
 
 
 p.code, code.code {
-  @at-root &, span.code {
-    font-family: monospace;
-    background-color: $mediumgray;
-    padding: 0 0.15em;
-  }
-
   display: block;
   padding: inherit;
   padding-left: 18px; padding-right: 18px;
   margin-bottom: 0;
+
+  @at-root &, span.code {
+    font-family: monospace;
+    background-color: colors.$mediumgray;
+    padding: 0 0.15em;
+  }
 
   & + & {
     margin-top: 0;
@@ -212,8 +215,8 @@ input[type="checkbox"] {
   border: 1px solid;
 
   &.success {
-    background: lighten($green, 8%);
-    border-color: darken($green, 1%);
-    color: $whitish;
+    background: color.adjust(colors.$green, $lightness: 8%);
+    border-color: color.adjust(colors.$green, $lightness: -1%);
+    color: colors.$whitish;
   }
 }
