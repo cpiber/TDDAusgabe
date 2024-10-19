@@ -173,6 +173,7 @@
             <p><label>Adresse:<br /><textarea class="w100p Adresse"></textarea></label></p>
             <p><label>Telefonnummer:<br /><input class="w100p Telefonnummer" type="text" placeholder="Telefon" /></label></p>
             <br />
+            <p class="confirm" style="display: none;"><label><input class="confirm" type="checkbox" /> Name existiert bereits. Trotzdem speichern?</label></p>
             <p><button class="w100p save" data-save="Speichern" data-create="Anlegen"></button></p>
             <p><button class="w100p delete">Löschen</button></p>
           </div>

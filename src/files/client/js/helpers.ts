@@ -141,3 +141,12 @@ export function timeout(ms: number = 0) {
   setTimeout(() => { dfd.resolve(); }, ms);
   return dfd.promise();
 }
+
+// debounce input
+export function debounce<T extends any[]>(func: (...args: T) => void, timeout = 300) {
+  let timer: number;
+  return (...args: T) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}

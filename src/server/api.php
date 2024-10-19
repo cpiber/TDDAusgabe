@@ -42,6 +42,7 @@ require "api/familie_update.php";
 require "api/familie_insert.php";
 require "api/familie_delete.php";
 require "api/familie_profile.php";
+require "api/familie_check.php";
 
 require "api/get_orte.php";
 require "api/ort_update.php";
@@ -84,7 +85,10 @@ if ( array_key_exists( 'api', $_GET ) ) {
     case "familie/profile":
       api_getfampicture($msg);
       break;
-    
+    case "familie/check":
+      api_checkfamname($msg);
+      break;
+
     case "ort":
       api_getorte($msg);
       break;

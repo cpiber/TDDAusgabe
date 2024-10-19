@@ -15,10 +15,16 @@ export default function request(endpoint: string, errorText: string = '', data: 
   const url = `?api=${encodeURIComponent(endpoint)}`;
   return _request(url, errorText, data);
 }
+export function request2(endpoint: string, data: { [key: string]: any } = undefined): JQuery.jqXHR {
+  const url = `?api=${encodeURIComponent(endpoint)}`;
+  return $.post(url, data);
+}
 function _request(url: string, errorText: string, data_in: { [key: string]: any }): apiRequest {
   if (loginpromise) return login(url, errorText, data_in);
-  return $.post(url, data_in)
-    .then((data: apiData, _: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
+  return handleXHR($.post(url, data_in), url, errorText, data_in);
+}
+export function handleXHR(xhr: JQuery.jqXHR, url: string, errorText: string, data_in: { [key: string]: any }): apiRequest {
+  return xhr.then((data: apiData, _: JQuery.Ajax.SuccessTextStatus, jqXHR: JQueryXHR) => {
       if (!data) {
         console.error(`${errorText} :: Failed request (NO DATA)`, data);
         alert(`
@@ -40,6 +46,7 @@ function _request(url: string, errorText: string, data_in: { [key: string]: any 
       console.debug(`Opening login dialog to retry...`);
       return login(url, errorText, data_in);
     }, (jqXHR: JQueryXHR, _: JQuery.Ajax.ErrorTextStatus, error: string) => {
+      if (error === "abort") return;
       const msg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(`${errorText} :: Failed request (Network)`, jqXHR.status, error, msg);
       alert(`

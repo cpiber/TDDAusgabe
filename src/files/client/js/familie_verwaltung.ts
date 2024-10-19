@@ -1,9 +1,9 @@
 import $ from 'jquery';
-import request, { apiData, getImageUrl, upload } from "./api";
+import request, { apiData, getImageUrl, handleXHR, request2, upload } from "./api";
 import { familie } from "./familie";
 import { ausgabeFam } from "./familie_ausgabe";
 import { fam, famelems } from "./familie_interfaces";
-import { clone, close_modal, open_modal, timeout } from "./helpers";
+import { clone, close_modal, debounce, open_modal, timeout } from "./helpers";
 import { orte } from "./settings";
 
 export class verwaltungFam extends familie {
@@ -16,7 +16,7 @@ export class verwaltungFam extends familie {
   static $button_updateProf2: JQuery<HTMLInputElement>;
   static $button_deleteProf1: JQuery<HTMLInputElement>;
   static $button_deleteProf2: JQuery<HTMLInputElement>;
-  static current: verwaltungFam = null;
+  static $check_nameconfirm: JQuery<HTMLInputElement>;  static current: verwaltungFam = null;
   static search: () => void = null;
 
   constructor(data: any = null) {
@@ -49,6 +49,35 @@ export class verwaltungFam extends familie {
     for (const prop in this.elems) {
       this.elems[prop] = $inputs.filter(`.${prop}`);
     }
+    let runningXHR: JQuery.jqXHR = undefined;
+    this.elems.Name.on('keydown', () => {
+      this.$button_save.prop('disabled', true);
+    });
+    this.elems.Name.on('keydown', debounce(() => {
+      const cur = this.current;
+      if (!cur) return;
+      this.$button_save.prop('disabled', true);
+      this.$check_nameconfirm.parents('p.confirm').css('display', 'none');
+      if (runningXHR) runningXHR.abort();
+      if (!this.elems.Name.val()) return;
+      runningXHR = request2('familie/check', {
+        name: this.elems.Name.val(),
+        ID: this.current.data.ID,
+      });
+      handleXHR(runningXHR, 'familie/check', 'Fehler beim Überprüfen des Namens', {
+        name: this.elems.Name.val(),
+        ID: this.current.data.ID,
+      }).then((data: apiData) => {
+        if (data.data.duplicate) {
+          this.$button_save.prop('disabled', true);
+          this.$check_nameconfirm.prop('checked', false);
+          this.$check_nameconfirm.parents('p.confirm').css('display', '');
+        } else {
+          this.$button_save.prop('disabled', false);
+          this.$check_nameconfirm.parents('p.confirm').css('display', 'none');
+        }
+      });
+    }, 100))
     this.elems.Ort.on('change', () => {
       const cur = this.current;
       if (!cur) return;
@@ -76,6 +105,9 @@ export class verwaltungFam extends familie {
     this.$button_delete = $inputs.filter('.delete').on('click', () => {
       if (!this.current) return;
       this.current.delete();
+    });
+    this.$check_nameconfirm = $inputs.filter('.confirm').on('change', () => {
+      this.$button_save.prop('disabled', !this.$check_nameconfirm.is(":checked"));
     });
     const $list = $('#tab3 .select-list ul');
     $('#tab3 .button-add').on('click', () => {
@@ -133,6 +165,8 @@ export class verwaltungFam extends familie {
 
   show() {
     super.show(verwaltungFam);
+    verwaltungFam.$button_save.prop('disabled', true);
+    verwaltungFam.$check_nameconfirm.parents('p.confirm').css('display', 'none');
 
     verwaltungFam.elems.Ort.trigger('change');
     timeout().then(() => verwaltungFam.elems.Gruppe.val(this.data.Gruppe));
