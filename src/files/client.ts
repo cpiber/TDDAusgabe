@@ -53,7 +53,7 @@ export interface TabElement extends HTMLAnchorElement {
 
 // load window
 jQuery(($) => {
-  $('button, [type="button"]').on('mouseup', function () {
+  $('button, [type="button"]').on('mouseup', function() {
     $(this).trigger('blur'); // remove focus
   });
 
@@ -103,8 +103,8 @@ jQuery(($) => {
   verwaltungFam.clear();
 
   // Logs tab
-  const { info: updateLogInfo, logs: updateLogs } = initLogs();
-  tabLinks.get(3).onOpen = () => { updateLogInfo(); updateLogs(); };
+  const onOpenLogs = initLogs();
+  tabLinks.get(3).onOpen = onOpenLogs;
 
   // Settings tab
   const updateOrte = optionsOrteUpdate(loadOrte);
@@ -134,7 +134,7 @@ jQuery(($) => {
   } else {
     changeTab($tabHs.find(`a[href="${window.location.hash}"]`) as JQuery<TabElement>);
   }
-  $tabHs.on('click', 'a', function () { changeTab($(this)) });
+  $tabHs.on('click', 'a', function() { changeTab($(this)) });
   tabH();
 
 

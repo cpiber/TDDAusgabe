@@ -364,6 +364,26 @@ if ( $ver < DB_VER ) {
     }
   }
 
+  if ( $ver == 11 ) {
+    try {
+      $conn->exec( "SET autocommit = 0" );
+      $conn->beginTransaction();
+
+      $conn->exec( "INSERT INTO `einstellungen` (`Name`, `Val`) VALUES ('LoginPass', '')" );
+
+      $conn->exec( $trigger_familienUpdate );
+      $conn->exec( $trigger_orteUpdate );
+      
+      $conn->commit();
+      $ver = 12;
+
+    } catch ( PDOException $e ) {
+      $conn->rollBack();
+      upgrade_error( 12, $e );
+      $error = true;
+    }
+  }
+
   // write new dbver
   try {
     $conn->exec( "INSERT INTO `einstellungen` (`Name`, `Val`) Values ('Version', $ver) ON DUPLICATE KEY UPDATE `Val` = $ver;" );

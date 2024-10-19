@@ -2,6 +2,36 @@ import $ from 'jquery';
 import request, { apiData } from './api';
 
 export default function init() {
+  const $inp = $('#tab4 .login form, #tab4 .login :input');
+
+  const login = () => {
+    $inp.prop('disabled', true);
+    request('log/login', 'Anmeldung fehlgeschlagen', {
+      pw: $inp.eq(1).val(),
+    }).then(() => {
+      $('#tab4 .login').css('display', 'none');
+      $('#tab4 .actual').css('display', '');
+      inner = initActual();
+      inner.info();
+      inner.logs();
+    }).always(() => {
+      $inp.prop('disabled', false);
+    });
+
+    return false;
+  };
+
+  $inp.eq(0).on('submit', login);
+
+  let inner: { info: () => void, logs: () => void } = undefined;
+  return () => {
+    if (!inner) return;
+    inner.info();
+    inner.logs();
+  };
+}
+
+function initActual() {
   const $inp = $('#tab4 form, #tab4 :input');
   const $info = $('#tab4 .log-info span');
   const info = updateInfo.bind(null, $inp, $info);
@@ -10,7 +40,7 @@ export default function init() {
   const write = (date: Date, index: number) => {
     const str = date.toISOString().replace(/\.[0-9]{3}Z/, "");
     $inp.eq(index).val(str.substring(0, 10));
-    $inp.eq(index + 1).val(str.substring(11, 11+5));
+    $inp.eq(index + 1).val(str.substring(11, 11 + 5));
   }
   const writeDefault = () => {
     let d = new Date();
@@ -21,12 +51,20 @@ export default function init() {
     d.setUTCMonth(d.getUTCMonth() + 1); d.setUTCDate(0); d.setUTCHours(23); d.setUTCMinutes(59); d.setUTCSeconds(59);
     write(d, 3);
   };
+  const close = () => {
+    request('log/login', 'Abmeldung fehlgeschlagen', {
+      pw: '',
+    });
+    $('#tab4 .login').css('display', '');
+    $('#tab4 .actual').css('display', 'none');
+  };
 
   writeDefault();
   $inp.eq(0).on('submit', info);
   $inp.filter('.month').on('click', () => { writeDefault(); info(); });
   $inp.filter('.page').on('change', logs);
   $inp.filter('.refresh').on('click', logs);
+  $inp.filter('.close').on('click', close);
 
   return { info, logs };
 }

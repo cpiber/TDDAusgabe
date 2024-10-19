@@ -21,6 +21,8 @@ function api_getloginfo($msg) {
       $where = sprintf( " WHERE %s", implode( " AND ", $parts ) );
     
     $sql = "SELECT SUM(IF(`Type`='money',`Val`,0)) AS `Money`, SUM(IF(`Type`='attendance',1,0)) AS `Families`, SUM(IF(`Type`='attendance',`P1`,0)) AS `Adults`, SUM(IF(`Type`='attendance',`P2`,0)) AS `Children` FROM logsalt $where";
+    if ( !isset( $_SESSION['allow_logs'] ) || !$_SESSION['allow_logs'] ) throw new InvalidArgumentException( 'Not allowed' );
+
     $stmt = $conn->prepare( $sql );
     $stmt->setFetchMode( PDO::FETCH_ASSOC );
     $stmt->execute( $data );
@@ -32,6 +34,9 @@ function api_getloginfo($msg) {
 
     $msg['status'] = 'success';
   } catch ( PDOException $e ) {
+    $msg['status'] = 'failure';
+    $msg['message'] = $e->getMessage();
+  } catch ( InvalidArgumentException $e ) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
   }

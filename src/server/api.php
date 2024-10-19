@@ -53,6 +53,7 @@ require "api/setting_update.php";
 
 require "api/get_logs.php";
 require "api/get_loginfo.php";
+require "api/log_login.php";
 
 require "api/action_backupdb.php";
 require "api/action_resetfam.php";
@@ -109,6 +110,9 @@ if ( array_key_exists( 'api', $_GET ) ) {
       break;
     case "log/info":
       api_getloginfo($msg);
+      break;
+    case "log/login":
+      api_loglogin($msg);
       break;
 
     case "action/backupDB":

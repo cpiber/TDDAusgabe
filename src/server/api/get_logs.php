@@ -26,6 +26,8 @@ function api_getlogs($msg) {
     $where = implode( " AND ", $parts );
     $sql = "SELECT * FROM `logs` WHERE $where";
 
+    if ( !isset( $_SESSION['allow_logs'] ) || !$_SESSION['allow_logs'] ) throw new InvalidArgumentException( 'Not allowed' );
+
     if ( $pagesize != -1 ) {
       $pagesstmt = $conn->prepare( "SELECT COUNT(*) AS `cnt` FROM `logs` WHERE $where" );
       $pagesstmt->setFetchMode( PDO::FETCH_ASSOC );
@@ -44,6 +46,9 @@ function api_getlogs($msg) {
 
     $msg['status'] = 'success';
   } catch ( PDOException $e ) {
+    $msg['status'] = 'failure';
+    $msg['message'] = $e->getMessage();
+  } catch ( InvalidArgumentException $e ) {
     $msg['status'] = 'failure';
     $msg['message'] = $e->getMessage();
   }

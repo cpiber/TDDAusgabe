@@ -192,25 +192,37 @@
       </div>
       <div id="tab4">
         <h1>Logs</h1>
-        <h2>Einnahmen</h2>
-        <form><p>
-    <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
-          <button type="submit">Go</button>
-          &nbsp; &nbsp;
-          <button type="button" class="month">Monat</button>
-        </p></form>
-        <p class="log-info">
-          Einnahmen im angegebenen Bereich: <span class="money"></span>€<br />
-          Personen im angegebenen Bereich: <span class="adults"></span> Erwachsene(r), <span class="children"></span> Kind(er) / <span class="families"></span> Familie(n)
-        </p>
-        <p>&nbsp;</p>
-        <h2>Kompletter Log</h2>
-        <div class="log"></div>
-        <p>
-          Seite <select class="page"></select>
-          &nbsp; &nbsp;
-          <button type="button" class="refresh">Aktualisieren</button>
-        </p>
+        <div class="actual" style="display: none;">
+          <h2>Einnahmen</h2>
+          <form><p>
+            <input type="date" /><input type="time" /> - <input type="date" /><input type="time" />
+            <button type="submit">Go</button>
+            &nbsp; &nbsp;
+            <button type="button" class="month">Monat</button>
+          </p></form>
+          <p class="log-info">
+            Einnahmen im angegebenen Bereich: <span class="money"></span>€<br />
+            Personen im angegebenen Bereich: <span class="adults"></span> Erwachsene(r), <span class="children"></span> Kind(er) / <span class="families"></span> Familie(n)
+          </p>
+          <p>&nbsp;</p>
+          <h2>Kompletter Log</h2>
+          <div class="log"></div>
+          <p>
+            Seite <select class="page"></select>
+            &nbsp; &nbsp;
+            <button type="button" class="refresh">Aktualisieren</button>
+          </p>
+          <p>
+            <button type="button" class="close">Schließen</button>
+          </p>
+        </div>
+        <div class="login">
+          <p>Die Logs beinhalten sensitive Daten. Bitte melden Sie sich an.
+          <form>
+            <label>Nutzer: <input type="password" name="password" /></label>
+            <button type="submit">Go</button>
+          </form>
+        </div>
       </div>
       <div id="tab5">
         <h1>Ein&shy;stel&shy;lungen</h1>
