@@ -9,7 +9,7 @@ if ( DEBUG ) {
 }
 
 
-define( 'VERSION', '2.1.1' );
+define( 'VERSION', '2.1.2' );
 define( 'DB_SERVER', 'localhost' );
 define( 'DB_VER', 12 );
 define( 'STATIC_DIR', __DIR__ . '/static/' );
