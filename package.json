@@ -27,7 +27,7 @@
     "jsbarcode": "^3.11.5",
     "object.values": "^1.1.6",
     "phpinclude": "https://github.com/cpiber/PHPInclude/releases/download/v2.0.1/phpinclude-2.0.1.tgz",
-    "rollup": "^3.23.0",
+    "rollup": "^3.30.0",
     "sass": "^1.62.1",
     "tslib": "^2.5.2",
     "typescript": "^5.0.4"
